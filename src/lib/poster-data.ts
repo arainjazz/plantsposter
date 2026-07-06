@@ -1,16 +1,6 @@
 // Poster is authored in a virtual canvas of 1240 x 1754 (A3 portrait aspect).
-import seasonSpring from "@/assets/banrihua/season-spring.jpg";
-import seasonSummer from "@/assets/banrihua/season-summer.jpg";
-import seasonAutumn from "@/assets/banrihua/season-autumn.jpg";
-import seasonWinter from "@/assets/banrihua/season-winter.jpg";
-import traitSpine from "@/assets/banrihua/trait-spine.jpg";
-import traitLeaf from "@/assets/banrihua/trait-leaf.jpg";
-import traitHair from "@/assets/banrihua/trait-hair.jpg";
-import traitFlower from "@/assets/banrihua/trait-flower.jpg";
-import simSongaricum from "@/assets/banrihua/sim-songaricum.jpg";
-import simOrdosicum from "@/assets/banrihua/sim-ordosicum.jpg";
-import habitatImg from "@/assets/banrihua/habitat.jpg";
-import humanitiesImg from "@/assets/banrihua/humanities.jpg";
+// All image blocks default to null (dashed placeholder) so users can drop their
+// own art in Canva-style. Use Inspector's upload button to replace any slot.
 
 export const POSTER_W = 1240;
 export const POSTER_H = 1754;
