@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   const [pages, setPages] = useState<PosterPage[]>([
-    { id: "page-1", name: "封面·半日花", blocks: INITIAL_BLOCKS },
+    { id: "page-1", name: "封面·半日花", autoName: false, blocks: INITIAL_BLOCKS },
   ]);
   const [activeId, setActiveId] = useState<string>("page-1");
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
