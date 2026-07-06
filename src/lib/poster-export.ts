@@ -5,8 +5,12 @@ import type { Palette } from "@/lib/poster-ops";
 const FONT_FAMILY: Record<NonNullable<TextBlock["fontFamily"]>, string> = {
   serif: '"Noto Serif SC", "Source Han Serif SC", Georgia, "Songti SC", serif',
   sans: '"Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif',
-  display:
-    '"Noto Serif SC", "Songti SC", "STSong", "Source Han Serif SC", Georgia, serif',
+  display: '"ZCOOL XiaoWei", "Noto Serif SC", "Songti SC", Georgia, serif',
+  kai: '"Ma Shan Zheng", "KaiTi", "STKaiti", cursive',
+  wenkai: '"LXGW WenKai TC", "KaiTi", "STKaiti", serif',
+  mono: '"JetBrains Mono", "Menlo", "Courier New", monospace',
+  playfair: '"Playfair Display", Georgia, serif',
+  inter: '"Inter", "Noto Sans SC", "PingFang SC", sans-serif',
 };
 
 // Cache loaded images by src.
