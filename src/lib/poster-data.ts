@@ -39,6 +39,7 @@ export type PosterPage = {
   id: string;
   name: string;
   blocks: Block[];
+  autoName?: boolean; // if true, title auto-derives from largest text block
 };
 
 export const INITIAL_BLOCKS: Block[] = [
@@ -294,6 +295,7 @@ export function makeEmptyPage(name: string): PosterPage {
   return {
     id: `page-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     name,
+    autoName: true,
     blocks: [
       {
         id: `blank-title-${Date.now()}`,
@@ -311,8 +313,18 @@ export function clonePage(page: PosterPage, name?: string): PosterPage {
   return {
     id: `page-${Date.now()}-${suffix}`,
     name: name ?? `${page.name} 副本`,
+    autoName: page.autoName,
     blocks: page.blocks.map((b) => ({ ...b, id: `${b.id}-c${suffix}` })),
   };
+}
+
+// Pick a human-readable name from the visually dominant text block on a page.
+export function deriveAutoName(blocks: Block[]): string | null {
+  const texts = blocks.filter((b): b is TextBlock => b.type === "text" && !!b.text?.trim());
+  if (!texts.length) return null;
+  const top = [...texts].sort((a, b) => b.fontSize - a.fontSize)[0];
+  const first = top.text.split(/\n/)[0].trim().replace(/\s+/g, "").slice(0, 14);
+  return first || null;
 }
 
 export function blockPatch(blocks: Block[], id: string, patch: Partial<Block>): Block[] {
