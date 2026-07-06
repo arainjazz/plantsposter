@@ -71,6 +71,28 @@ function Editor() {
   function moveBlock(id: string, x: number, y: number) {
     updateActiveBlocks((bs) => bs.map((b) => (b.id === id ? { ...b, x, y } : b)));
   }
+  function resizeBlock(id: string, patch: { x: number; y: number; w: number; h?: number }) {
+    updateActiveBlocks((bs) =>
+      bs.map((b) => {
+        if (b.id !== id) return b;
+        if (b.type === "image") {
+          return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h };
+        }
+        return { ...b, x: patch.x, y: patch.y, w: patch.w };
+      }),
+    );
+  }
+
+  // Auto-rename active page from its dominant title text when autoName is true.
+  useEffect(() => {
+    if (!activePage.autoName) return;
+    const suggested = deriveAutoName(activePage.blocks);
+    if (suggested && suggested !== activePage.name) {
+      setPages((prev) =>
+        prev.map((p) => (p.id === activePage.id ? { ...p, name: suggested } : p)),
+      );
+    }
+  }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name]);
 
   function apply(ops: Operation[]) {
     const { blocks: nb, palette: np } = applyOperations(blocks, palette, ops);
@@ -107,7 +129,8 @@ function Editor() {
     setSelectedId(null);
   }
   function renamePage(id: string, name: string) {
-    setPages((prev) => prev.map((p) => (p.id === id ? { ...p, name } : p)));
+    // User-typed name freezes autoName so it stops overriding.
+    setPages((prev) => prev.map((p) => (p.id === id ? { ...p, name, autoName: false } : p)));
   }
 
   return (
@@ -165,6 +188,7 @@ function Editor() {
           selectedId={selectedId}
           onSelect={setSelectedId}
           onMove={moveBlock}
+          onResize={resizeBlock}
           displayWidth={displayWidth}
         />
       </main>
