@@ -18,7 +18,7 @@ export type TextBlock = {
   color: string;
   fontWeight: 400 | 500 | 600 | 700 | 800;
   fontStyle?: "normal" | "italic";
-  fontFamily?: "serif" | "sans" | "display";
+  fontFamily?: "serif" | "sans" | "display" | "kai" | "wenkai" | "mono" | "playfair" | "inter";
   align?: "left" | "center" | "right";
   lineHeight?: number;
   letterSpacing?: number;
