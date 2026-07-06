@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PosterCanvas } from "@/components/PosterCanvas";
 import { Inspector } from "@/components/Inspector";
 import { AiChat } from "@/components/AiChat";
 import { ExportMenu } from "@/components/ExportMenu";
 import { PageTabs } from "@/components/PageTabs";
+import { BlockContextMenu } from "@/components/BlockContextMenu";
+import { ImageSearchModal } from "@/components/ImageSearchModal";
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
 import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage, deriveAutoName } from "@/lib/poster-data";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
@@ -13,7 +15,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "半日花 · 植物图鉴 AI 编辑器" },
-      { name: "description", content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多页面、AI 编辑与多格式导出。" },
+      { name: "description", content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多选、AI 编辑与多格式导出。" },
       { property: "og:title", content: "半日花 · 植物图鉴 AI 编辑器" },
       { property: "og:description", content: "多页面、可拖动、AI 驱动的植物海报编辑器。" },
     ],
@@ -21,15 +23,44 @@ export const Route = createFileRoute("/")({
   component: Editor,
 });
 
+async function urlToBase64(src: string): Promise<{ mimeType: string; data: string } | null> {
+  try {
+    if (src.startsWith("data:")) {
+      const [meta, b64] = src.split(",");
+      const mime = /data:(.*?);base64/.exec(meta)?.[1] ?? "image/png";
+      return { mimeType: mime, data: b64 };
+    }
+    const r = await fetch(src);
+    const blob = await r.blob();
+    return await new Promise((resolve) => {
+      const fr = new FileReader();
+      fr.onload = () => {
+        const s = String(fr.result);
+        const [meta, b64] = s.split(",");
+        const mime = /data:(.*?);base64/.exec(meta)?.[1] ?? blob.type;
+        resolve({ mimeType: mime, data: b64 });
+      };
+      fr.readAsDataURL(blob);
+    });
+  } catch { return null; }
+}
+
 function Editor() {
   const [pages, setPages] = useState<PosterPage[]>([
     { id: "page-1", name: "封面·半日花", autoName: false, blocks: INITIAL_BLOCKS },
   ]);
   const [activeId, setActiveId] = useState<string>("page-1");
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const stageRef = useRef<HTMLDivElement>(null);
   const [displayWidth, setDisplayWidth] = useState(600);
+
+  // context menu + search modal
+  const [ctxMenu, setCtxMenu] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [searchFor, setSearchFor] = useState<string | null>(null);
+  const [busyMsg, setBusyMsg] = useState<string | null>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+  const uploadTargetRef = useRef<string | null>(null);
 
   useEffect(() => {
     const el = stageRef.current;
@@ -47,52 +78,69 @@ function Editor() {
   const activePage = pages.find((p) => p.id === activeId) ?? pages[0];
   const blocks = activePage.blocks;
 
-  const selected = useMemo(
-    () => blocks.find((b) => b.id === selectedId) ?? null,
-    [blocks, selectedId],
-  );
+  const soloSelected = useMemo<Block | null>(() => {
+    if (selectedIds.size !== 1) return null;
+    const id = Array.from(selectedIds)[0];
+    return blocks.find((b) => b.id === id) ?? null;
+  }, [blocks, selectedIds]);
 
-  function updateActiveBlocks(mapFn: (bs: Block[]) => Block[]) {
+  const updateActiveBlocks = useCallback((mapFn: (bs: Block[]) => Block[]) => {
     setPages((prev) => prev.map((p) => (p.id === activeId ? { ...p, blocks: mapFn(p.blocks) } : p)));
-  }
+  }, [activeId]);
 
   function patchSelected(patch: Partial<TextBlock>) {
-    if (!selectedId) return;
-    updateActiveBlocks((bs) =>
-      bs.map((b) => (b.id === selectedId && b.type === "text" ? { ...b, ...patch } : b)),
-    );
+    if (!soloSelected) return;
+    const id = soloSelected.id;
+    updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "text" ? { ...b, ...patch } : b)));
   }
+  const setImageAt = useCallback((id: string, src: string | null) => {
+    updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "image" ? ({ ...(b as ImageBlock), src }) : b)));
+  }, [updateActiveBlocks]);
   function setImage(src: string | null) {
-    if (!selectedId) return;
-    updateActiveBlocks((bs) =>
-      bs.map((b) => (b.id === selectedId && b.type === "image" ? ({ ...(b as ImageBlock), src }) : b)),
-    );
+    if (!soloSelected || soloSelected.type !== "image") return;
+    setImageAt(soloSelected.id, src);
   }
-  function moveBlock(id: string, x: number, y: number) {
-    updateActiveBlocks((bs) => bs.map((b) => (b.id === id ? { ...b, x, y } : b)));
+  function moveMany(dx: number, dy: number) {
+    if (selectedIds.size === 0) return;
+    updateActiveBlocks((bs) => bs.map((b) => selectedIds.has(b.id) ? { ...b, x: b.x + dx, y: b.y + dy } : b));
   }
   function resizeBlock(id: string, patch: { x: number; y: number; w: number; h?: number }) {
     updateActiveBlocks((bs) =>
       bs.map((b) => {
         if (b.id !== id) return b;
-        if (b.type === "image") {
-          return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h };
-        }
+        if (b.type === "image") return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h };
         return { ...b, x: patch.x, y: patch.y, w: patch.w };
       }),
     );
   }
+  function selectIds(ids: string[]) { setSelectedIds(new Set(ids)); }
 
-  // Auto-rename active page from its dominant title text when autoName is true.
+  // Auto-rename
   useEffect(() => {
     if (!activePage.autoName) return;
     const suggested = deriveAutoName(activePage.blocks);
     if (suggested && suggested !== activePage.name) {
-      setPages((prev) =>
-        prev.map((p) => (p.id === activePage.id ? { ...p, name: suggested } : p)),
-      );
+      setPages((prev) => prev.map((p) => (p.id === activePage.id ? { ...p, name: suggested } : p)));
     }
   }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name]);
+
+  // Delete key
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedIds.size > 0) {
+        e.preventDefault();
+        updateActiveBlocks((bs) => bs.filter((b) => !selectedIds.has(b.id)));
+        setSelectedIds(new Set());
+      } else if (e.key === "Escape") {
+        setSelectedIds(new Set());
+        setCtxMenu(null);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedIds, updateActiveBlocks]);
 
   function apply(ops: Operation[]) {
     const { blocks: nb, palette: np } = applyOperations(blocks, palette, ops);
@@ -105,7 +153,7 @@ function Editor() {
     const p = makeEmptyPage(`新页面 ${pages.length + 1}`);
     setPages((prev) => [...prev, p]);
     setActiveId(p.id);
-    setSelectedId(null);
+    setSelectedIds(new Set());
   }
   function duplicatePage(id: string) {
     const src = pages.find((p) => p.id === id);
@@ -118,7 +166,7 @@ function Editor() {
       return out;
     });
     setActiveId(c.id);
-    setSelectedId(null);
+    setSelectedIds(new Set());
   }
   function deletePage(id: string) {
     setPages((prev) => {
@@ -126,11 +174,43 @@ function Editor() {
       if (id === activeId && out.length > 0) setActiveId(out[0].id);
       return out;
     });
-    setSelectedId(null);
+    setSelectedIds(new Set());
   }
   function renamePage(id: string, name: string) {
-    // User-typed name freezes autoName so it stops overriding.
     setPages((prev) => prev.map((p) => (p.id === id ? { ...p, name, autoName: false } : p)));
+  }
+
+  // ── image ops from context menu ─────────────────────────
+  function openContextMenu(id: string, x: number, y: number) {
+    setCtxMenu({ id, x, y });
+  }
+  function triggerUpload(id: string) {
+    uploadTargetRef.current = id;
+    uploadInputRef.current?.click();
+  }
+  async function removeBackground(id: string) {
+    const block = blocks.find((b) => b.id === id);
+    if (!block || block.type !== "image" || !block.src) return;
+    setBusyMsg("正在去除背景（AI）...");
+    try {
+      const ref = await urlToBase64(block.src);
+      if (!ref) { setBusyMsg(null); alert("无法读取图像"); return; }
+      const r = await fetch("/api/gen-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: "Remove the background completely. Output ONLY the main subject on a fully transparent background. Preserve fine edges, hair, and leaf detail. PNG with alpha channel.",
+          reference: ref,
+        }),
+      });
+      const j = await r.json() as { dataUrl?: string; error?: string };
+      if (j.dataUrl) setImageAt(id, j.dataUrl);
+      else alert(j.error || "去背景失败");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "去背景失败");
+    } finally {
+      setBusyMsg(null);
+    }
   }
 
   return (
@@ -145,78 +225,109 @@ function Editor() {
         color: "#222",
       }}
     >
-      {/* Header */}
-      <header
-        style={{
-          gridColumn: "1 / -1",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 20px",
-          background: "white",
-          borderBottom: "1px solid #e5e5e5",
-          gap: 16,
-        }}
-      >
+      <header style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", padding: "0 20px", background: "white", borderBottom: "1px solid #e5e5e5", gap: 16 }}>
         <div style={{ fontWeight: 700, fontSize: 15 }}>🌾 Ordos Plantspedia · Editor</div>
         <div style={{ color: "#888", fontSize: 12 }}>
-          半日花 Helianthemum songaricum ｜ A3 竖版 ｜ {pages.length} 页
+          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · 拖拽框选
         </div>
         <div style={{ marginLeft: "auto" }}>
           <ExportMenu pages={pages} activePageId={activeId} palette={palette} />
         </div>
       </header>
 
-      {/* Left: AI chat */}
       <aside style={{ borderRight: "1px solid #e5e5e5", background: "white" }}>
         <AiChat
           blocks={blocks}
-          selectedImageId={selected?.type === "image" ? selected.id : null}
+          selectedImageId={soloSelected?.type === "image" ? soloSelected.id : null}
           onApplyOperations={apply}
         />
       </aside>
 
-      {/* Center: poster canvas */}
       <main
         ref={stageRef}
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          overflow: "auto",
-          padding: 24,
-        }}
+        style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", overflow: "auto", padding: 24 }}
       >
         <PosterCanvas
           blocks={blocks}
           palette={palette}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onMove={moveBlock}
+          selectedIds={selectedIds}
+          onSelectIds={selectIds}
+          onMoveMany={moveMany}
           onResize={resizeBlock}
+          onImageContextMenu={openContextMenu}
           displayWidth={displayWidth}
         />
       </main>
 
-      {/* Right: inspector */}
       <aside style={{ borderLeft: "1px solid #e5e5e5", background: "white", overflowY: "auto" }}>
         <div style={{ padding: "12px 14px", borderBottom: "1px solid #eee", fontSize: 13, fontWeight: 600 }}>
-          属性面板
+          属性面板 {selectedIds.size > 1 ? `（已选 ${selectedIds.size} 个，仅显示单选属性）` : ""}
         </div>
-        <Inspector block={selected} onChange={patchSelected} onChangeImage={setImage} />
+        <Inspector block={soloSelected} onChange={patchSelected} onChangeImage={setImage} />
       </aside>
 
-      {/* Bottom: page tabs — spans all columns */}
       <div style={{ gridColumn: "1 / -1" }}>
         <PageTabs
           pages={pages}
           activeId={activeId}
-          onSelect={(id) => { setActiveId(id); setSelectedId(null); }}
+          onSelect={(id) => { setActiveId(id); setSelectedIds(new Set()); }}
           onAdd={addPage}
           onDuplicate={duplicatePage}
           onDelete={deletePage}
           onRename={renamePage}
         />
       </div>
+
+      {/* Hidden file input for context-menu uploads */}
+      <input
+        ref={uploadInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          const id = uploadTargetRef.current;
+          e.target.value = "";
+          if (!f || !id) return;
+          const fr = new FileReader();
+          fr.onload = () => setImageAt(id, String(fr.result));
+          fr.readAsDataURL(f);
+        }}
+      />
+
+      {ctxMenu && (() => {
+        const b = blocks.find((x) => x.id === ctxMenu.id);
+        const hasImage = b?.type === "image" && !!b.src;
+        return (
+          <BlockContextMenu
+            x={ctxMenu.x} y={ctxMenu.y}
+            hasImage={hasImage}
+            onClose={() => setCtxMenu(null)}
+            onUpload={() => triggerUpload(ctxMenu.id)}
+            onSearch={() => setSearchFor(ctxMenu.id)}
+            onRemoveBg={() => removeBackground(ctxMenu.id)}
+            onClear={() => setImageAt(ctxMenu.id, null)}
+          />
+        );
+      })()}
+
+      {searchFor && (
+        <ImageSearchModal
+          initialQuery={(blocks.find((b) => b.id === searchFor) as ImageBlock | undefined)?.label ?? ""}
+          onClose={() => setSearchFor(null)}
+          onPick={(url) => { setImageAt(searchFor, url); setSearchFor(null); }}
+        />
+      )}
+
+      {busyMsg && (
+        <div style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200,
+          color: "white", fontSize: 15,
+        }}>
+          {busyMsg}
+        </div>
+      )}
     </div>
   );
 }
