@@ -201,6 +201,25 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
             </option>
           ))}
         </select>
+        <select
+          value={imgModel}
+          onChange={(e) => pickImgModel(e.target.value)}
+          style={{
+            fontSize: 11,
+            padding: "3px 6px",
+            border: "1px solid #ddd",
+            borderRadius: 4,
+            background: "white",
+            maxWidth: 180,
+          }}
+          title="图像生成模型（用于🖼️生成配图）"
+        >
+          {IMAGE_MODELS.map((m) => (
+            <option key={m.id} value={m.id}>
+              🖼 {m.label}
+            </option>
+          ))}
+        </select>
       </div>
       <div
         style={{
@@ -301,6 +320,25 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
             fontFamily: "inherit",
           }}
         />
+        <button
+          onClick={generateImage}
+          disabled={loading || !input.trim()}
+          title={selectedImageId ? `生成图并填入「${selectedImageId}」` : "先在画布选中一个图片框"}
+          style={{
+            padding: "0 10px",
+            height: 46,
+            background: selectedImageId ? "#b0692b" : "#c9b7a3",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: loading || !input.trim() ? "not-allowed" : "pointer",
+            fontSize: 13,
+            opacity: loading || !input.trim() ? 0.6 : 1,
+            whiteSpace: "nowrap",
+          }}
+        >
+          🖼️ 生成配图
+        </button>
         <button
           onClick={send}
           disabled={loading || (!input.trim() && !image)}
