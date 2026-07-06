@@ -115,6 +115,7 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
       ]);
     } finally {
       setLoading(false);
+    }
   }
 
   async function generateImage() {
@@ -166,7 +167,6 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
     } finally {
       setLoading(false);
     }
-  }
   }
 
   return (
