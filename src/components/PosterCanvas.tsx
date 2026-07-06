@@ -1,6 +1,6 @@
 import { Block, TextBlock, ImageBlock, POSTER_H, POSTER_W } from "@/lib/poster-data";
 import type { Palette } from "@/lib/poster-ops";
-import { CSSProperties } from "react";
+import { CSSProperties, useRef } from "react";
 
 const FAMILY: Record<string, string> = {
   serif: '"Noto Serif SC", "Source Han Serif SC", Georgia, "Songti SC", serif',
@@ -14,16 +14,53 @@ type Props = {
   palette: Palette;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
-  displayWidth: number; // css px width of rendered canvas
+  onMove: (id: string, x: number, y: number) => void;
+  displayWidth: number;
 };
 
-export function PosterCanvas({ blocks, palette, selectedId, onSelect, displayWidth }: Props) {
+export function PosterCanvas({ blocks, palette, selectedId, onSelect, onMove, displayWidth }: Props) {
   const scale = displayWidth / POSTER_W;
   const height = POSTER_H * scale;
+  const dragRef = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+  } | null>(null);
+
+  function startDrag(e: React.PointerEvent, b: Block) {
+    e.stopPropagation();
+    onSelect(b.id);
+    (e.target as Element).setPointerCapture(e.pointerId);
+    dragRef.current = {
+      id: b.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: b.x,
+      origY: b.y,
+    };
+  }
+  function onDrag(e: React.PointerEvent) {
+    const d = dragRef.current;
+    if (!d) return;
+    const dx = (e.clientX - d.startX) / scale;
+    const dy = (e.clientY - d.startY) / scale;
+    onMove(d.id, Math.round(d.origX + dx), Math.round(d.origY + dy));
+  }
+  function endDrag(e: React.PointerEvent) {
+    if (dragRef.current) {
+      try { (e.target as Element).releasePointerCapture(e.pointerId); } catch {}
+    }
+    dragRef.current = null;
+  }
 
   return (
     <div
       onClick={() => onSelect(null)}
+      onPointerMove={onDrag}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       style={{
         width: displayWidth,
         height,
@@ -46,20 +83,9 @@ export function PosterCanvas({ blocks, palette, selectedId, onSelect, displayWid
       >
         {blocks.map((b) =>
           b.type === "text" ? (
-            <TextEl
-              key={b.id}
-              block={b}
-              selected={selectedId === b.id}
-              onSelect={(id) => onSelect(id)}
-            />
+            <TextEl key={b.id} block={b} selected={selectedId === b.id} onPointerDown={(e) => startDrag(e, b)} />
           ) : (
-            <ImageEl
-              key={b.id}
-              block={b}
-              palette={palette}
-              selected={selectedId === b.id}
-              onSelect={(id) => onSelect(id)}
-            />
+            <ImageEl key={b.id} block={b} palette={palette} selected={selectedId === b.id} onPointerDown={(e) => startDrag(e, b)} />
           ),
         )}
       </div>
@@ -70,11 +96,11 @@ export function PosterCanvas({ blocks, palette, selectedId, onSelect, displayWid
 function TextEl({
   block,
   selected,
-  onSelect,
+  onPointerDown,
 }: {
   block: TextBlock;
   selected: boolean;
-  onSelect: (id: string) => void;
+  onPointerDown: (e: React.PointerEvent) => void;
 }) {
   const style: CSSProperties = {
     position: "absolute",
@@ -91,19 +117,15 @@ function TextEl({
     letterSpacing: block.letterSpacing ? `${block.letterSpacing}px` : undefined,
     textTransform: block.textTransform,
     whiteSpace: "pre-wrap",
-    cursor: "pointer",
+    cursor: "move",
+    userSelect: "none",
+    touchAction: "none",
     outline: selected ? "2px solid #4c8dff" : "none",
     outlineOffset: 4,
     borderRadius: 2,
   };
   return (
-    <div
-      style={style}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(block.id);
-      }}
-    >
+    <div style={style} onPointerDown={onPointerDown} onClick={(e) => e.stopPropagation()}>
       {block.text}
     </div>
   );
@@ -113,27 +135,25 @@ function ImageEl({
   block,
   palette,
   selected,
-  onSelect,
+  onPointerDown,
 }: {
   block: ImageBlock;
   palette: Palette;
   selected: boolean;
-  onSelect: (id: string) => void;
+  onPointerDown: (e: React.PointerEvent) => void;
 }) {
   return (
     <div
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(block.id);
-      }}
+      onPointerDown={onPointerDown}
+      onClick={(e) => e.stopPropagation()}
       style={{
         position: "absolute",
         left: block.x,
         top: block.y,
         width: block.w,
         height: block.h,
-        border: "2px dashed rgba(0,0,0,0.2)",
-        background: "rgba(0,0,0,0.03)",
+        border: block.src ? "none" : "2px dashed rgba(0,0,0,0.2)",
+        background: block.src ? "transparent" : "rgba(0,0,0,0.03)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -141,13 +161,21 @@ function ImageEl({
         fontFamily: FAMILY.serif,
         fontStyle: "italic",
         fontSize: 16,
-        cursor: "pointer",
+        cursor: "move",
+        userSelect: "none",
+        touchAction: "none",
         outline: selected ? "2px solid #4c8dff" : "none",
         outlineOffset: 4,
+        overflow: "hidden",
       }}
     >
       {block.src ? (
-        <img src={block.src} alt={block.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <img
+          src={block.src}
+          alt={block.label}
+          draggable={false}
+          style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
+        />
       ) : (
         block.label
       )}
