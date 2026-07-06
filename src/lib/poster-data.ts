@@ -102,13 +102,13 @@ export const INITIAL_BLOCKS: Block[] = [
 
   // 4 season images (new)
   { id: "season-img-1", type: "image", x: 720, y: 300, w: 105, h: 78,
-    src: seasonSpring, label: "春·new shoots" },
+    src: null, label: "春·new shoots" },
   { id: "season-img-2", type: "image", x: 835, y: 300, w: 105, h: 78,
-    src: seasonSummer, label: "夏·yellow bloom" },
+    src: null, label: "夏·yellow bloom" },
   { id: "season-img-3", type: "image", x: 950, y: 300, w: 105, h: 78,
-    src: seasonAutumn, label: "秋·seed capsule" },
+    src: null, label: "秋·seed capsule" },
   { id: "season-img-4", type: "image", x: 1065, y: 300, w: 105, h: 78,
-    src: seasonWinter, label: "冬·woody cushion" },
+    src: null, label: "冬·woody cushion" },
 
   { id: "season-1-cn", type: "text", x: 720, y: 388, w: 105, align: "center",
     text: "春", fontSize: 20, color: POSTER_INK, fontWeight: 700, fontFamily: "display" },
@@ -154,7 +154,7 @@ export const INITIAL_BLOCKS: Block[] = [
 
   // 4 trait images (new) + shifted titles/bodies
   { id: "trait-img-1", type: "image", x: 720, y: 875, w: 60, h: 60,
-    src: traitSpine, label: "刺状枝端" },
+    src: null, label: "刺状枝端" },
   { id: "trait-1-title", type: "text", x: 790, y: 878, w: 160,
     text: "刺状枝端", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-1-body", type: "text", x: 790, y: 902, w: 160,
@@ -162,7 +162,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.4 },
 
   { id: "trait-img-2", type: "image", x: 960, y: 875, w: 60, h: 60,
-    src: traitLeaf, label: "微小反卷叶" },
+    src: null, label: "微小反卷叶" },
   { id: "trait-2-title", type: "text", x: 1030, y: 878, w: 160,
     text: "微小反卷叶", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-2-body", type: "text", x: 1030, y: 902, w: 160,
@@ -170,7 +170,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.4 },
 
   { id: "trait-img-3", type: "image", x: 720, y: 955, w: 60, h: 60,
-    src: traitHair, label: "白色短柔毛" },
+    src: null, label: "白色短柔毛" },
   { id: "trait-3-title", type: "text", x: 790, y: 958, w: 160,
     text: "白色短柔毛", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-3-body", type: "text", x: 790, y: 982, w: 160,
@@ -178,7 +178,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.4 },
 
   { id: "trait-img-4", type: "image", x: 960, y: 955, w: 60, h: 60,
-    src: traitFlower, label: "顶生黄色单花" },
+    src: null, label: "顶生黄色单花" },
   { id: "trait-4-title", type: "text", x: 1030, y: 958, w: 160,
     text: "顶生黄色单花", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-4-body", type: "text", x: 1030, y: 982, w: 160,
@@ -213,7 +213,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 12, color: POSTER_INK, fontWeight: 600, fontFamily: "sans" },
 
   { id: "sim-img-1", type: "image", x: 60, y: 1470, w: 75, h: 95,
-    src: simSongaricum, label: "H. songaricum" },
+    src: null, label: "H. songaricum" },
   { id: "sim-1-title", type: "text", x: 145, y: 1472, w: 210,
     text: "半日花 H. songaricum", fontSize: 12, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "sim-1-body", type: "text", x: 145, y: 1496, w: 210,
@@ -221,7 +221,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.5 },
 
   { id: "sim-img-2", type: "image", x: 380, y: 1470, w: 75, h: 95,
-    src: simOrdosicum, label: "H. ordosicum" },
+    src: null, label: "H. ordosicum" },
   { id: "sim-2-title", type: "text", x: 465, y: 1472, w: 210,
     text: "鄂尔多斯半日花 H. ordosicum", fontSize: 12, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "sim-2-body", type: "text", x: 465, y: 1496, w: 210,
@@ -236,7 +236,7 @@ export const INITIAL_BLOCKS: Block[] = [
     text: "荒漠草原的石质山地与砾坡  rocky hills and gravel slopes",
     fontSize: 13, color: POSTER_INK, fontWeight: 600, fontFamily: "sans" },
   { id: "img-habitat", type: "image", x: 720, y: 1115, w: 460, h: 165,
-    src: habitatImg, label: "典型生境·砾坡" },
+    src: null, label: "典型生境·砾坡" },
   { id: "sec-habitat-body", type: "text", x: 720, y: 1290, w: 460,
     text: "常见于海拔1000–1400m的石质山地、坡地和荒漠草原；在西鄂尔多斯可成为独特荒漠群落的建群种。",
     fontSize: 12, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.5 },
@@ -273,7 +273,7 @@ export const INITIAL_BLOCKS: Block[] = [
 
   // ── Humanities (bottom, with 1 image) ─────────────────────
   { id: "img-humanities", type: "image", x: 60, y: 1605, w: 300, h: 130,
-    src: humanitiesImg, label: "半日花核心区" },
+    src: null, label: "半日花核心区" },
   { id: "sec-hum", type: "text", x: 380, y: 1610, w: 500,
     text: "HUMANITIES · 植 物 人 文", fontSize: 15, color: POSTER_ACCENT,
     fontWeight: 700, fontFamily: "sans", letterSpacing: 2 },
