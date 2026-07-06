@@ -107,9 +107,14 @@ export function Inspector({ block, onChange, onChangeImage }: Props) {
             onChange={(e) => onChange({ fontFamily: e.target.value as TextBlock["fontFamily"] })}
             style={inp}
           >
-            <option value="sans">无衬线</option>
-            <option value="serif">衬线</option>
-            <option value="display">标题衬线</option>
+            <option value="sans">无衬线 · Noto Sans SC</option>
+            <option value="serif">衬线 · Noto Serif SC</option>
+            <option value="display">标题 · ZCOOL XiaoWei</option>
+            <option value="kai">楷体 · Ma Shan Zheng</option>
+            <option value="wenkai">霞鹜文楷 · LXGW WenKai</option>
+            <option value="playfair">Playfair Display</option>
+            <option value="inter">Inter</option>
+            <option value="mono">JetBrains Mono</option>
           </select>
         </Field>
         <Field label="斜体">
