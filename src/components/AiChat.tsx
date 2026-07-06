@@ -115,7 +115,58 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
       ]);
     } finally {
       setLoading(false);
+  }
+
+  async function generateImage() {
+    const text = input.trim();
+    if (!text || loading) return;
+    if (!selectedImageId) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "请先在画布上点选一个图片框，我再把生成的配图放进去。" },
+      ]);
+      return;
     }
+    setInput("");
+    const targetId = selectedImageId;
+    const userLabel = `🖼️ 生成配图 → ${targetId}\n${text}` + (image ? `\n📎 ${image.name}` : "");
+    const nextHistory = [...messages, { role: "user" as const, content: userLabel }];
+    setMessages(nextHistory);
+    setLoading(true);
+    const ref = image;
+    setImage(null);
+    try {
+      const res = await fetch("/api/gen-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: text,
+          model: imgModel,
+          reference: ref ? { mimeType: ref.mimeType, data: ref.data } : null,
+        }),
+      });
+      const data = (await res.json()) as { dataUrl?: string; error?: string; text?: string };
+      if (data.dataUrl) {
+        onApplyOperations([{ type: "set_image", id: targetId, src: data.dataUrl }]);
+        setMessages([
+          ...nextHistory,
+          { role: "assistant", content: `✔ 已生成并放入「${targetId}」${data.text ? `\n\n${data.text}` : ""}` },
+        ]);
+      } else {
+        setMessages([
+          ...nextHistory,
+          { role: "assistant", content: data.error || "生成失败（无图像返回）" },
+        ]);
+      }
+    } catch (err) {
+      setMessages([
+        ...nextHistory,
+        { role: "assistant", content: `请求失败：${err instanceof Error ? err.message : "unknown"}` },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }
   }
 
   return (
