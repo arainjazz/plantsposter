@@ -23,7 +23,8 @@ export type Operation =
       ink?: string;
       accent?: string;
       muted?: string;
-    };
+    }
+  | { type: "set_image"; id: string; src: string };
 
 export type Palette = {
   background: string;
@@ -100,6 +101,12 @@ export function applyOperations(
           else if (c === prev.muted) c = nextPalette.muted;
           return { ...b, color: c };
         });
+        break;
+      }
+      case "set_image": {
+        nextBlocks = nextBlocks.map((b) =>
+          b.id === op.id && b.type === "image" ? { ...b, src: op.src } : b,
+        );
         break;
       }
     }

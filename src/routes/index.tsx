@@ -168,7 +168,11 @@ function Editor() {
 
       {/* Left: AI chat */}
       <aside style={{ borderRight: "1px solid #e5e5e5", background: "white" }}>
-        <AiChat blocks={blocks} onApplyOperations={apply} />
+        <AiChat
+          blocks={blocks}
+          selectedImageId={selected?.type === "image" ? selected.id : null}
+          onApplyOperations={apply}
+        />
       </aside>
 
       {/* Center: poster canvas */}
