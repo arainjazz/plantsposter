@@ -6,7 +6,7 @@ import { AiChat } from "@/components/AiChat";
 import { ExportMenu } from "@/components/ExportMenu";
 import { PageTabs } from "@/components/PageTabs";
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
-import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage } from "@/lib/poster-data";
+import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage, deriveAutoName } from "@/lib/poster-data";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
 
 export const Route = createFileRoute("/")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   const [pages, setPages] = useState<PosterPage[]>([
-    { id: "page-1", name: "封面·半日花", blocks: INITIAL_BLOCKS },
+    { id: "page-1", name: "封面·半日花", autoName: false, blocks: INITIAL_BLOCKS },
   ]);
   const [activeId, setActiveId] = useState<string>("page-1");
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
@@ -71,6 +71,28 @@ function Editor() {
   function moveBlock(id: string, x: number, y: number) {
     updateActiveBlocks((bs) => bs.map((b) => (b.id === id ? { ...b, x, y } : b)));
   }
+  function resizeBlock(id: string, patch: { x: number; y: number; w: number; h?: number }) {
+    updateActiveBlocks((bs) =>
+      bs.map((b) => {
+        if (b.id !== id) return b;
+        if (b.type === "image") {
+          return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h };
+        }
+        return { ...b, x: patch.x, y: patch.y, w: patch.w };
+      }),
+    );
+  }
+
+  // Auto-rename active page from its dominant title text when autoName is true.
+  useEffect(() => {
+    if (!activePage.autoName) return;
+    const suggested = deriveAutoName(activePage.blocks);
+    if (suggested && suggested !== activePage.name) {
+      setPages((prev) =>
+        prev.map((p) => (p.id === activePage.id ? { ...p, name: suggested } : p)),
+      );
+    }
+  }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name]);
 
   function apply(ops: Operation[]) {
     const { blocks: nb, palette: np } = applyOperations(blocks, palette, ops);
@@ -107,7 +129,8 @@ function Editor() {
     setSelectedId(null);
   }
   function renamePage(id: string, name: string) {
-    setPages((prev) => prev.map((p) => (p.id === id ? { ...p, name } : p)));
+    // User-typed name freezes autoName so it stops overriding.
+    setPages((prev) => prev.map((p) => (p.id === id ? { ...p, name, autoName: false } : p)));
   }
 
   return (
@@ -165,6 +188,7 @@ function Editor() {
           selectedId={selectedId}
           onSelect={setSelectedId}
           onMove={moveBlock}
+          onResize={resizeBlock}
           displayWidth={displayWidth}
         />
       </main>

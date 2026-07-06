@@ -1,16 +1,6 @@
 // Poster is authored in a virtual canvas of 1240 x 1754 (A3 portrait aspect).
-import seasonSpring from "@/assets/banrihua/season-spring.jpg";
-import seasonSummer from "@/assets/banrihua/season-summer.jpg";
-import seasonAutumn from "@/assets/banrihua/season-autumn.jpg";
-import seasonWinter from "@/assets/banrihua/season-winter.jpg";
-import traitSpine from "@/assets/banrihua/trait-spine.jpg";
-import traitLeaf from "@/assets/banrihua/trait-leaf.jpg";
-import traitHair from "@/assets/banrihua/trait-hair.jpg";
-import traitFlower from "@/assets/banrihua/trait-flower.jpg";
-import simSongaricum from "@/assets/banrihua/sim-songaricum.jpg";
-import simOrdosicum from "@/assets/banrihua/sim-ordosicum.jpg";
-import habitatImg from "@/assets/banrihua/habitat.jpg";
-import humanitiesImg from "@/assets/banrihua/humanities.jpg";
+// All image blocks default to null (dashed placeholder) so users can drop their
+// own art in Canva-style. Use Inspector's upload button to replace any slot.
 
 export const POSTER_W = 1240;
 export const POSTER_H = 1754;
@@ -49,6 +39,7 @@ export type PosterPage = {
   id: string;
   name: string;
   blocks: Block[];
+  autoName?: boolean; // if true, title auto-derives from largest text block
 };
 
 export const INITIAL_BLOCKS: Block[] = [
@@ -112,13 +103,13 @@ export const INITIAL_BLOCKS: Block[] = [
 
   // 4 season images (new)
   { id: "season-img-1", type: "image", x: 720, y: 300, w: 105, h: 78,
-    src: seasonSpring, label: "春·new shoots" },
+    src: null, label: "春·new shoots" },
   { id: "season-img-2", type: "image", x: 835, y: 300, w: 105, h: 78,
-    src: seasonSummer, label: "夏·yellow bloom" },
+    src: null, label: "夏·yellow bloom" },
   { id: "season-img-3", type: "image", x: 950, y: 300, w: 105, h: 78,
-    src: seasonAutumn, label: "秋·seed capsule" },
+    src: null, label: "秋·seed capsule" },
   { id: "season-img-4", type: "image", x: 1065, y: 300, w: 105, h: 78,
-    src: seasonWinter, label: "冬·woody cushion" },
+    src: null, label: "冬·woody cushion" },
 
   { id: "season-1-cn", type: "text", x: 720, y: 388, w: 105, align: "center",
     text: "春", fontSize: 20, color: POSTER_INK, fontWeight: 700, fontFamily: "display" },
@@ -164,7 +155,7 @@ export const INITIAL_BLOCKS: Block[] = [
 
   // 4 trait images (new) + shifted titles/bodies
   { id: "trait-img-1", type: "image", x: 720, y: 875, w: 60, h: 60,
-    src: traitSpine, label: "刺状枝端" },
+    src: null, label: "刺状枝端" },
   { id: "trait-1-title", type: "text", x: 790, y: 878, w: 160,
     text: "刺状枝端", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-1-body", type: "text", x: 790, y: 902, w: 160,
@@ -172,7 +163,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.4 },
 
   { id: "trait-img-2", type: "image", x: 960, y: 875, w: 60, h: 60,
-    src: traitLeaf, label: "微小反卷叶" },
+    src: null, label: "微小反卷叶" },
   { id: "trait-2-title", type: "text", x: 1030, y: 878, w: 160,
     text: "微小反卷叶", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-2-body", type: "text", x: 1030, y: 902, w: 160,
@@ -180,7 +171,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.4 },
 
   { id: "trait-img-3", type: "image", x: 720, y: 955, w: 60, h: 60,
-    src: traitHair, label: "白色短柔毛" },
+    src: null, label: "白色短柔毛" },
   { id: "trait-3-title", type: "text", x: 790, y: 958, w: 160,
     text: "白色短柔毛", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-3-body", type: "text", x: 790, y: 982, w: 160,
@@ -188,7 +179,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.4 },
 
   { id: "trait-img-4", type: "image", x: 960, y: 955, w: 60, h: 60,
-    src: traitFlower, label: "顶生黄色单花" },
+    src: null, label: "顶生黄色单花" },
   { id: "trait-4-title", type: "text", x: 1030, y: 958, w: 160,
     text: "顶生黄色单花", fontSize: 14, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "trait-4-body", type: "text", x: 1030, y: 982, w: 160,
@@ -223,7 +214,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 12, color: POSTER_INK, fontWeight: 600, fontFamily: "sans" },
 
   { id: "sim-img-1", type: "image", x: 60, y: 1470, w: 75, h: 95,
-    src: simSongaricum, label: "H. songaricum" },
+    src: null, label: "H. songaricum" },
   { id: "sim-1-title", type: "text", x: 145, y: 1472, w: 210,
     text: "半日花 H. songaricum", fontSize: 12, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "sim-1-body", type: "text", x: 145, y: 1496, w: 210,
@@ -231,7 +222,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 10, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.5 },
 
   { id: "sim-img-2", type: "image", x: 380, y: 1470, w: 75, h: 95,
-    src: simOrdosicum, label: "H. ordosicum" },
+    src: null, label: "H. ordosicum" },
   { id: "sim-2-title", type: "text", x: 465, y: 1472, w: 210,
     text: "鄂尔多斯半日花 H. ordosicum", fontSize: 12, color: POSTER_INK, fontWeight: 700, fontFamily: "sans" },
   { id: "sim-2-body", type: "text", x: 465, y: 1496, w: 210,
@@ -246,7 +237,7 @@ export const INITIAL_BLOCKS: Block[] = [
     text: "荒漠草原的石质山地与砾坡  rocky hills and gravel slopes",
     fontSize: 13, color: POSTER_INK, fontWeight: 600, fontFamily: "sans" },
   { id: "img-habitat", type: "image", x: 720, y: 1115, w: 460, h: 165,
-    src: habitatImg, label: "典型生境·砾坡" },
+    src: null, label: "典型生境·砾坡" },
   { id: "sec-habitat-body", type: "text", x: 720, y: 1290, w: 460,
     text: "常见于海拔1000–1400m的石质山地、坡地和荒漠草原；在西鄂尔多斯可成为独特荒漠群落的建群种。",
     fontSize: 12, color: POSTER_INK, fontWeight: 400, fontFamily: "sans", lineHeight: 1.5 },
@@ -283,7 +274,7 @@ export const INITIAL_BLOCKS: Block[] = [
 
   // ── Humanities (bottom, with 1 image) ─────────────────────
   { id: "img-humanities", type: "image", x: 60, y: 1605, w: 300, h: 130,
-    src: humanitiesImg, label: "半日花核心区" },
+    src: null, label: "半日花核心区" },
   { id: "sec-hum", type: "text", x: 380, y: 1610, w: 500,
     text: "HUMANITIES · 植 物 人 文", fontSize: 15, color: POSTER_ACCENT,
     fontWeight: 700, fontFamily: "sans", letterSpacing: 2 },
@@ -304,6 +295,7 @@ export function makeEmptyPage(name: string): PosterPage {
   return {
     id: `page-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     name,
+    autoName: true,
     blocks: [
       {
         id: `blank-title-${Date.now()}`,
@@ -321,8 +313,18 @@ export function clonePage(page: PosterPage, name?: string): PosterPage {
   return {
     id: `page-${Date.now()}-${suffix}`,
     name: name ?? `${page.name} 副本`,
+    autoName: page.autoName,
     blocks: page.blocks.map((b) => ({ ...b, id: `${b.id}-c${suffix}` })),
   };
+}
+
+// Pick a human-readable name from the visually dominant text block on a page.
+export function deriveAutoName(blocks: Block[]): string | null {
+  const texts = blocks.filter((b): b is TextBlock => b.type === "text" && !!b.text?.trim());
+  if (!texts.length) return null;
+  const top = [...texts].sort((a, b) => b.fontSize - a.fontSize)[0];
+  const first = top.text.split(/\n/)[0].trim().replace(/\s+/g, "").slice(0, 14);
+  return first || null;
 }
 
 export function blockPatch(blocks: Block[], id: string, patch: Partial<Block>): Block[] {
