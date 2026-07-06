@@ -1,0 +1,279 @@
+import type { Block, TextBlock, ImageBlock } from "@/lib/poster-data";
+import { POSTER_H, POSTER_W } from "@/lib/poster-data";
+import type { Palette } from "@/lib/poster-ops";
+
+const FONT_FAMILY: Record<NonNullable<TextBlock["fontFamily"]>, string> = {
+  serif: '"Noto Serif SC", "Source Han Serif SC", Georgia, "Songti SC", serif',
+  sans: '"Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif',
+  display:
+    '"Noto Serif SC", "Songti SC", "STSong", "Source Han Serif SC", Georgia, serif',
+};
+
+// ── Render a poster to an off-screen canvas (used by PNG/JPG/PDF export) ──
+export function renderPosterToCanvas(
+  blocks: Block[],
+  palette: Palette,
+  scale = 2,
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = POSTER_W * scale;
+  canvas.height = POSTER_H * scale;
+  const ctx = canvas.getContext("2d")!;
+  ctx.scale(scale, scale);
+
+  // background
+  ctx.fillStyle = palette.background;
+  ctx.fillRect(0, 0, POSTER_W, POSTER_H);
+
+  for (const b of blocks) {
+    if (b.type === "image") {
+      const ib = b as ImageBlock;
+      ctx.fillStyle = "rgba(0,0,0,0.04)";
+      ctx.fillRect(ib.x, ib.y, ib.w, ib.h);
+      ctx.strokeStyle = "rgba(0,0,0,0.15)";
+      ctx.setLineDash([6, 6]);
+      ctx.strokeRect(ib.x, ib.y, ib.w, ib.h);
+      ctx.setLineDash([]);
+      ctx.fillStyle = palette.muted;
+      ctx.font = `italic 14px ${FONT_FAMILY.serif}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(ib.label, ib.x + ib.w / 2, ib.y + ib.h / 2);
+      continue;
+    }
+    const t = b as TextBlock;
+    const family = FONT_FAMILY[t.fontFamily ?? "sans"];
+    const style = t.fontStyle === "italic" ? "italic" : "normal";
+    ctx.fillStyle = t.color;
+    ctx.font = `${style} ${t.fontWeight ?? 400} ${t.fontSize}px ${family}`;
+    ctx.textAlign = (t.align ?? "left") as CanvasTextAlign;
+    ctx.textBaseline = "top";
+
+    const lineHeight = t.fontSize * (t.lineHeight ?? 1.4);
+    const lines = wrapLines(ctx, t.text, t.w, t.letterSpacing ?? 0);
+    let anchorX = t.x;
+    if (t.align === "center") anchorX = t.x + t.w / 2;
+    else if (t.align === "right") anchorX = t.x + t.w;
+    lines.forEach((line, i) => {
+      drawLineWithSpacing(
+        ctx,
+        line,
+        anchorX,
+        t.y + i * lineHeight,
+        t.letterSpacing ?? 0,
+        t.align ?? "left",
+        t.textTransform === "uppercase",
+      );
+    });
+  }
+
+  return canvas;
+}
+
+function wrapLines(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  letterSpacing: number,
+): string[] {
+  const out: string[] = [];
+  for (const paragraph of text.split("\n")) {
+    if (!paragraph) { out.push(""); continue; }
+    // Chinese-friendly: wrap per character when needed.
+    let cur = "";
+    for (const ch of Array.from(paragraph)) {
+      const test = cur + ch;
+      const w = measureWithSpacing(ctx, test, letterSpacing);
+      if (w > maxWidth && cur) {
+        out.push(cur);
+        cur = ch;
+      } else {
+        cur = test;
+      }
+    }
+    if (cur) out.push(cur);
+  }
+  return out;
+}
+
+function measureWithSpacing(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  spacing: number,
+): number {
+  if (!spacing) return ctx.measureText(text).width;
+  const chars = Array.from(text);
+  return chars.reduce((acc, c) => acc + ctx.measureText(c).width, 0) + spacing * Math.max(0, chars.length - 1);
+}
+
+function drawLineWithSpacing(
+  ctx: CanvasRenderingContext2D,
+  line: string,
+  anchorX: number,
+  y: number,
+  spacing: number,
+  align: "left" | "center" | "right",
+  upper: boolean,
+) {
+  const text = upper ? line.toUpperCase() : line;
+  if (!spacing) {
+    ctx.fillText(text, anchorX, y);
+    return;
+  }
+  const chars = Array.from(text);
+  const width = measureWithSpacing(ctx, text, spacing);
+  let x = anchorX;
+  if (align === "center") x = anchorX - width / 2;
+  else if (align === "right") x = anchorX - width;
+  const prevAlign = ctx.textAlign;
+  ctx.textAlign = "left";
+  for (const c of chars) {
+    ctx.fillText(c, x, y);
+    x += ctx.measureText(c).width + spacing;
+  }
+  ctx.textAlign = prevAlign;
+}
+
+// ── SVG export ─────────────────────────────────────────────
+export function renderPosterToSVG(blocks: Block[], palette: Palette): string {
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const parts: string[] = [];
+  parts.push(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">`,
+  );
+  parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="${palette.background}"/>`);
+  for (const b of blocks) {
+    if (b.type === "image") {
+      parts.push(
+        `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.15)" stroke-dasharray="6 6"/>`,
+        `<text x="${b.x + b.w / 2}" y="${b.y + b.h / 2}" font-family="serif" font-style="italic" font-size="14" text-anchor="middle" dominant-baseline="middle" fill="${palette.muted}">${esc(b.label)}</text>`,
+      );
+      continue;
+    }
+    const t = b;
+    const family = FONT_FAMILY[t.fontFamily ?? "sans"];
+    const lineHeight = t.fontSize * (t.lineHeight ?? 1.4);
+    const anchor = t.align === "center" ? "middle" : t.align === "right" ? "end" : "start";
+    const x = t.align === "center" ? t.x + t.w / 2 : t.align === "right" ? t.x + t.w : t.x;
+    const lines = t.text.split("\n");
+    parts.push(
+      `<text x="${x}" y="${t.y + t.fontSize}" font-family='${family}' font-size="${t.fontSize}" font-weight="${t.fontWeight}" font-style="${t.fontStyle ?? "normal"}" letter-spacing="${t.letterSpacing ?? 0}" text-anchor="${anchor}" fill="${t.color}">${lines
+        .map((l, i) => `<tspan x="${x}" dy="${i === 0 ? 0 : lineHeight}">${esc(t.textTransform === "uppercase" ? l.toUpperCase() : l)}</tspan>`)
+        .join("")}</text>`,
+    );
+  }
+  parts.push("</svg>");
+  return parts.join("");
+}
+
+export function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export async function exportPng(
+  blocks: Block[],
+  palette: Palette,
+  transparent: boolean,
+) {
+  const canvas = renderPosterToCanvas(
+    transparent ? blocks : blocks,
+    transparent ? { ...palette, background: "#00000000" } : palette,
+    2,
+  );
+  if (transparent) {
+    // paint on transparent canvas by clearing before render
+    const c2 = document.createElement("canvas");
+    c2.width = canvas.width;
+    c2.height = canvas.height;
+    const ctx = c2.getContext("2d")!;
+    ctx.drawImage(canvas, 0, 0);
+    // simple approach: re-render without background fill
+    const clean = renderPosterToCanvas(blocks, { ...palette, background: "rgba(0,0,0,0)" }, 2);
+    clean.toBlob((blob) => blob && downloadBlob(blob, "banrihua.png"), "image/png");
+    return;
+  }
+  canvas.toBlob((blob) => blob && downloadBlob(blob, "banrihua.png"), "image/png");
+}
+
+export async function exportJpg(blocks: Block[], palette: Palette) {
+  const canvas = renderPosterToCanvas(blocks, palette, 2);
+  canvas.toBlob((blob) => blob && downloadBlob(blob, "banrihua.jpg"), "image/jpeg", 0.92);
+}
+
+export async function exportPdf(blocks: Block[], palette: Palette, mode: "print" | "standard") {
+  const { jsPDF } = await import("jspdf");
+  const canvas = renderPosterToCanvas(blocks, palette, mode === "print" ? 3 : 2);
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+  // A3 portrait: 297 x 420 mm
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
+  pdf.addImage(dataUrl, "JPEG", 0, 0, 297, 420);
+  pdf.save(mode === "print" ? "banrihua-print.pdf" : "banrihua.pdf");
+}
+
+export function exportSvg(blocks: Block[], palette: Palette) {
+  const svg = renderPosterToSVG(blocks, palette);
+  downloadBlob(new Blob([svg], { type: "image/svg+xml" }), "banrihua.svg");
+}
+
+export async function exportPptx(blocks: Block[], palette: Palette) {
+  const mod = await import("pptxgenjs");
+  const PptxGenJS = mod.default;
+  const pptx = new PptxGenJS();
+  // A3 portrait in inches
+  pptx.defineLayout({ name: "A3P", width: 11.69, height: 16.54 });
+  pptx.layout = "A3P";
+  const slide = pptx.addSlide();
+  slide.background = { color: palette.background.replace("#", "") };
+
+  const toInX = (px: number) => (px / POSTER_W) * 11.69;
+  const toInY = (px: number) => (px / POSTER_H) * 16.54;
+
+  for (const b of blocks) {
+    if (b.type === "image") {
+      slide.addShape("rect", {
+        x: toInX(b.x),
+        y: toInY(b.y),
+        w: toInX(b.w),
+        h: toInY(b.h),
+        fill: { color: "F5F0E4" },
+        line: { color: "888888", dashType: "dash", width: 0.5 },
+      });
+      slide.addText(b.label, {
+        x: toInX(b.x),
+        y: toInY(b.y),
+        w: toInX(b.w),
+        h: toInY(b.h),
+        align: "center",
+        valign: "middle",
+        italic: true,
+        color: palette.muted.replace("#", ""),
+        fontSize: 11,
+      });
+      continue;
+    }
+    const t = b;
+    slide.addText(t.text, {
+      x: toInX(t.x),
+      y: toInY(t.y),
+      w: toInX(t.w),
+      h: toInY(t.fontSize * (t.lineHeight ?? 1.4) * Math.max(1, t.text.split("\n").length) + 20),
+      fontSize: Math.round(t.fontSize * 0.75),
+      color: t.color.replace("#", ""),
+      bold: (t.fontWeight ?? 400) >= 600,
+      italic: t.fontStyle === "italic",
+      align: (t.align ?? "left") as "left" | "center" | "right",
+      fontFace: t.fontFamily === "serif" || t.fontFamily === "display" ? "Songti SC" : "PingFang SC",
+      charSpacing: t.letterSpacing ? t.letterSpacing * 5 : 0,
+    });
+  }
+
+  await pptx.writeFile({ fileName: "banrihua.pptx" });
+}
