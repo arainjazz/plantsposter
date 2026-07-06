@@ -6,44 +6,58 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 type Props = {
   blocks: Block[];
+  selectedImageId: string | null;
   onApplyOperations: (ops: Operation[]) => void;
 };
 
 const GEMINI_MODELS = [
-  { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash（默认·推荐）" },
-  { id: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash Lite（最快最省）" },
-  { id: "gemini-3.5-pro", label: "Gemini 3.5 Pro（质量最高）" },
-  { id: "gemini-2.5-flash-image", label: "Gemini 2.5 Flash Image（图像生成/编辑）" },
+  { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash（默认·文本）" },
+  { id: "gemini-3.1-flash-lite", label: "Gemini 3.1 Flash Lite" },
+  { id: "gemini-3-pro-preview", label: "Gemini 3 Pro（质量高·文本）" },
   { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
   { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
   { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite" },
-  { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
+];
+
+// Image-generation models return image bytes; text models do NOT.
+const IMAGE_MODELS = [
+  { id: "gemini-2.5-flash-image", label: "Nano Banana · 2.5 Flash Image（快，推荐）" },
+  { id: "gemini-3.1-flash-image", label: "Nano Banana 2 · 3.1 Flash Image" },
+  { id: "gemini-3-pro-image", label: "Gemini 3 Pro Image（最好，慢）" },
 ];
 
 const MODEL_KEY = "banrihua.gemini.model";
+const IMG_MODEL_KEY = "banrihua.gemini.image_model";
 
-export function AiChat({ blocks, onApplyOperations }: Props) {
+export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
       content:
-        "你好，我是海报编辑助手（Gemini 驱动）。可以：\n• 直接说要改什么，如「主色换成墨绿+米白」\n• 点 📎 上传参考图，如「照着这张图配色」\n• 右上角切换 Gemini 模型版本",
+        "你好，我是海报编辑助手（Gemini 驱动）。\n• 直接说要改什么，如「主色换成墨绿+米白」\n• 📎 上传参考图\n• 🖼️ 选中画布上的一个图片框，输入描述后点『生成配图』，我会用 Nano Banana 生成图像并放进那个框",
     },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [model, setModel] = useState<string>(GEMINI_MODELS[0].id);
+  const [imgModel, setImgModel] = useState<string>(IMAGE_MODELS[0].id);
   const [image, setImage] = useState<{ mimeType: string; data: string; name: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(MODEL_KEY);
     if (saved && GEMINI_MODELS.some((m) => m.id === saved)) setModel(saved);
+    const savedImg = localStorage.getItem(IMG_MODEL_KEY);
+    if (savedImg && IMAGE_MODELS.some((m) => m.id === savedImg)) setImgModel(savedImg);
   }, []);
 
   function pickModel(id: string) {
     setModel(id);
     localStorage.setItem(MODEL_KEY, id);
+  }
+  function pickImgModel(id: string) {
+    setImgModel(id);
+    localStorage.setItem(IMG_MODEL_KEY, id);
   }
 
   async function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
