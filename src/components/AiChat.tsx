@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { Block } from "@/lib/poster-data";
 import type { Operation } from "@/lib/poster-ops";
 
@@ -9,31 +9,70 @@ type Props = {
   onApplyOperations: (ops: Operation[]) => void;
 };
 
+const GEMINI_MODELS = [
+  { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash（推荐，快）" },
+  { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro（质量最高）" },
+  { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite（最快最省）" },
+  { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
+  { id: "gemini-2.0-flash-lite", label: "Gemini 2.0 Flash Lite" },
+];
+
+const MODEL_KEY = "banrihua.gemini.model";
+
 export function AiChat({ blocks, onApplyOperations }: Props) {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
       content:
-        "你好，我是海报编辑助手。可以对我说：\n• 把标题“半 日 花”改成“沙生半日花”\n• 主色换成墨绿+米白\n• 所有小字号加大 2 号\n• 把 SIMILAR SPECIES 那栏正文改成斜体",
+        "你好，我是海报编辑助手（Gemini 驱动）。可以：\n• 直接说要改什么，如「主色换成墨绿+米白」\n• 点 📎 上传参考图，如「照着这张图配色」\n• 右上角切换 Gemini 模型版本",
     },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState<string>(GEMINI_MODELS[0].id);
+  const [image, setImage] = useState<{ mimeType: string; data: string; name: string } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(MODEL_KEY);
+    if (saved && GEMINI_MODELS.some((m) => m.id === saved)) setModel(saved);
+  }, []);
+
+  function pickModel(id: string) {
+    setModel(id);
+    localStorage.setItem(MODEL_KEY, id);
+  }
+
+  async function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const buf = await f.arrayBuffer();
+    let bin = "";
+    const bytes = new Uint8Array(buf);
+    for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+    setImage({ mimeType: f.type || "image/png", data: btoa(bin), name: f.name });
+    e.target.value = "";
+  }
 
   async function send() {
     const text = input.trim();
-    if (!text || loading) return;
+    if ((!text && !image) || loading) return;
     setInput("");
-    const nextHistory = [...messages, { role: "user" as const, content: text }];
+    const userLabel = text + (image ? `\n📎 ${image.name}` : "");
+    const nextHistory = [...messages, { role: "user" as const, content: userLabel }];
     setMessages(nextHistory);
     setLoading(true);
+    const sentImage = image;
+    setImage(null);
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: text,
+          message: text || "(仅参考附图)",
+          model,
           history: messages,
+          image: sentImage ? { mimeType: sentImage.mimeType, data: sentImage.data } : null,
           blocks: blocks.map((b) => ({
             id: b.id,
             text: b.type === "text" ? b.text : undefined,
@@ -49,18 +88,13 @@ export function AiChat({ blocks, onApplyOperations }: Props) {
           role: "assistant",
           content:
             data.message +
-            (data.operations?.length
-              ? `\n\n✔ 已应用 ${data.operations.length} 处修改`
-              : ""),
+            (data.operations?.length ? `\n\n✔ 已应用 ${data.operations.length} 处修改` : ""),
         },
       ]);
     } catch (err) {
       setMessages([
         ...nextHistory,
-        {
-          role: "assistant",
-          content: `请求失败：${err instanceof Error ? err.message : "unknown"}`,
-        },
+        { role: "assistant", content: `请求失败：${err instanceof Error ? err.message : "unknown"}` },
       ]);
     } finally {
       setLoading(false);
@@ -69,10 +103,47 @@ export function AiChat({ blocks, onApplyOperations }: Props) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#fafaf7" }}>
-      <div style={{ padding: "12px 14px", borderBottom: "1px solid #eee", fontSize: 13, fontWeight: 600 }}>
-        AI 编辑助手
+      <div
+        style={{
+          padding: "10px 14px",
+          borderBottom: "1px solid #eee",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <span style={{ fontSize: 13, fontWeight: 600 }}>AI 编辑助手</span>
+        <select
+          value={model}
+          onChange={(e) => pickModel(e.target.value)}
+          style={{
+            marginLeft: "auto",
+            fontSize: 11,
+            padding: "3px 6px",
+            border: "1px solid #ddd",
+            borderRadius: 4,
+            background: "white",
+            maxWidth: 200,
+          }}
+          title="Gemini 模型版本"
+        >
+          {GEMINI_MODELS.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.label}
+            </option>
+          ))}
+        </select>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: 12, display: "flex", flexDirection: "column", gap: 10 }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: 12,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
         {messages.map((m, i) => (
           <div
             key={i}
@@ -96,7 +167,51 @@ export function AiChat({ blocks, onApplyOperations }: Props) {
           <div style={{ alignSelf: "flex-start", fontSize: 12, color: "#888" }}>思考中…</div>
         )}
       </div>
-      <div style={{ padding: 10, borderTop: "1px solid #eee", display: "flex", gap: 6 }}>
+      {image && (
+        <div
+          style={{
+            padding: "6px 12px",
+            borderTop: "1px solid #eee",
+            fontSize: 12,
+            color: "#555",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <img
+            src={`data:${image.mimeType};base64,${image.data}`}
+            alt=""
+            style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4 }}
+          />
+          <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {image.name}
+          </span>
+          <button
+            onClick={() => setImage(null)}
+            style={{ border: "none", background: "transparent", cursor: "pointer", color: "#888" }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      <div style={{ padding: 10, borderTop: "1px solid #eee", display: "flex", gap: 6, alignItems: "flex-end" }}>
+        <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
+        <button
+          onClick={() => fileRef.current?.click()}
+          title="附加参考图"
+          style={{
+            padding: "0 10px",
+            height: 46,
+            background: "white",
+            border: "1px solid #d9d9d9",
+            borderRadius: 6,
+            cursor: "pointer",
+            fontSize: 16,
+          }}
+        >
+          📎
+        </button>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -120,15 +235,17 @@ export function AiChat({ blocks, onApplyOperations }: Props) {
         />
         <button
           onClick={send}
-          disabled={loading || !input.trim()}
+          disabled={loading || (!input.trim() && !image)}
           style={{
             padding: "0 14px",
+            height: 46,
             background: "#2a2622",
             color: "white",
             border: "none",
             borderRadius: 6,
             cursor: loading ? "wait" : "pointer",
             fontSize: 13,
+            opacity: loading || (!input.trim() && !image) ? 0.5 : 1,
           }}
         >
           发送
