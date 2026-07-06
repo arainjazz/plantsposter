@@ -6,7 +6,7 @@ import { AiChat } from "@/components/AiChat";
 import { ExportMenu } from "@/components/ExportMenu";
 import { PageTabs } from "@/components/PageTabs";
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
-import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage } from "@/lib/poster-data";
+import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage, deriveAutoName } from "@/lib/poster-data";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
 
 export const Route = createFileRoute("/")({
