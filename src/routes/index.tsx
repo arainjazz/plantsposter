@@ -70,17 +70,9 @@ function Editor() {
   }
 
   function apply(ops: Operation[]) {
-    setBlocks((prevBlocks) => {
-      setPalette((prevPal) => {
-        const { blocks: nb, palette: np } = applyOperations(prevBlocks, prevPal, ops);
-        // Because we're inside nested setState, only palette can be safely set here.
-        // We defer the blocks assignment through outer return below.
-        // But we already computed nb; store it via closure.
-        queueMicrotask(() => setBlocks(nb));
-        return np;
-      });
-      return prevBlocks;
-    });
+    const { blocks: nb, palette: np } = applyOperations(blocks, palette, ops);
+    setBlocks(nb);
+    setPalette(np);
   }
 
   return (
