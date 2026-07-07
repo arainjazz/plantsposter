@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "banrihua-poster-mcp",
+      "version": "0.1.0",
+      "title": "半日花 Poster Editor MCP"
+    },
+    "tools": [
+      {
+        "name": "get_poster_catalog",
+        "title": "Get poster block catalog",
+        "description": "Return the default 半日花 (Helianthemum songaricum) A3 poster block catalog: canvas size and every editable block id with its text/label. Use as a reference when drafting update_text / update_style / set_image / set_range_map operations for the poster editor.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "project_coordinates",
+        "title": "Project lat/lon to poster world-map pixels",
+        "description": "Apply the poster's fixed regression-corrected projection to convert (lat, lon) points into (x, y) pixel coordinates on the Wikimedia CC0 950×620 base map. Use this before laying out any Global Range distribution overlay.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "points": {
+              "minItems": 1,
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number",
+                    "minimum": -90,
+                    "maximum": 90,
+                    "description": "Latitude, north positive."
+                  },
+                  "lon": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180,
+                    "description": "Longitude, east positive."
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "native",
+                      "introduced"
+                    ]
+                  }
+                },
+                "required": [
+                  "lat",
+                  "lon"
+                ]
+              }
+            }
+          },
+          "required": [
+            "points"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "generate_image",
+        "title": "Generate poster illustration",
+        "description": "Generate an illustration or reference photo for the poster via Lovable AI Gateway (google/gemini-2.5-flash-image). Returns a base64 data URL.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 4000,
+              "description": "Full image prompt (English works best)."
+            },
+            "model": {
+              "description": "Optional short Gemini image model id, defaults to gemini-2.5-flash-image.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "prompt"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
