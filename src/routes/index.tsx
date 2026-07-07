@@ -542,9 +542,12 @@ function Editor() {
         <Inspector
           block={soloSelected}
           background={palette.background}
+          selectionCount={selectedIds.size}
           onChange={patchSelected}
           onChangeImage={setImage}
           onChangeBackground={(c) => setPalette((p) => ({ ...p, background: c }))}
+          onAlignToPage={alignToPage}
+          onDistribute={distribute}
         />
       </aside>
 
