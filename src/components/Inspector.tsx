@@ -37,12 +37,21 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
   if (!block) {
     return (
       <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
-        <BackgroundPicker value={background} onChange={onChangeBackground} />
-        <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
-          点击画布上的任意文字或图片框可编辑其样式；<br/>
-          支持 ⌘/Ctrl+点击 多选、拖拽框选、Del 删除、⌘/Ctrl+C/V 复制粘贴。
-        </div>
+        {selectionCount >= 2 ? (
+          <>
+            <div style={{ fontSize: 12, color: "#888" }}>已选 {selectionCount} 个元素</div>
+            {AlignPanel}
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
+            <BackgroundPicker value={background} onChange={onChangeBackground} />
+            <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
+              点击画布上的任意文字或图片框可编辑其样式；<br/>
+              支持 ⌘/Ctrl+点击 多选、拖拽框选、Del 删除、⌘/Ctrl+C/V 复制粘贴、⌘/Ctrl+Z 撤销。
+            </div>
+          </>
+        )}
       </div>
     );
   }
