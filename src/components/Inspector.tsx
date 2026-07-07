@@ -205,9 +205,20 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
           style={inp}
         />
       </Field>
+
+      {AlignPanel}
     </div>
   );
 }
+
+const alignBtn: React.CSSProperties = {
+  padding: "6px 4px",
+  border: "1px solid #d9d9d9",
+  background: "white",
+  borderRadius: 4,
+  cursor: "pointer",
+  fontSize: 12,
+};
 
 function BackgroundPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [mode, setMode] = useState<"solid" | "gradient" | "transparent">("solid");
