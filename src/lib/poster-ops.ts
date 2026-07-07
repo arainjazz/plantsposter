@@ -24,7 +24,15 @@ export type Operation =
       accent?: string;
       muted?: string;
     }
-  | { type: "set_image"; id: string; src: string };
+  | { type: "set_image"; id: string; src: string }
+  | {
+      type: "set_range_map";
+      id: string;
+      points: Array<{ lat: number; lon: number; kind?: "native" | "introduced"; label?: string }>;
+      title?: string;
+      subtitle?: string;
+      source?: string;
+    };
 
 export type Palette = {
   background: string;
