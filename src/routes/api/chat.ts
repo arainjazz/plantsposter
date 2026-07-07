@@ -74,8 +74,11 @@ Operations available (set "type" plus the fields listed):
                     fontFamily (serif|sans|display), textTransform (none|uppercase)
 - replace_all     : find, replace, caseSensitive?
 - recolor_scheme  : any of background, ink, accent, muted (all #RRGGBB)
-- set_image       : id (must be an image block id), src (a full data:image/svg+xml;base64,... URL or https URL).
-                    Use this when you generate a distribution map SVG — encode the SVG as base64 and prefix with data:image/svg+xml;base64,
+- set_image       : id (must be an image block id), src (a full data:image/... URL or https URL).
+- set_range_map   : id (image block id, e.g. img-map), points: [{ lat, lon, kind: "native"|"introduced", label? }],
+                    optional title / subtitle / source. Use this for ANY "全球分布 / GLOBAL RANGE" map request —
+                    the client automatically composes the SVG on top of the fixed Wikimedia CC0 base map
+                    with the required projection formula. NEVER hand-craft the SVG yourself.
 
 General rules:
 - Use ONLY block ids from the provided catalog. Do not invent ids.
