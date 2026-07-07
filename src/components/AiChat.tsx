@@ -311,7 +311,7 @@ function ConfigModal({
   const [modelId, setModelId] = useState("");
   const [baseURL, setBaseURL] = useState("https://ai.gateway.lovable.dev/v1");
   const [apiKey, setApiKey] = useState("");
-  const [kind, setKind] = useState<"chat" | "image">("chat");
+  const [kind, setKind] = useState<ModelKind>("chat");
 
   function submit() {
     if (!modelId.trim() || !baseURL.trim() || !apiKey.trim()) {
