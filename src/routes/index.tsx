@@ -355,13 +355,40 @@ function Editor() {
     document.body.style.cursor = "col-resize";
   }
 
-  // ── clipboard: copy/paste blocks (⌘/Ctrl + C/V) ─────────
+  // ── clipboard: copy/paste blocks (⌘/Ctrl + C/V) + undo (⌘/Ctrl+Z) ─────
   const clipboardRef = useRef<Block[]>([]);
+  const historyRef = useRef<Array<{ pages: PosterPage[]; activeId: string; palette: Palette }>>([]);
+  const skipHistoryRef = useRef(false);
+  const prevSnapRef = useRef<{ pages: PosterPage[]; activeId: string; palette: Palette } | null>(null);
+
+  // Track history: push previous snapshot before applying a new one.
+  useEffect(() => {
+    if (!hydrated) { prevSnapRef.current = { pages, activeId, palette }; return; }
+    if (skipHistoryRef.current) { skipHistoryRef.current = false; prevSnapRef.current = { pages, activeId, palette }; return; }
+    if (prevSnapRef.current) {
+      historyRef.current.push(prevSnapRef.current);
+      if (historyRef.current.length > 100) historyRef.current.shift();
+    }
+    prevSnapRef.current = { pages, activeId, palette };
+  }, [hydrated, pages, activeId, palette]);
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
       const meta = e.metaKey || e.ctrlKey;
+      if (meta && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        const snap = historyRef.current.pop();
+        if (snap) {
+          skipHistoryRef.current = true;
+          setPages(snap.pages);
+          setActiveId(snap.activeId);
+          setPalette(snap.palette);
+          setSelectedIds(new Set());
+        }
+        return;
+      }
       if (meta && e.key.toLowerCase() === "c" && selectedIds.size > 0) {
         e.preventDefault();
         clipboardRef.current = blocks.filter((b) => selectedIds.has(b.id)).map((b) => ({ ...b }));
