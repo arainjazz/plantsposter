@@ -172,16 +172,18 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <Field label="对齐">
-          <select
-            value={t.align ?? "left"}
-            onChange={(e) => onChange({ align: e.target.value as "left" | "center" | "right" })}
-            style={inp}
-          >
-            <option value="left">左</option>
-            <option value="center">中</option>
-            <option value="right">右</option>
-          </select>
+        <Field label="文本对齐">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4 }}>
+            {(["left", "center", "right"] as const).map((a) => (
+              <button
+                key={a}
+                onClick={() => onChange({ align: a })}
+                style={{ ...alignBtn, background: (t.align ?? "left") === a ? "#2a2622" : "white", color: (t.align ?? "left") === a ? "white" : "#333" }}
+              >
+                {a === "left" ? "⯇" : a === "center" ? "≡" : "⯈"}
+              </button>
+            ))}
+          </div>
         </Field>
         <Field label="行高">
           <input
