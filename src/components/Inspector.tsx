@@ -83,6 +83,7 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
             清除图片
           </button>
         )}
+        {AlignPanel}
       </div>
     );
   }
