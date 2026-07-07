@@ -127,17 +127,18 @@ type ChatBody = {
   blocks: Array<{ id: string; text?: string; role?: string }>;
   history: Array<{ role: "user" | "assistant"; content: string }>;
   image?: { mimeType: string; data: string } | null;
+  custom?: { baseURL: string; apiKey: string } | null;
 };
 
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const key = process.env.GEMINI_API_KEY;
-        if (!key) return new Response("Missing GEMINI_API_KEY", { status: 500 });
-
         const body = (await request.json()) as ChatBody;
         const model = body.model || "gemini-2.5-flash";
+        const custom = body.custom;
+        const key = process.env.GEMINI_API_KEY;
+        if (!custom && !key) return new Response("Missing GEMINI_API_KEY", { status: 500 });
 
         const catalog = body.blocks
           .map(
