@@ -14,11 +14,27 @@ const OPERATIONS_SCHEMA = {
         properties: {
           type: {
             type: "string",
-            enum: ["update_text", "update_style", "replace_all", "recolor_scheme", "set_image"],
+            enum: ["update_text", "update_style", "replace_all", "recolor_scheme", "set_image", "set_range_map"],
           },
           id: { type: "string" },
           text: { type: "string" },
           src: { type: "string" },
+          title: { type: "string" },
+          subtitle: { type: "string" },
+          source: { type: "string" },
+          points: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                lat: { type: "number" },
+                lon: { type: "number" },
+                kind: { type: "string", enum: ["native", "introduced"] },
+                label: { type: "string" },
+              },
+              required: ["lat", "lon"],
+            },
+          },
           fontSize: { type: "number" },
           color: { type: "string" },
           fontWeight: { type: "number" },
