@@ -165,38 +165,77 @@ export const Route = createFileRoute("/api/chat")({
           });
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
-          model,
-        )}:generateContent?key=${encodeURIComponent(key)}`;
-
         try {
-          const upstream = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              systemInstruction: { role: "system", parts: [{ text: SYSTEM }] },
-              contents: [{ role: "user", parts: userParts }],
-              generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: OPERATIONS_SCHEMA,
-                temperature: 0.6,
+          let text = "";
+          if (custom) {
+            // OpenAI-compatible chat completions (user-supplied model / endpoint)
+            const messages: Array<Record<string, unknown>> = [
+              { role: "system", content: SYSTEM },
+              ...body.history.map((h) => ({ role: h.role, content: h.content })),
+              {
+                role: "user",
+                content: body.image?.data
+                  ? [
+                      { type: "text", text: body.message },
+                      { type: "image_url", image_url: { url: `data:${body.image.mimeType};base64,${body.image.data}` } },
+                    ]
+                  : `Block catalog:\n${catalog}\n\nUser: ${body.message}`,
               },
-            }),
-          });
-
-          if (!upstream.ok) {
-            const errText = await upstream.text();
-            console.error("gemini error", upstream.status, errText);
-            return Response.json(
-              { message: `Gemini 出错 (${upstream.status})：${errText.slice(0, 200)}`, operations: [] },
-              { status: 200 },
-            );
+            ];
+            const upstream = await fetch(`${custom.baseURL.replace(/\/$/, "")}/chat/completions`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${custom.apiKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model,
+                messages,
+                response_format: { type: "json_object" },
+                temperature: 0.6,
+              }),
+            });
+            if (!upstream.ok) {
+              const errText = await upstream.text();
+              return Response.json(
+                { message: `自定义模型出错 (${upstream.status})：${errText.slice(0, 200)}`, operations: [] },
+                { status: 200 },
+              );
+            }
+            const j = (await upstream.json()) as {
+              choices?: Array<{ message?: { content?: string } }>;
+            };
+            text = j.choices?.[0]?.message?.content ?? "";
+          } else {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+              model,
+            )}:generateContent?key=${encodeURIComponent(key!)}`;
+            const upstream = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                systemInstruction: { role: "system", parts: [{ text: SYSTEM }] },
+                contents: [{ role: "user", parts: userParts }],
+                generationConfig: {
+                  responseMimeType: "application/json",
+                  responseSchema: OPERATIONS_SCHEMA,
+                  temperature: 0.6,
+                },
+              }),
+            });
+            if (!upstream.ok) {
+              const errText = await upstream.text();
+              console.error("gemini error", upstream.status, errText);
+              return Response.json(
+                { message: `Gemini 出错 (${upstream.status})：${errText.slice(0, 200)}`, operations: [] },
+                { status: 200 },
+              );
+            }
+            const json = (await upstream.json()) as {
+              candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+            };
+            text = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
           }
-
-          const json = (await upstream.json()) as {
-            candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-          };
-          const text = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
           let parsed: { message: string; operations: unknown[] };
           try {
             parsed = JSON.parse(text);
