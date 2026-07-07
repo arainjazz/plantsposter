@@ -39,6 +39,16 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+    if (
+      process.env.NODE_ENV === "production" &&
+      (url.pathname === "/mcp" ||
+        url.pathname.startsWith("/.mcp/") ||
+        url.pathname === "/.well-known/oauth-protected-resource")
+    ) {
+      return new Response("Not Found", { status: 404 });
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
