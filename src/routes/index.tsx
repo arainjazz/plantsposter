@@ -174,6 +174,52 @@ function Editor() {
   }
   function selectIds(ids: string[]) { setSelectedIds(new Set(ids)); }
 
+  function alignToPage(dir: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") {
+    if (selectedIds.size === 0) return;
+    const sel = blocks.filter((b) => selectedIds.has(b.id));
+    const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
+    let refX1 = 0, refX2 = POSTER_W, refY1 = 0, refY2 = POSTER_H;
+    if (sel.length >= 2) {
+      refX1 = Math.min(...sel.map((b) => b.x));
+      refX2 = Math.max(...sel.map((b) => b.x + b.w));
+      refY1 = Math.min(...sel.map((b) => b.y));
+      refY2 = Math.max(...sel.map((b) => b.y + boxH(b)));
+    }
+    updateActiveBlocks((bs) => bs.map((b) => {
+      if (!selectedIds.has(b.id)) return b;
+      const bh = boxH(b);
+      let { x, y } = b;
+      if (dir === "left") x = refX1;
+      else if (dir === "right") x = refX2 - b.w;
+      else if (dir === "hcenter") x = Math.round((refX1 + refX2) / 2 - b.w / 2);
+      else if (dir === "top") y = refY1;
+      else if (dir === "bottom") y = refY2 - bh;
+      else if (dir === "vcenter") y = Math.round((refY1 + refY2) / 2 - bh / 2);
+      return { ...b, x, y };
+    }));
+  }
+
+  function distribute(axis: "h" | "v") {
+    if (selectedIds.size < 3) return;
+    const sel = blocks.filter((b) => selectedIds.has(b.id));
+    const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
+    const sorted = [...sel].sort((a, b) => (axis === "h" ? a.x - b.x : a.y - b.y));
+    const first = sorted[0], last = sorted[sorted.length - 1];
+    const gap = axis === "h"
+      ? ((last.x + last.w) - first.x - sorted.reduce((s, b) => s + b.w, 0)) / (sorted.length - 1)
+      : ((last.y + boxH(last)) - first.y - sorted.reduce((s, b) => s + boxH(b), 0)) / (sorted.length - 1);
+    const positions = new Map<string, { x?: number; y?: number }>();
+    let cursor = axis === "h" ? first.x : first.y;
+    for (const b of sorted) {
+      if (axis === "h") { positions.set(b.id, { x: Math.round(cursor) }); cursor += b.w + gap; }
+      else { positions.set(b.id, { y: Math.round(cursor) }); cursor += boxH(b) + gap; }
+    }
+    updateActiveBlocks((bs) => bs.map((b) => {
+      const p = positions.get(b.id);
+      return p ? { ...b, ...p } : b;
+    }));
+  }
+
   // Auto-rename
   useEffect(() => {
     if (!activePage.autoName) return;
