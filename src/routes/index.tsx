@@ -434,7 +434,7 @@ function Editor() {
       <header style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", padding: "0 20px", background: "white", borderBottom: "1px solid #e5e5e5", gap: 16 }}>
         <div style={{ fontWeight: 700, fontSize: 15 }}>🌾 Ordos Plantspedia · Editor</div>
         <div style={{ color: "#888", fontSize: 12 }}>
-          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · ⌘/Ctrl+C/V 复制粘贴
+          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · ⌘/Ctrl+C/V 复制粘贴 · ⌘/Ctrl+Z 撤销
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           <ExportMenu pages={pages} activePageId={activeId} palette={palette} />
