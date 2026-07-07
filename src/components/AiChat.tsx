@@ -67,8 +67,8 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
     setCustomModels(loadCustom());
   }, []);
 
-  const allChat = [...BUILTIN_CHAT, ...customModels.filter((m) => m.kind === "chat")];
-  const allImage = [...BUILTIN_IMAGE, ...customModels.filter((m) => m.kind === "image")];
+  const allChat = [...BUILTIN_CHAT, ...customModels.filter((m) => m.kind === "chat" || m.kind === "native")];
+  const allImage = [...BUILTIN_IMAGE, ...customModels.filter((m) => m.kind === "image" || m.kind === "native")];
 
   function pickModel(id: string) { setModel(id); localStorage.setItem(MODEL_KEY, id); }
   function pickImgModel(id: string) { setImgModel(id); localStorage.setItem(IMG_MODEL_KEY, id); }
