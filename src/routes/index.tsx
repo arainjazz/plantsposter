@@ -289,17 +289,24 @@ function Editor() {
     }
   }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name]);
 
+  const pagesRef = useRef(pages);
+  pagesRef.current = pages;
+  const activeIdRef = useRef(activeId);
+  activeIdRef.current = activeId;
+
   // Sync URL search param 'page' -> activeId
   useEffect(() => {
     if (!hydrated) return;
     if (searchPage) {
-      const matchedPage = pages.find((pg) => pg.id === searchPage || pg.name === searchPage);
-      if (matchedPage && matchedPage.id !== activeId) {
+      const matchedPage = pagesRef.current.find(
+        (pg) => pg.id === searchPage || pg.name === searchPage,
+      );
+      if (matchedPage && matchedPage.id !== activeIdRef.current) {
         setActiveId(matchedPage.id);
         setSelectedIds(new Set());
       }
     }
-  }, [searchPage, pages, hydrated, activeId]);
+  }, [searchPage, hydrated]);
 
   // Sync activeId -> URL search param 'page'
   useEffect(() => {
