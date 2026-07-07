@@ -1,15 +1,39 @@
 import type { Block, TextBlock } from "@/lib/poster-data";
 import { useEffect, useState } from "react";
 
+export type AlignDir = "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom";
+export type DistributeAxis = "h" | "v";
+
 type Props = {
   block: Block | null;
   background: string;
+  selectionCount: number;
   onChange: (patch: Partial<TextBlock>) => void;
   onChangeImage: (src: string | null) => void;
   onChangeBackground: (color: string) => void;
+  onAlignToPage: (dir: AlignDir) => void;
+  onDistribute: (axis: DistributeAxis) => void;
 };
 
-export function Inspector({ block, background, onChange, onChangeImage, onChangeBackground }: Props) {
+export function Inspector({ block, background, selectionCount, onChange, onChangeImage, onChangeBackground, onAlignToPage, onDistribute }: Props) {
+  const AlignPanel = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "10px 12px", background: "#f7f5f0", borderRadius: 6 }}>
+      <div style={{ fontSize: 11, color: "#666", fontWeight: 600 }}>对齐到页面 · {selectionCount} 个元素</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+        <button style={alignBtn} onClick={() => onAlignToPage("left")} title="左对齐">⇤</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("hcenter")} title="水平居中">⇔</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("right")} title="右对齐">⇥</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("top")} title="顶对齐">⤒</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("vcenter")} title="垂直居中">⇕</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("bottom")} title="底对齐">⤓</button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginTop: 4 }}>
+        <button style={alignBtn} onClick={() => onDistribute("h")} disabled={selectionCount < 3} title="水平等距（≥3）">↔ 水平等距</button>
+        <button style={alignBtn} onClick={() => onDistribute("v")} disabled={selectionCount < 3} title="垂直等距（≥3）">↕ 垂直等距</button>
+      </div>
+      <div style={{ fontSize: 10, color: "#888" }}>提示：单选时相对整页对齐；多选时相对整体外框对齐。</div>
+    </div>
+  );
   if (!block) {
     return (
       <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
