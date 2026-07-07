@@ -96,6 +96,27 @@ function Editor() {
         setPages(p.pages);
         setActiveId(p.activeId);
         setPalette(p.palette);
+
+        // Sync URL search param 'page' if missing
+        const url = new URL(window.location.href);
+        if (!url.searchParams.get("page")) {
+          const activePage = p.pages.find((pg) => pg.id === p.activeId) ?? p.pages[0];
+          if (activePage) {
+            void navigate({
+              search: (prev) => ({ ...prev, page: activePage.name }),
+              replace: true,
+            });
+          }
+        }
+      } else {
+        // No saved state, default URL sync
+        const url = new URL(window.location.href);
+        if (!url.searchParams.get("page")) {
+          void navigate({
+            search: (prev) => ({ ...prev, page: "封面·半日花" }),
+            replace: true,
+          });
+        }
       }
       setHydrated(true);
       setSaveStatus("saved");
@@ -104,7 +125,7 @@ function Editor() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [navigate]);
 
   // Persist on every change (after hydration to avoid overwriting with defaults).
   useEffect(() => {
@@ -286,8 +307,12 @@ function Editor() {
     const suggested = deriveAutoName(activePage.blocks);
     if (suggested && suggested !== activePage.name) {
       setPages((prev) => prev.map((p) => (p.id === activePage.id ? { ...p, name: suggested } : p)));
+      void navigate({
+        search: (prev) => ({ ...prev, page: suggested }),
+        replace: true,
+      });
     }
-  }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name]);
+  }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name, navigate]);
 
   const pagesRef = useRef(pages);
   pagesRef.current = pages;
@@ -307,21 +332,6 @@ function Editor() {
       }
     }
   }, [searchPage, hydrated]);
-
-  // Sync activeId -> URL search param 'page'
-  useEffect(() => {
-    if (!hydrated) return;
-    const activePage = pages.find((p) => p.id === activeId) ?? pages[0];
-    if (activePage) {
-      const currentName = activePage.name;
-      if (searchPage !== currentName && searchPage !== activePage.id) {
-        void navigate({
-          search: (prev) => ({ ...prev, page: currentName }),
-          replace: true,
-        });
-      }
-    }
-  }, [activeId, pages, hydrated, searchPage, navigate]);
 
   // Delete key
   useEffect(() => {
@@ -372,6 +382,10 @@ function Editor() {
     setPages((prev) => [...prev, p]);
     setActiveId(p.id);
     setSelectedIds(new Set());
+    void navigate({
+      search: (prev) => ({ ...prev, page: p.name }),
+      replace: true,
+    });
   }
   function duplicatePage(id: string) {
     const src = pages.find((p) => p.id === id);
@@ -385,17 +399,37 @@ function Editor() {
     });
     setActiveId(c.id);
     setSelectedIds(new Set());
+    void navigate({
+      search: (prev) => ({ ...prev, page: c.name }),
+      replace: true,
+    });
   }
   function deletePage(id: string) {
-    setPages((prev) => {
-      const out = prev.filter((p) => p.id !== id);
-      if (id === activeId && out.length > 0) setActiveId(out[0].id);
-      return out;
-    });
+    if (pages.length <= 1) return;
+    const i = pages.findIndex((p) => p.id === id);
+    const nextActive = pages[i === 0 ? 1 : i - 1];
+    setPages((prev) => prev.filter((p) => p.id !== id));
+    if (id === activeId) {
+      setActiveId(nextActive.id);
+      void navigate({
+        search: (prev) => ({ ...prev, page: nextActive.name }),
+        replace: true,
+      });
+    }
     setSelectedIds(new Set());
   }
   function renamePage(id: string, name: string) {
-    setPages((prev) => prev.map((p) => (p.id === id ? { ...p, name, autoName: false } : p)));
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setPages((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, name: trimmed, autoName: false } : p)),
+    );
+    if (id === activeId) {
+      void navigate({
+        search: (prev) => ({ ...prev, page: trimmed }),
+        replace: true,
+      });
+    }
   }
 
   // ── image ops from context menu ─────────────────────────
@@ -463,12 +497,23 @@ function Editor() {
         setPalette(state.palette);
         setSelectedIds(new Set());
         setSaveMessage("已导入本地保存文件");
+        const activePage = state.pages.find((p) => p.id === state.activeId) ?? state.pages[0];
+        if (activePage) {
+          void navigate({
+            search: (prev) => ({ ...prev, page: activePage.name }),
+            replace: true,
+          });
+        }
       } else {
         const result = await importDocumentAsPage(file);
         setPages((prev) => [...prev, result.page]);
         setActiveId(result.page.id);
         setSelectedIds(new Set());
         setSaveMessage(result.message);
+        void navigate({
+          search: (prev) => ({ ...prev, page: result.page.name }),
+          replace: true,
+        });
       }
     } catch (e) {
       alert(e instanceof Error ? e.message : "导入失败");
@@ -708,6 +753,13 @@ function Editor() {
           onSelect={(id) => {
             setActiveId(id);
             setSelectedIds(new Set());
+            const p = pages.find((pg) => pg.id === id);
+            if (p) {
+              void navigate({
+                search: (prev) => ({ ...prev, page: p.name }),
+                replace: true,
+              });
+            }
           }}
           onAdd={addPage}
           onDuplicate={duplicatePage}
