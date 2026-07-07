@@ -343,9 +343,10 @@ function ConfigModal({
 
         <div style={{ display: "grid", gap: 8 }}>
           <label style={fLbl}>类型
-            <select value={kind} onChange={(e) => setKind(e.target.value as "chat" | "image")} style={fInp}>
+            <select value={kind} onChange={(e) => setKind(e.target.value as ModelKind)} style={fInp}>
               <option value="chat">文本 / 编辑指令 (chat)</option>
               <option value="image">图像生成 (image)</option>
+              <option value="native">原生多模态 (native · 同时支持文本+图像)</option>
             </select>
           </label>
           <label style={fLbl}>显示名称（可选）
