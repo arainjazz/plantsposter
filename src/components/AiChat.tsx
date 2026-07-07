@@ -46,7 +46,7 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
     {
       role: "assistant",
       content:
-        "你好，我是页面编辑助理。\n• 说要改什么，我用 Gemini 生成编辑指令\n• 选中一个图片框，输入描述后点『生成配图』（走 Lovable AI Gateway，不再受个人配额限制）\n• 点『一键去背景』把选中的图片抠透明背景\n• 生成"全球分布图"时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG",
+        '你好，我是页面编辑助理。\n• 说要改什么，我用 Gemini 生成编辑指令\n• 选中一个图片框，输入描述后点『生成配图』（走 Lovable AI Gateway，不再受个人配额限制）\n• 点『一键去背景』把选中的图片抠透明背景\n• 生成"全球分布图"时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG',
     },
   ]);
   const [input, setInput] = useState("");
