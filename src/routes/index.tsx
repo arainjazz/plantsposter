@@ -11,20 +11,9 @@ import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data
 import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage, deriveAutoName } from "@/lib/poster-data";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
 import { composeRangeMapSVG } from "@/lib/range-map";
-
-const STORAGE_KEY = "banrihua.editor.v1";
-type PersistedState = { pages: PosterPage[]; activeId: string; palette: Palette };
-
-function loadPersisted(): PersistedState | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as PersistedState;
-    if (!parsed?.pages?.length) return null;
-    return parsed;
-  } catch { return null; }
-}
+import { cleanupImageBackground } from "@/lib/image-edit";
+import { downloadEditorStateFile, loadEditorState, parseEditorStateFile, saveEditorState } from "@/lib/editor-storage";
+import { importDocumentAsPage } from "@/lib/editor-import";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,6 +51,8 @@ async function urlToBase64(src: string): Promise<{ mimeType: string; data: strin
 
 function Editor() {
   const [hydrated, setHydrated] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"loading" | "saving" | "saved" | "error">("loading");
+  const [saveMessage, setSaveMessage] = useState("正在读取本地草稿…");
   const [pages, setPages] = useState<PosterPage[]>([
     { id: "page-1", name: "封面·半日花", autoName: false, blocks: INITIAL_BLOCKS },
   ]);
@@ -73,21 +64,39 @@ function Editor() {
 
   // Load persisted state once on mount (client only, so SSR stays deterministic).
   useEffect(() => {
-    const p = loadPersisted();
-    if (p) {
-      setPages(p.pages);
-      setActiveId(p.activeId);
-      setPalette(p.palette);
-    }
-    setHydrated(true);
+    let cancelled = false;
+    void (async () => {
+      const p = await loadEditorState();
+      if (cancelled) return;
+      if (p) {
+        setPages(p.pages);
+        setActiveId(p.activeId);
+        setPalette(p.palette);
+      }
+      setHydrated(true);
+      setSaveStatus("saved");
+      setSaveMessage(p ? "已恢复并自动保存到本地" : "已启用本地自动保存");
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   // Persist on every change (after hydration to avoid overwriting with defaults).
   useEffect(() => {
     if (!hydrated) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ pages, activeId, palette }));
-    } catch { /* quota exceeded — silently ignore */ }
+    setSaveStatus("saving");
+    setSaveMessage("正在自动保存到本地…");
+    const t = window.setTimeout(() => {
+      void saveEditorState({ pages, activeId, palette })
+        .then(() => {
+          setSaveStatus("saved");
+          setSaveMessage(`已自动保存 · ${new Date().toLocaleTimeString()}`);
+        })
+        .catch(() => {
+          setSaveStatus("error");
+          setSaveMessage("自动保存失败，可能导致刷新后丢失，请点击保存数据在本地");
+        });
+    }, 250);
+    return () => window.clearTimeout(t);
   }, [hydrated, pages, activeId, palette]);
 
   // context menu + search modal
@@ -95,6 +104,7 @@ function Editor() {
   const [searchFor, setSearchFor] = useState<string | null>(null);
   const [busyMsg, setBusyMsg] = useState<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
   const uploadTargetRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -127,6 +137,9 @@ function Editor() {
     if (!soloSelected) return;
     const id = soloSelected.id;
     updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "text" ? { ...b, ...patch } : b)));
+  }
+  function changeText(id: string, text: string) {
+    updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "text" ? { ...b, text } : b)));
   }
   const setImageAt = useCallback((id: string, src: string | null) => {
     updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "image" ? ({ ...(b as ImageBlock), src }) : b)));
@@ -255,7 +268,7 @@ function Editor() {
   async function removeBackground(id: string) {
     const block = blocks.find((b) => b.id === id);
     if (!block || block.type !== "image" || !block.src) return;
-    setBusyMsg("正在去除背景（AI）...");
+    setBusyMsg("正在去除背景并清理边缘…");
     try {
       const ref = await urlToBase64(block.src);
       if (!ref) { setBusyMsg(null); alert("无法读取图像"); return; }
@@ -263,15 +276,56 @@ function Editor() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: "Remove the background completely. Output ONLY the main subject on a fully transparent background. Preserve fine edges, hair, and leaf detail. PNG with alpha channel.",
+          prompt: "Professional product cutout. Remove ALL background pixels completely, including white/gray halos, shadows, paper, table, sky, and edge spill. Output ONLY the foreground subject on fully transparent PNG alpha. Preserve botanical fine hairs, leaf edges, stems, and petals.",
           reference: ref,
         }),
       });
       const j = await r.json() as { dataUrl?: string; error?: string };
-      if (j.dataUrl) setImageAt(id, j.dataUrl);
-      else alert(j.error || "去背景失败");
+      if (j.dataUrl) {
+        const aiRef = await urlToBase64(j.dataUrl);
+        setImageAt(id, aiRef ? await cleanupImageBackground(aiRef) : j.dataUrl);
+      } else {
+        setImageAt(id, await cleanupImageBackground(ref));
+        if (j.error) console.warn("AI background removal failed; used local cleanup", j.error);
+      }
     } catch (e) {
-      alert(e instanceof Error ? e.message : "去背景失败");
+      try {
+        const ref = await urlToBase64(block.src);
+        if (ref) setImageAt(id, await cleanupImageBackground(ref));
+        else alert(e instanceof Error ? e.message : "去背景失败");
+      } catch {
+        alert(e instanceof Error ? e.message : "去背景失败");
+      }
+    } finally {
+      setBusyMsg(null);
+    }
+  }
+
+  function manualSave() {
+    const state = { pages, activeId, palette };
+    downloadEditorStateFile(state);
+    void saveEditorState(state).catch(() => undefined);
+  }
+
+  async function handleImportFile(file: File) {
+    setBusyMsg("正在导入文件…");
+    try {
+      if (file.name.toLowerCase().endsWith(".json")) {
+        const state = await parseEditorStateFile(file);
+        setPages(state.pages);
+        setActiveId(state.activeId);
+        setPalette(state.palette);
+        setSelectedIds(new Set());
+        setSaveMessage("已导入本地保存文件");
+      } else {
+        const result = await importDocumentAsPage(file);
+        setPages((prev) => [...prev, result.page]);
+        setActiveId(result.page.id);
+        setSelectedIds(new Set());
+        setSaveMessage(result.message);
+      }
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "导入失败");
     } finally {
       setBusyMsg(null);
     }
@@ -355,8 +409,18 @@ function Editor() {
         <div style={{ color: "#888", fontSize: 12 }}>
           A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · ⌘/Ctrl+C/V 复制粘贴
         </div>
-        <div style={{ marginLeft: "auto" }}>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           <ExportMenu pages={pages} activePageId={activeId} palette={palette} />
+          <div style={{
+            minWidth: 190, padding: "7px 10px", borderRadius: 6,
+            border: saveStatus === "error" ? "1px solid #c93" : "1px solid #d8ddcf",
+            background: saveStatus === "error" ? "#fff7df" : "#f4f7ef",
+            color: saveStatus === "error" ? "#7a4b00" : "#405230", fontSize: 12,
+          }}>
+            {saveStatus === "saving" ? "⏳ " : saveStatus === "error" ? "⚠ " : "✓ "}{saveMessage}
+          </div>
+          <button onClick={manualSave} style={headerBtn}>保存数据在本地</button>
+          <button onClick={() => importInputRef.current?.click()} style={headerBtn}>导入</button>
         </div>
       </header>
 
@@ -386,6 +450,7 @@ function Editor() {
           onMoveMany={moveMany}
           onResize={resizeBlock}
           onResizeMany={resizeMany}
+          onChangeText={changeText}
           onImageContextMenu={openContextMenu}
           displayWidth={displayWidth}
         />
@@ -439,6 +504,18 @@ function Editor() {
         }}
       />
 
+      <input
+        ref={importInputRef}
+        type="file"
+        accept=".json,.pdf,.pptx,.html,.htm,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/html"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          e.target.value = "";
+          if (f) void handleImportFile(f);
+        }}
+      />
+
       {ctxMenu && (() => {
         const b = blocks.find((x) => x.id === ctxMenu.id);
         const hasImage = b?.type === "image" && !!b.src;
@@ -475,3 +552,13 @@ function Editor() {
     </div>
   );
 }
+
+const headerBtn: React.CSSProperties = {
+  padding: "7px 10px",
+  border: "1px solid #d9d9d9",
+  background: "white",
+  borderRadius: 6,
+  cursor: "pointer",
+  fontSize: 12,
+  whiteSpace: "nowrap",
+};

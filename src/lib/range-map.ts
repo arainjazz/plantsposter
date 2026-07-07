@@ -34,12 +34,15 @@ async function loadBaseMap(): Promise<string> {
   if (cachedBase) return cachedBase;
   const r = await fetch("/world-map.svg");
   const text = await r.text();
-  // Extract inner content of the root <svg> so we can drop it into our own svg.
-  const inner = text
-    .replace(/^[\s\S]*?<svg[^>]*>/i, "")
-    .replace(/<\/svg>\s*$/i, "");
-  cachedBase = inner;
-  return inner;
+  // Deterministic base: keep only country/region path geometry, strip all
+  // source styling so every generated map has identical fill/stroke.
+  const paths = text.match(/<path\b[\s\S]*?(?:\/>|<\/path>)/gi) ?? [];
+  cachedBase = paths
+    .map((path) => path
+      .replace(/\s(?:style|fill|stroke|stroke-width|stroke-dasharray|stroke-linejoin|stroke-linecap|opacity)="[^"]*"/gi, "")
+      .replace(/\s+\/?>$/, (end) => end.includes("/") ? "/>" : ">"))
+    .join("\n");
+  return cachedBase;
 }
 
 export async function composeRangeMapSVG(
