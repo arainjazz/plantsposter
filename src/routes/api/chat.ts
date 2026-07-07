@@ -14,10 +14,11 @@ const OPERATIONS_SCHEMA = {
         properties: {
           type: {
             type: "string",
-            enum: ["update_text", "update_style", "replace_all", "recolor_scheme"],
+            enum: ["update_text", "update_style", "replace_all", "recolor_scheme", "set_image"],
           },
           id: { type: "string" },
           text: { type: "string" },
+          src: { type: "string" },
           fontSize: { type: "number" },
           color: { type: "string" },
           fontWeight: { type: "number" },
@@ -57,6 +58,8 @@ Operations available (set "type" plus the fields listed):
                     fontFamily (serif|sans|display), textTransform (none|uppercase)
 - replace_all     : find, replace, caseSensitive?
 - recolor_scheme  : any of background, ink, accent, muted (all #RRGGBB)
+- set_image       : id (must be an image block id), src (a full data:image/svg+xml;base64,... URL or https URL).
+                    Use this when you generate a distribution map SVG — encode the SVG as base64 and prefix with data:image/svg+xml;base64,
 
 General rules:
 - Use ONLY block ids from the provided catalog. Do not invent ids.
@@ -67,10 +70,9 @@ General rules:
 - Keep the message under 3 sentences.
 
 ═══════════════════════════════════════════════════════════════════════════
-CONTENT SKILL — 使用以下规范生成"重要提示"与"全球分布"两栏文本
+CONTENT SKILL — "重要提示"栏 (IMPORTANT NOTE)
 ═══════════════════════════════════════════════════════════════════════════
-
-■ IMPORTANT NOTE 面板  (blocks: sec-note / sec-note-sub / sec-note-body)
+■ blocks: sec-note / sec-note-sub / sec-note-body
   - 标题固定为 "IMPORTANT NOTE · 重 要 提 示"，不要改动。
   - 主题不是固定的分类学栏目，须依据研究证据从以下候选中挑最有说服力、最
     影响读者理解海报的一项：
@@ -83,21 +85,41 @@ CONTENT SKILL — 使用以下规范生成"重要提示"与"全球分布"两栏�
   - 证据不足时不要硬凑主题；明确写出不确定性和分歧 ("尚有争议""证据有限"等)。
   - sec-note-sub 一行中英并列的副标题；sec-note-body 2-4 句中英对照正文。
 
-■ GLOBAL RANGE 分布图与说明  (blocks: sec-range / sec-range-sub / img-map / sec-range-caption)
-  - 底图使用真实 GBIF 记录或另一个可追溯、有文献支持的分布数据集。文字须
-    记录：taxon key 或查询、筛选条件、记录数、下载/API URL、访问日期、局限性。
-  - 地图为透明底世界线稿，覆盖层需克制，忽略南极洲。
-    · 经核验的分布点用红色。
-    · 有文献支持的原生分布范围用黄色区块或包络线。
-    · 分布点须与原生范围底色可视区分。
-  - 不要凭空补点，不要臆造鄂尔多斯本地记录。
-  - 原生、栽培、引入、不确定记录不得混绘且不加标注。
-  - sec-range-caption 用简洁中英双语写明：记录总数、筛选/去重方式、原生
-    范围来源、主要局限。
+═══════════════════════════════════════════════════════════════════════════
+CONTENT SKILL — "全球分布"栏 (GLOBAL RANGE) 与配图 SVG 规范
+═══════════════════════════════════════════════════════════════════════════
+■ 文本 blocks: sec-range / sec-range-sub / sec-range-caption
+  - 底图使用真实 GBIF/POWO 记录或另一个可追溯、有文献支持的分布数据集。
+    caption 记录：taxon key 或查询、筛选条件、记录数、下载/API URL、访问日期、局限性。
+  - 不要凭空补点，不要臆造鄂尔多斯本地记录。原生 / 引入 / 不确定记录不得混绘。
 
-════════════════════════════════════════════════════════════════════════════
-当用户询问 "重要提示"、"IMPORTANT NOTE"、"分布" 或 "GLOBAL RANGE" 相关内容时，
-按上述规范生成或修订 update_text 操作；如缺少证据，先在 message 中说明再改。`;
+■ 配图 SVG 规范 (img-map 或任何"全球分布"图片块)
+  当用户要求"生成全球分布图 / 分布地图 / GLOBAL RANGE 图"时，你必须生成一份符合以下
+  规范的 SVG，用 base64 编码后通过 set_image (id 为地图图片块) 写入。
+
+  1. 矢量底图: 基于 Wikimedia Commons CC0 底图 "World map - low resolution.svg"，
+     viewBox="0 0 950 620"。国家路径填充 #e8dcc4，描边 #8a7a5a，宽度 0.35。
+     由于路径过长，若无本地拷贝可用一个简化占位边界，并在 caption 说明。
+  2. 投影公式 (禁止用理论 Plate Carrée 中心公式，必须用回归校正公式)：
+        x = 2.6865 * lon + 449.3127
+        y = -3.4451 * lat + 339.3522
+     lon 东正西负；lat 北正南负。SVG 左上 (0,0)，右下 (950,620)。
+  3. 散点样式：
+     - 原生点：<circle cx=".." cy=".." r="4.2" fill="#3a7d2e" stroke="#fff"
+       stroke-width="0.7" opacity="0.92"/>，放在 <g id="native-points">
+     - 引入点：fill="#d97706"，其余同上，放在 <g id="introduced-points">
+  4. 经纬网 (虚线 #b9a87e 0.55 透明 0.2 宽 dasharray="2 3")：
+        赤道 y=339.35，北回归线 y=258.61，南回归线 y=420.09
+  5. 海洋背景 radialGradient (#e6eef2 → #cdd9df)。
+  6. 图例组: 绿点=Native 原生 / 橙点=Introduced 引入，中英双语。
+  7. 标题: "[Genus species] · Global Distribution" + 副标 "Equirectangular projection · low-resolution country borders"。
+  8. 数据源标注: "Base map: Wikimedia Commons (World map - low resolution.svg, CC0) · Points: POWO 2024 / GBIF 2024 / CABI 2024"。
+  9. 每个投影点必须在 message 中以文本凭证方式列出:
+        "Xinjiang - Turpan: (lat 42.9, lon 89.2) -> (x 688.95, y 191.56)"
+  10. 证据不足时不要臆造点；宁少勿假。
+
+  输出方式: operations 中一条 set_image，src 值为
+    "data:image/svg+xml;base64,<你生成的 SVG 的 base64>"`;
 
 type ChatBody = {
   message: string;
