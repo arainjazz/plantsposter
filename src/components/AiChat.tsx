@@ -10,7 +10,8 @@ type Props = {
   onApplyOperations: (ops: Operation[]) => void;
 };
 
-type ModelEntry = { id: string; label: string; kind: "chat" | "image"; custom?: { baseURL: string; apiKey: string } };
+type ModelKind = "chat" | "image" | "native";
+type ModelEntry = { id: string; label: string; kind: ModelKind; custom?: { baseURL: string; apiKey: string } };
 
 const BUILTIN_CHAT: ModelEntry[] = [
   { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash（默认）", kind: "chat" },
