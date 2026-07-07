@@ -358,6 +358,12 @@ function ConfigModal({
           <label style={fLbl}>Base URL <span style={{ color: "#c33" }}>*</span>
             <input value={baseURL} onChange={(e) => setBaseURL(e.target.value)} placeholder="https://api.openai.com/v1" style={fInp} />
           </label>
+          <div style={{ fontSize: 11, color: "#666", background: "#f7f5f0", padding: "8px 10px", borderRadius: 4, lineHeight: 1.55 }}>
+            <b>Base URL 尾部 <code>/v1</code> 规则：</b><br/>
+            ✅ <b>需要</b> <code>/v1</code>：OpenAI (<code>https://api.openai.com/v1</code>)、Lovable Gateway (<code>https://ai.gateway.lovable.dev/v1</code>)、DeepSeek (<code>https://api.deepseek.com/v1</code>)、OpenRouter (<code>https://openrouter.ai/api/v1</code>)、Moonshot、通义、SiliconFlow、Together、Groq、Anthropic OpenAI-compat 等。<br/>
+            ❌ <b>不要</b> <code>/v1</code>：Google Gemini 原生 API (<code>https://generativelanguage.googleapis.com</code>)、Azure OpenAI（用 <code>/openai/deployments/&lt;name&gt;</code>）、Vertex AI、部分 Ollama 本地 (<code>http://localhost:11434</code>)。<br/>
+            <b>「原生多模态」</b>类型专为 Gemini 原生 / Anthropic 原生等<b>非</b> OpenAI 兼容协议保留：填厂商官方 endpoint，无需 /v1。
+          </div>
           <label style={fLbl}>API Key <span style={{ color: "#c33" }}>*</span>
             <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." style={fInp} />
           </label>
