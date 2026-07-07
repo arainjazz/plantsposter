@@ -15,7 +15,13 @@ const RECORD = "latest";
 
 function isState(value: unknown): value is PersistedEditorState {
   const v = value as PersistedEditorState | null;
-  return !!v && Array.isArray(v.pages) && v.pages.length > 0 && typeof v.activeId === "string" && !!v.palette;
+  return (
+    !!v &&
+    Array.isArray(v.pages) &&
+    v.pages.length > 0 &&
+    typeof v.activeId === "string" &&
+    !!v.palette
+  );
 }
 
 function openDb(): Promise<IDBDatabase> {
@@ -48,8 +54,14 @@ async function writeIndexedDb(state: PersistedEditorState): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE, "readwrite");
     tx.objectStore(STORE).put(state, RECORD);
-    tx.oncomplete = () => { db.close(); resolve(); };
-    tx.onerror = () => { db.close(); reject(tx.error ?? new Error("IndexedDB write failed")); };
+    tx.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error ?? new Error("IndexedDB write failed"));
+    };
   });
 }
 
@@ -92,7 +104,9 @@ export async function saveEditorState(state: PersistedEditorState): Promise<void
 }
 
 export function downloadEditorStateFile(state: PersistedEditorState) {
-  const blob = new Blob([JSON.stringify({ version: 1, ...state }, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify({ version: 1, ...state }, null, 2)], {
+    type: "application/json",
+  });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -108,7 +122,11 @@ export async function parseEditorStateFile(file: File): Promise<PersistedEditorS
   if (isState(parsed)) return parsed;
   const wrapped = parsed as { pages?: unknown; activeId?: unknown; palette?: unknown };
   if (isState({ pages: wrapped.pages, activeId: wrapped.activeId, palette: wrapped.palette })) {
-    return { pages: wrapped.pages as PosterPage[], activeId: wrapped.activeId as string, palette: wrapped.palette as Palette };
+    return {
+      pages: wrapped.pages as PosterPage[],
+      activeId: wrapped.activeId as string,
+      palette: wrapped.palette as Palette,
+    };
   }
   throw new Error("不是有效的半日花编辑器保存文件");
 }

@@ -15,23 +15,71 @@ type Props = {
   onDistribute: (axis: DistributeAxis) => void;
 };
 
-export function Inspector({ block, background, selectionCount, onChange, onChangeImage, onChangeBackground, onAlignToPage, onDistribute }: Props) {
+export function Inspector({
+  block,
+  background,
+  selectionCount,
+  onChange,
+  onChangeImage,
+  onChangeBackground,
+  onAlignToPage,
+  onDistribute,
+}: Props) {
   const AlignPanel = (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "10px 12px", background: "#f7f5f0", borderRadius: 6 }}>
-      <div style={{ fontSize: 11, color: "#666", fontWeight: 600 }}>对齐到页面 · {selectionCount} 个元素</div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        padding: "10px 12px",
+        background: "#f7f5f0",
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ fontSize: 11, color: "#666", fontWeight: 600 }}>
+        对齐到页面 · {selectionCount} 个元素
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
-        <button style={alignBtn} onClick={() => onAlignToPage("left")} title="左对齐">⇤</button>
-        <button style={alignBtn} onClick={() => onAlignToPage("hcenter")} title="水平居中">⇔</button>
-        <button style={alignBtn} onClick={() => onAlignToPage("right")} title="右对齐">⇥</button>
-        <button style={alignBtn} onClick={() => onAlignToPage("top")} title="顶对齐">⤒</button>
-        <button style={alignBtn} onClick={() => onAlignToPage("vcenter")} title="垂直居中">⇕</button>
-        <button style={alignBtn} onClick={() => onAlignToPage("bottom")} title="底对齐">⤓</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("left")} title="左对齐">
+          ⇤
+        </button>
+        <button style={alignBtn} onClick={() => onAlignToPage("hcenter")} title="水平居中">
+          ⇔
+        </button>
+        <button style={alignBtn} onClick={() => onAlignToPage("right")} title="右对齐">
+          ⇥
+        </button>
+        <button style={alignBtn} onClick={() => onAlignToPage("top")} title="顶对齐">
+          ⤒
+        </button>
+        <button style={alignBtn} onClick={() => onAlignToPage("vcenter")} title="垂直居中">
+          ⇕
+        </button>
+        <button style={alignBtn} onClick={() => onAlignToPage("bottom")} title="底对齐">
+          ⤓
+        </button>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginTop: 4 }}>
-        <button style={alignBtn} onClick={() => onDistribute("h")} disabled={selectionCount < 3} title="水平等距（≥3）">↔ 水平等距</button>
-        <button style={alignBtn} onClick={() => onDistribute("v")} disabled={selectionCount < 3} title="垂直等距（≥3）">↕ 垂直等距</button>
+        <button
+          style={alignBtn}
+          onClick={() => onDistribute("h")}
+          disabled={selectionCount < 3}
+          title="水平等距（≥3）"
+        >
+          ↔ 水平等距
+        </button>
+        <button
+          style={alignBtn}
+          onClick={() => onDistribute("v")}
+          disabled={selectionCount < 3}
+          title="垂直等距（≥3）"
+        >
+          ↕ 垂直等距
+        </button>
       </div>
-      <div style={{ fontSize: 10, color: "#888" }}>提示：单选时相对整页对齐；多选时相对整体外框对齐。</div>
+      <div style={{ fontSize: 10, color: "#888" }}>
+        提示：单选时相对整页对齐；多选时相对整体外框对齐。
+      </div>
     </div>
   );
   if (!block) {
@@ -47,7 +95,8 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
             <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
             <BackgroundPicker value={background} onChange={onChangeBackground} />
             <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
-              点击画布上的任意文字或图片框可编辑其样式；<br/>
+              点击画布上的任意文字或图片框可编辑其样式；
+              <br />
               支持 ⌘/Ctrl+点击 多选、拖拽框选、Del 删除、⌘/Ctrl+C/V 复制粘贴、⌘/Ctrl+Z 撤销。
             </div>
           </>
@@ -76,10 +125,7 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
           />
         </label>
         {block.src && (
-          <button
-            onClick={() => onChangeImage(null)}
-            style={btn}
-          >
+          <button onClick={() => onChangeImage(null)} style={btn}>
             清除图片
           </button>
         )}
@@ -114,7 +160,9 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
         <Field label="字重">
           <select
             value={t.fontWeight}
-            onChange={(e) => onChange({ fontWeight: Number(e.target.value) as TextBlock["fontWeight"] })}
+            onChange={(e) =>
+              onChange({ fontWeight: Number(e.target.value) as TextBlock["fontWeight"] })
+            }
             style={inp}
           >
             {[400, 500, 600, 700, 800].map((w) => (
@@ -178,7 +226,11 @@ export function Inspector({ block, background, selectionCount, onChange, onChang
               <button
                 key={a}
                 onClick={() => onChange({ align: a })}
-                style={{ ...alignBtn, background: (t.align ?? "left") === a ? "#2a2622" : "white", color: (t.align ?? "left") === a ? "white" : "#333" }}
+                style={{
+                  ...alignBtn,
+                  background: (t.align ?? "left") === a ? "#2a2622" : "white",
+                  color: (t.align ?? "left") === a ? "white" : "#333",
+                }}
               >
                 {a === "left" ? "⯇" : a === "center" ? "≡" : "⯈"}
               </button>
@@ -246,14 +298,25 @@ function BackgroundPicker({ value, onChange }: { value: string; onChange: (v: st
 
   function emit(nextMode = mode, nextC1 = c1, nextC2 = c2, nextAlpha = alpha, nextAngle = angle) {
     if (nextMode === "transparent") onChange("rgba(0,0,0,0)");
-    else if (nextMode === "gradient") onChange(`linear-gradient(${nextAngle}deg, ${hexToRgba(nextC1, nextAlpha / 100)} 0%, ${hexToRgba(nextC2, nextAlpha / 100)} 100%)`);
+    else if (nextMode === "gradient")
+      onChange(
+        `linear-gradient(${nextAngle}deg, ${hexToRgba(nextC1, nextAlpha / 100)} 0%, ${hexToRgba(nextC2, nextAlpha / 100)} 100%)`,
+      );
     else onChange(hexToRgba(nextC1, nextAlpha / 100));
   }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       <Field label="背景类型">
-        <select value={mode} onChange={(e) => { const m = e.target.value as typeof mode; setMode(m); emit(m); }} style={inp}>
+        <select
+          value={mode}
+          onChange={(e) => {
+            const m = e.target.value as typeof mode;
+            setMode(m);
+            emit(m);
+          }}
+          style={inp}
+        >
           <option value="solid">纯色</option>
           <option value="gradient">线性渐变</option>
           <option value="transparent">透明</option>
@@ -263,25 +326,75 @@ function BackgroundPicker({ value, onChange }: { value: string; onChange: (v: st
         <>
           <Field label={mode === "gradient" ? "起始颜色" : "背景颜色"}>
             <div style={{ display: "flex", gap: 8 }}>
-              <input type="color" value={c1} onChange={(e) => { setC1(e.target.value); emit(mode, e.target.value); }} style={swatch} />
-              <input value={c1} onChange={(e) => { setC1(e.target.value); emit(mode, e.target.value); }} style={{ ...inp, flex: 1 }} />
+              <input
+                type="color"
+                value={c1}
+                onChange={(e) => {
+                  setC1(e.target.value);
+                  emit(mode, e.target.value);
+                }}
+                style={swatch}
+              />
+              <input
+                value={c1}
+                onChange={(e) => {
+                  setC1(e.target.value);
+                  emit(mode, e.target.value);
+                }}
+                style={{ ...inp, flex: 1 }}
+              />
             </div>
           </Field>
           {mode === "gradient" && (
             <>
               <Field label="结束颜色">
                 <div style={{ display: "flex", gap: 8 }}>
-                  <input type="color" value={c2} onChange={(e) => { setC2(e.target.value); emit(mode, c1, e.target.value); }} style={swatch} />
-                  <input value={c2} onChange={(e) => { setC2(e.target.value); emit(mode, c1, e.target.value); }} style={{ ...inp, flex: 1 }} />
+                  <input
+                    type="color"
+                    value={c2}
+                    onChange={(e) => {
+                      setC2(e.target.value);
+                      emit(mode, c1, e.target.value);
+                    }}
+                    style={swatch}
+                  />
+                  <input
+                    value={c2}
+                    onChange={(e) => {
+                      setC2(e.target.value);
+                      emit(mode, c1, e.target.value);
+                    }}
+                    style={{ ...inp, flex: 1 }}
+                  />
                 </div>
               </Field>
               <Field label={`渐变角度 ${angle}°`}>
-                <input type="range" min="0" max="360" value={angle} onChange={(e) => { const a = Number(e.target.value); setAngle(a); emit(mode, c1, c2, alpha, a); }} />
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={angle}
+                  onChange={(e) => {
+                    const a = Number(e.target.value);
+                    setAngle(a);
+                    emit(mode, c1, c2, alpha, a);
+                  }}
+                />
               </Field>
             </>
           )}
           <Field label={`透明度 ${alpha}%`}>
-            <input type="range" min="0" max="100" value={alpha} onChange={(e) => { const a = Number(e.target.value); setAlpha(a); emit(mode, c1, c2, a); }} />
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={alpha}
+              onChange={(e) => {
+                const a = Number(e.target.value);
+                setAlpha(a);
+                emit(mode, c1, c2, a);
+              }}
+            />
           </Field>
           <input value={value} onChange={(e) => onChange(e.target.value)} style={inp} />
         </>
@@ -298,7 +411,9 @@ function hexToRgba(hex: string, a: number): string {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12, color: "#555" }}>
+    <label
+      style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12, color: "#555" }}
+    >
       {label}
       {children}
     </label>
@@ -315,7 +430,12 @@ const inp: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
-const swatch: React.CSSProperties = { width: 40, height: 32, border: "1px solid #ddd", borderRadius: 4 };
+const swatch: React.CSSProperties = {
+  width: 40,
+  height: 32,
+  border: "1px solid #ddd",
+  borderRadius: 4,
+};
 
 const ta: React.CSSProperties = {
   ...inp,

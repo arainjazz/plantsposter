@@ -8,18 +8,38 @@ import { PageTabs } from "@/components/PageTabs";
 import { BlockContextMenu } from "@/components/BlockContextMenu";
 import { ImageSearchModal } from "@/components/ImageSearchModal";
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
-import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage, deriveAutoName } from "@/lib/poster-data";
+import {
+  INITIAL_BLOCKS,
+  POSTER_H,
+  POSTER_W,
+  makeEmptyPage,
+  clonePage,
+  deriveAutoName,
+} from "@/lib/poster-data";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
 import { composeRangeMapSVG } from "@/lib/range-map";
 import { cleanupImageBackground } from "@/lib/image-edit";
-import { downloadEditorStateFile, loadEditorState, parseEditorStateFile, saveEditorState } from "@/lib/editor-storage";
+import {
+  downloadEditorStateFile,
+  loadEditorState,
+  parseEditorStateFile,
+  saveEditorState,
+} from "@/lib/editor-storage";
 import { importDocumentAsPage } from "@/lib/editor-import";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      page: typeof search.page === "string" ? search.page : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "半日花 · 植物图鉴 AI 编辑器" },
-      { name: "description", content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多选、AI 编辑与多格式导出。" },
+      {
+        name: "description",
+        content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多选、AI 编辑与多格式导出。",
+      },
       { property: "og:title", content: "半日花 · 植物图鉴 AI 编辑器" },
       { property: "og:description", content: "多页面、可拖动、AI 驱动的植物海报编辑器。" },
     ],
@@ -46,10 +66,14 @@ async function urlToBase64(src: string): Promise<{ mimeType: string; data: strin
       };
       fr.readAsDataURL(blob);
     });
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function Editor() {
+  const { page: searchPage } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const [hydrated, setHydrated] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"loading" | "saving" | "saved" | "error">("loading");
   const [saveMessage, setSaveMessage] = useState("正在读取本地草稿…");
@@ -77,7 +101,9 @@ function Editor() {
       setSaveStatus("saved");
       setSaveMessage(p ? "已恢复并自动保存到本地" : "已启用本地自动保存");
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Persist on every change (after hydration to avoid overwriting with defaults).
@@ -129,34 +155,51 @@ function Editor() {
     return blocks.find((b) => b.id === id) ?? null;
   }, [blocks, selectedIds]);
 
-  const updateActiveBlocks = useCallback((mapFn: (bs: Block[]) => Block[]) => {
-    setPages((prev) => prev.map((p) => (p.id === activeId ? { ...p, blocks: mapFn(p.blocks) } : p)));
-  }, [activeId]);
+  const updateActiveBlocks = useCallback(
+    (mapFn: (bs: Block[]) => Block[]) => {
+      setPages((prev) =>
+        prev.map((p) => (p.id === activeId ? { ...p, blocks: mapFn(p.blocks) } : p)),
+      );
+    },
+    [activeId],
+  );
 
   function patchSelected(patch: Partial<TextBlock>) {
     if (!soloSelected) return;
     const id = soloSelected.id;
-    updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "text" ? { ...b, ...patch } : b)));
+    updateActiveBlocks((bs) =>
+      bs.map((b) => (b.id === id && b.type === "text" ? { ...b, ...patch } : b)),
+    );
   }
   function changeText(id: string, text: string) {
-    updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "text" ? { ...b, text } : b)));
+    updateActiveBlocks((bs) =>
+      bs.map((b) => (b.id === id && b.type === "text" ? { ...b, text } : b)),
+    );
   }
-  const setImageAt = useCallback((id: string, src: string | null) => {
-    updateActiveBlocks((bs) => bs.map((b) => (b.id === id && b.type === "image" ? ({ ...(b as ImageBlock), src }) : b)));
-  }, [updateActiveBlocks]);
+  const setImageAt = useCallback(
+    (id: string, src: string | null) => {
+      updateActiveBlocks((bs) =>
+        bs.map((b) => (b.id === id && b.type === "image" ? { ...(b as ImageBlock), src } : b)),
+      );
+    },
+    [updateActiveBlocks],
+  );
   function setImage(src: string | null) {
     if (!soloSelected || soloSelected.type !== "image") return;
     setImageAt(soloSelected.id, src);
   }
   function moveMany(dx: number, dy: number) {
     if (selectedIds.size === 0) return;
-    updateActiveBlocks((bs) => bs.map((b) => selectedIds.has(b.id) ? { ...b, x: b.x + dx, y: b.y + dy } : b));
+    updateActiveBlocks((bs) =>
+      bs.map((b) => (selectedIds.has(b.id) ? { ...b, x: b.x + dx, y: b.y + dy } : b)),
+    );
   }
   function resizeBlock(id: string, patch: { x: number; y: number; w: number; h?: number }) {
     updateActiveBlocks((bs) =>
       bs.map((b) => {
         if (b.id !== id) return b;
-        if (b.type === "image") return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h };
+        if (b.type === "image")
+          return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h };
         return { ...b, x: patch.x, y: patch.y, w: patch.w };
       }),
     );
@@ -172,31 +215,38 @@ function Editor() {
       }),
     );
   }
-  function selectIds(ids: string[]) { setSelectedIds(new Set(ids)); }
+  function selectIds(ids: string[]) {
+    setSelectedIds(new Set(ids));
+  }
 
   function alignToPage(dir: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") {
     if (selectedIds.size === 0) return;
     const sel = blocks.filter((b) => selectedIds.has(b.id));
     const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
-    let refX1 = 0, refX2 = POSTER_W, refY1 = 0, refY2 = POSTER_H;
+    let refX1 = 0,
+      refX2 = POSTER_W,
+      refY1 = 0,
+      refY2 = POSTER_H;
     if (sel.length >= 2) {
       refX1 = Math.min(...sel.map((b) => b.x));
       refX2 = Math.max(...sel.map((b) => b.x + b.w));
       refY1 = Math.min(...sel.map((b) => b.y));
       refY2 = Math.max(...sel.map((b) => b.y + boxH(b)));
     }
-    updateActiveBlocks((bs) => bs.map((b) => {
-      if (!selectedIds.has(b.id)) return b;
-      const bh = boxH(b);
-      let { x, y } = b;
-      if (dir === "left") x = refX1;
-      else if (dir === "right") x = refX2 - b.w;
-      else if (dir === "hcenter") x = Math.round((refX1 + refX2) / 2 - b.w / 2);
-      else if (dir === "top") y = refY1;
-      else if (dir === "bottom") y = refY2 - bh;
-      else if (dir === "vcenter") y = Math.round((refY1 + refY2) / 2 - bh / 2);
-      return { ...b, x, y };
-    }));
+    updateActiveBlocks((bs) =>
+      bs.map((b) => {
+        if (!selectedIds.has(b.id)) return b;
+        const bh = boxH(b);
+        let { x, y } = b;
+        if (dir === "left") x = refX1;
+        else if (dir === "right") x = refX2 - b.w;
+        else if (dir === "hcenter") x = Math.round((refX1 + refX2) / 2 - b.w / 2);
+        else if (dir === "top") y = refY1;
+        else if (dir === "bottom") y = refY2 - bh;
+        else if (dir === "vcenter") y = Math.round((refY1 + refY2) / 2 - bh / 2);
+        return { ...b, x, y };
+      }),
+    );
   }
 
   function distribute(axis: "h" | "v") {
@@ -204,20 +254,30 @@ function Editor() {
     const sel = blocks.filter((b) => selectedIds.has(b.id));
     const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
     const sorted = [...sel].sort((a, b) => (axis === "h" ? a.x - b.x : a.y - b.y));
-    const first = sorted[0], last = sorted[sorted.length - 1];
-    const gap = axis === "h"
-      ? ((last.x + last.w) - first.x - sorted.reduce((s, b) => s + b.w, 0)) / (sorted.length - 1)
-      : ((last.y + boxH(last)) - first.y - sorted.reduce((s, b) => s + boxH(b), 0)) / (sorted.length - 1);
+    const first = sorted[0],
+      last = sorted[sorted.length - 1];
+    const gap =
+      axis === "h"
+        ? (last.x + last.w - first.x - sorted.reduce((s, b) => s + b.w, 0)) / (sorted.length - 1)
+        : (last.y + boxH(last) - first.y - sorted.reduce((s, b) => s + boxH(b), 0)) /
+          (sorted.length - 1);
     const positions = new Map<string, { x?: number; y?: number }>();
     let cursor = axis === "h" ? first.x : first.y;
     for (const b of sorted) {
-      if (axis === "h") { positions.set(b.id, { x: Math.round(cursor) }); cursor += b.w + gap; }
-      else { positions.set(b.id, { y: Math.round(cursor) }); cursor += boxH(b) + gap; }
+      if (axis === "h") {
+        positions.set(b.id, { x: Math.round(cursor) });
+        cursor += b.w + gap;
+      } else {
+        positions.set(b.id, { y: Math.round(cursor) });
+        cursor += boxH(b) + gap;
+      }
     }
-    updateActiveBlocks((bs) => bs.map((b) => {
-      const p = positions.get(b.id);
-      return p ? { ...b, ...p } : b;
-    }));
+    updateActiveBlocks((bs) =>
+      bs.map((b) => {
+        const p = positions.get(b.id);
+        return p ? { ...b, ...p } : b;
+      }),
+    );
   }
 
   // Auto-rename
@@ -229,11 +289,39 @@ function Editor() {
     }
   }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name]);
 
+  // Sync URL search param 'page' -> activeId
+  useEffect(() => {
+    if (!hydrated) return;
+    if (searchPage) {
+      const matchedPage = pages.find((pg) => pg.id === searchPage || pg.name === searchPage);
+      if (matchedPage && matchedPage.id !== activeId) {
+        setActiveId(matchedPage.id);
+        setSelectedIds(new Set());
+      }
+    }
+  }, [searchPage, pages, hydrated, activeId]);
+
+  // Sync activeId -> URL search param 'page'
+  useEffect(() => {
+    if (!hydrated) return;
+    const activePage = pages.find((p) => p.id === activeId) ?? pages[0];
+    if (activePage) {
+      const currentName = activePage.name;
+      if (searchPage !== currentName && searchPage !== activePage.id) {
+        void navigate({
+          search: (prev) => ({ ...prev, page: currentName }),
+          replace: true,
+        });
+      }
+    }
+  }, [activeId, pages, hydrated, searchPage, navigate]);
+
   // Delete key
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable)
+        return;
       if ((e.key === "Delete" || e.key === "Backspace") && selectedIds.size > 0) {
         e.preventDefault();
         updateActiveBlocks((bs) => bs.filter((b) => !selectedIds.has(b.id)));
@@ -317,16 +405,21 @@ function Editor() {
     setBusyMsg("正在去除背景并清理边缘…");
     try {
       const ref = await urlToBase64(block.src);
-      if (!ref) { setBusyMsg(null); alert("无法读取图像"); return; }
+      if (!ref) {
+        setBusyMsg(null);
+        alert("无法读取图像");
+        return;
+      }
       const r = await fetch("/api/gen-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: "Professional product cutout. Remove ALL background pixels completely, including white/gray halos, shadows, paper, table, sky, and edge spill. Output ONLY the foreground subject on fully transparent PNG alpha. Preserve botanical fine hairs, leaf edges, stems, and petals.",
+          prompt:
+            "Professional product cutout. Remove ALL background pixels completely, including white/gray halos, shadows, paper, table, sky, and edge spill. Output ONLY the foreground subject on fully transparent PNG alpha. Preserve botanical fine hairs, leaf edges, stems, and petals.",
           reference: ref,
         }),
       });
-      const j = await r.json() as { dataUrl?: string; error?: string };
+      const j = (await r.json()) as { dataUrl?: string; error?: string };
       if (j.dataUrl) {
         const aiRef = await urlToBase64(j.dataUrl);
         setImageAt(id, aiRef ? await cleanupImageBackground(aiRef) : j.dataUrl);
@@ -391,10 +484,16 @@ function Editor() {
       if (d.side === "left") setLeftW(clamped);
       else setRightW(clamped);
     }
-    function onUp() { dragRef.current = null; document.body.style.cursor = ""; }
+    function onUp() {
+      dragRef.current = null;
+      document.body.style.cursor = "";
+    }
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
-    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
   }, []);
   function startDrag(side: "left" | "right", e: React.MouseEvent) {
     dragRef.current = { side, startX: e.clientX, startW: side === "left" ? leftW : rightW };
@@ -405,12 +504,21 @@ function Editor() {
   const clipboardRef = useRef<Block[]>([]);
   const historyRef = useRef<Array<{ pages: PosterPage[]; activeId: string; palette: Palette }>>([]);
   const skipHistoryRef = useRef(false);
-  const prevSnapRef = useRef<{ pages: PosterPage[]; activeId: string; palette: Palette } | null>(null);
+  const prevSnapRef = useRef<{ pages: PosterPage[]; activeId: string; palette: Palette } | null>(
+    null,
+  );
 
   // Track history: push previous snapshot before applying a new one.
   useEffect(() => {
-    if (!hydrated) { prevSnapRef.current = { pages, activeId, palette }; return; }
-    if (skipHistoryRef.current) { skipHistoryRef.current = false; prevSnapRef.current = { pages, activeId, palette }; return; }
+    if (!hydrated) {
+      prevSnapRef.current = { pages, activeId, palette };
+      return;
+    }
+    if (skipHistoryRef.current) {
+      skipHistoryRef.current = false;
+      prevSnapRef.current = { pages, activeId, palette };
+      return;
+    }
     if (prevSnapRef.current) {
       historyRef.current.push(prevSnapRef.current);
       if (historyRef.current.length > 100) historyRef.current.shift();
@@ -421,7 +529,8 @@ function Editor() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable)
+        return;
       const meta = e.metaKey || e.ctrlKey;
       if (meta && e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
@@ -477,23 +586,44 @@ function Editor() {
         color: "#222",
       }}
     >
-      <header style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", padding: "0 20px", background: "white", borderBottom: "1px solid #e5e5e5", gap: 16 }}>
+      <header
+        style={{
+          gridColumn: "1 / -1",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 20px",
+          background: "white",
+          borderBottom: "1px solid #e5e5e5",
+          gap: 16,
+        }}
+      >
         <div style={{ fontWeight: 700, fontSize: 15 }}>🌾 Ordos Plantspedia · Editor</div>
         <div style={{ color: "#888", fontSize: 12 }}>
-          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · ⌘/Ctrl+C/V 复制粘贴 · ⌘/Ctrl+Z 撤销
+          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 ·
+          ⌘/Ctrl+C/V 复制粘贴 · ⌘/Ctrl+Z 撤销
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           <ExportMenu pages={pages} activePageId={activeId} palette={palette} />
-          <div style={{
-            minWidth: 190, padding: "7px 10px", borderRadius: 6,
-            border: saveStatus === "error" ? "1px solid #c93" : "1px solid #d8ddcf",
-            background: saveStatus === "error" ? "#fff7df" : "#f4f7ef",
-            color: saveStatus === "error" ? "#7a4b00" : "#405230", fontSize: 12,
-          }}>
-            {saveStatus === "saving" ? "⏳ " : saveStatus === "error" ? "⚠ " : "✓ "}{saveMessage}
+          <div
+            style={{
+              minWidth: 190,
+              padding: "7px 10px",
+              borderRadius: 6,
+              border: saveStatus === "error" ? "1px solid #c93" : "1px solid #d8ddcf",
+              background: saveStatus === "error" ? "#fff7df" : "#f4f7ef",
+              color: saveStatus === "error" ? "#7a4b00" : "#405230",
+              fontSize: 12,
+            }}
+          >
+            {saveStatus === "saving" ? "⏳ " : saveStatus === "error" ? "⚠ " : "✓ "}
+            {saveMessage}
           </div>
-          <button onClick={manualSave} style={headerBtn}>保存数据在本地</button>
-          <button onClick={() => importInputRef.current?.click()} style={headerBtn}>导入</button>
+          <button onClick={manualSave} style={headerBtn}>
+            保存数据在本地
+          </button>
+          <button onClick={() => importInputRef.current?.click()} style={headerBtn}>
+            导入
+          </button>
         </div>
       </header>
 
@@ -513,7 +643,13 @@ function Editor() {
 
       <main
         ref={stageRef}
-        style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", overflow: "auto", padding: 24 }}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          overflow: "auto",
+          padding: 24,
+        }}
       >
         <PosterCanvas
           blocks={blocks}
@@ -536,7 +672,14 @@ function Editor() {
       />
 
       <aside style={{ borderLeft: "1px solid #e5e5e5", background: "white", overflowY: "auto" }}>
-        <div style={{ padding: "12px 14px", borderBottom: "1px solid #eee", fontSize: 13, fontWeight: 600 }}>
+        <div
+          style={{
+            padding: "12px 14px",
+            borderBottom: "1px solid #eee",
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
           属性面板 {selectedIds.size > 1 ? `（已选 ${selectedIds.size} 个，仅显示单选属性）` : ""}
         </div>
         <Inspector
@@ -555,7 +698,10 @@ function Editor() {
         <PageTabs
           pages={pages}
           activeId={activeId}
-          onSelect={(id) => { setActiveId(id); setSelectedIds(new Set()); }}
+          onSelect={(id) => {
+            setActiveId(id);
+            setSelectedIds(new Set());
+          }}
           onAdd={addPage}
           onDuplicate={duplicatePage}
           onDelete={deletePage}
@@ -592,36 +738,51 @@ function Editor() {
         }}
       />
 
-      {ctxMenu && (() => {
-        const b = blocks.find((x) => x.id === ctxMenu.id);
-        const hasImage = b?.type === "image" && !!b.src;
-        return (
-          <BlockContextMenu
-            x={ctxMenu.x} y={ctxMenu.y}
-            hasImage={hasImage}
-            onClose={() => setCtxMenu(null)}
-            onUpload={() => triggerUpload(ctxMenu.id)}
-            onSearch={() => setSearchFor(ctxMenu.id)}
-            onRemoveBg={() => removeBackground(ctxMenu.id)}
-            onClear={() => setImageAt(ctxMenu.id, null)}
-          />
-        );
-      })()}
+      {ctxMenu &&
+        (() => {
+          const b = blocks.find((x) => x.id === ctxMenu.id);
+          const hasImage = b?.type === "image" && !!b.src;
+          return (
+            <BlockContextMenu
+              x={ctxMenu.x}
+              y={ctxMenu.y}
+              hasImage={hasImage}
+              onClose={() => setCtxMenu(null)}
+              onUpload={() => triggerUpload(ctxMenu.id)}
+              onSearch={() => setSearchFor(ctxMenu.id)}
+              onRemoveBg={() => removeBackground(ctxMenu.id)}
+              onClear={() => setImageAt(ctxMenu.id, null)}
+            />
+          );
+        })()}
 
       {searchFor && (
         <ImageSearchModal
-          initialQuery={(blocks.find((b) => b.id === searchFor) as ImageBlock | undefined)?.label ?? ""}
+          initialQuery={
+            (blocks.find((b) => b.id === searchFor) as ImageBlock | undefined)?.label ?? ""
+          }
           onClose={() => setSearchFor(null)}
-          onPick={(url) => { setImageAt(searchFor, url); setSearchFor(null); }}
+          onPick={(url) => {
+            setImageAt(searchFor, url);
+            setSearchFor(null);
+          }}
         />
       )}
 
       {busyMsg && (
-        <div style={{
-          position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
-          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200,
-          color: "white", fontSize: 15,
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1200,
+            color: "white",
+            fontSize: 15,
+          }}
+        >
           {busyMsg}
         </div>
       )}

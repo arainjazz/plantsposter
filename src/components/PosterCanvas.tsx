@@ -30,23 +30,57 @@ type Props = {
   displayWidth: number;
 };
 
-type MoveState = { kind: "move"; startX: number; startY: number; committedDx: number; committedDy: number };
+type MoveState = {
+  kind: "move";
+  startX: number;
+  startY: number;
+  committedDx: number;
+  committedDy: number;
+};
 type ResizeState = {
-  kind: "resize"; id: string; handle: Handle;
-  startX: number; startY: number;
-  origX: number; origY: number; origW: number; origH: number; isText: boolean;
+  kind: "resize";
+  id: string;
+  handle: Handle;
+  startX: number;
+  startY: number;
+  origX: number;
+  origY: number;
+  origW: number;
+  origH: number;
+  isText: boolean;
 };
 type GroupResizeState = {
-  kind: "group-resize"; handle: Handle;
-  startX: number; startY: number;
-  bboxX: number; bboxY: number; bboxW: number; bboxH: number;
+  kind: "group-resize";
+  handle: Handle;
+  startX: number;
+  startY: number;
+  bboxX: number;
+  bboxY: number;
+  bboxW: number;
+  bboxH: number;
   originals: Array<{ id: string; x: number; y: number; w: number; h: number; isText: boolean }>;
 };
-type MarqueeState = { kind: "marquee"; startX: number; startY: number; curX: number; curY: number; additive: boolean };
+type MarqueeState = {
+  kind: "marquee";
+  startX: number;
+  startY: number;
+  curX: number;
+  curY: number;
+  additive: boolean;
+};
 type DragState = MoveState | ResizeState | GroupResizeState | MarqueeState | null;
 
 export function PosterCanvas({
-  blocks, palette, selectedIds, onSelectIds, onMoveMany, onResize, onResizeMany, onChangeText, onImageContextMenu, displayWidth,
+  blocks,
+  palette,
+  selectedIds,
+  onSelectIds,
+  onMoveMany,
+  onResize,
+  onResizeMany,
+  onChangeText,
+  onImageContextMenu,
+  displayWidth,
 }: Props) {
   const scale = displayWidth / POSTER_W;
   const height = POSTER_H * scale;
@@ -60,13 +94,20 @@ export function PosterCanvas({
     const additive = e.metaKey || e.ctrlKey || e.shiftKey;
     if (additive) {
       const next = new Set(selectedIds);
-      if (next.has(b.id)) next.delete(b.id); else next.add(b.id);
+      if (next.has(b.id)) next.delete(b.id);
+      else next.add(b.id);
       onSelectIds(Array.from(next));
     } else if (!selectedIds.has(b.id)) {
       onSelectIds([b.id]);
     }
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
-    dragRef.current = { kind: "move", startX: e.clientX, startY: e.clientY, committedDx: 0, committedDy: 0 };
+    dragRef.current = {
+      kind: "move",
+      startX: e.clientX,
+      startY: e.clientY,
+      committedDx: 0,
+      committedDy: 0,
+    };
   }
 
   function startResize(e: React.PointerEvent, b: Block, handle: Handle) {
@@ -74,27 +115,45 @@ export function PosterCanvas({
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
     const h = b.type === "image" ? b.h : 100;
     dragRef.current = {
-      kind: "resize", id: b.id, handle,
-      startX: e.clientX, startY: e.clientY,
-      origX: b.x, origY: b.y, origW: b.w, origH: h,
+      kind: "resize",
+      id: b.id,
+      handle,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: b.x,
+      origY: b.y,
+      origW: b.w,
+      origH: h,
       isText: b.type === "text",
     };
   }
 
-  function startGroupResize(e: React.PointerEvent, handle: Handle, bbox: { x: number; y: number; w: number; h: number }) {
+  function startGroupResize(
+    e: React.PointerEvent,
+    handle: Handle,
+    bbox: { x: number; y: number; w: number; h: number },
+  ) {
     e.stopPropagation();
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
     const originals = blocks
       .filter((b) => selectedIds.has(b.id))
       .map((b) => ({
-        id: b.id, x: b.x, y: b.y, w: b.w,
+        id: b.id,
+        x: b.x,
+        y: b.y,
+        w: b.w,
         h: b.type === "image" ? b.h : 100,
         isText: b.type === "text",
       }));
     dragRef.current = {
-      kind: "group-resize", handle,
-      startX: e.clientX, startY: e.clientY,
-      bboxX: bbox.x, bboxY: bbox.y, bboxW: bbox.w, bboxH: bbox.h,
+      kind: "group-resize",
+      handle,
+      startX: e.clientX,
+      startY: e.clientY,
+      bboxX: bbox.x,
+      bboxY: bbox.y,
+      bboxW: bbox.w,
+      bboxH: bbox.h,
       originals,
     };
   }
@@ -107,7 +166,10 @@ export function PosterCanvas({
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
     dragRef.current = {
       kind: "marquee",
-      startX: x, startY: y, curX: x, curY: y,
+      startX: x,
+      startY: y,
+      curX: x,
+      curY: y,
       additive: e.metaKey || e.ctrlKey || e.shiftKey,
     };
     if (!(e.metaKey || e.ctrlKey || e.shiftKey)) onSelectIds([]);
@@ -135,14 +197,23 @@ export function PosterCanvas({
       let { origX: x, origY: y, origW: w, origH: h } = d;
       if (d.handle.includes("e")) w = Math.max(20, d.origW + dx);
       if (d.handle.includes("s")) h = Math.max(20, d.origH + dy);
-      if (d.handle.includes("w")) { w = Math.max(20, d.origW - dx); x = d.origX + (d.origW - w); }
-      if (d.handle.includes("n")) { h = Math.max(20, d.origH - dy); y = d.origY + (d.origH - h); }
+      if (d.handle.includes("w")) {
+        w = Math.max(20, d.origW - dx);
+        x = d.origX + (d.origW - w);
+      }
+      if (d.handle.includes("n")) {
+        h = Math.max(20, d.origH - dy);
+        y = d.origY + (d.origH - h);
+      }
       if (!d.isText && e.shiftKey) {
         const ratio = d.origW / d.origH;
-        if (Math.abs(w - d.origW) > Math.abs(h - d.origH)) h = w / ratio; else w = h * ratio;
+        if (Math.abs(w - d.origW) > Math.abs(h - d.origH)) h = w / ratio;
+        else w = h * ratio;
       }
       onResize(d.id, {
-        x: Math.round(x), y: Math.round(y), w: Math.round(w),
+        x: Math.round(x),
+        y: Math.round(y),
+        w: Math.round(w),
         h: d.isText ? undefined : Math.round(h),
       });
       return;
@@ -152,11 +223,20 @@ export function PosterCanvas({
       const dy = (e.clientY - d.startY) / scale;
       const hasH = d.handle.includes("e") || d.handle.includes("w");
       const hasV = d.handle.includes("n") || d.handle.includes("s");
-      let newX = d.bboxX, newY = d.bboxY, newW = d.bboxW, newH = d.bboxH;
+      let newX = d.bboxX,
+        newY = d.bboxY,
+        newW = d.bboxW,
+        newH = d.bboxH;
       if (d.handle.includes("e")) newW = Math.max(30, d.bboxW + dx);
       if (d.handle.includes("s")) newH = Math.max(30, d.bboxH + dy);
-      if (d.handle.includes("w")) { newW = Math.max(30, d.bboxW - dx); newX = d.bboxX + (d.bboxW - newW); }
-      if (d.handle.includes("n")) { newH = Math.max(30, d.bboxH - dy); newY = d.bboxY + (d.bboxH - newH); }
+      if (d.handle.includes("w")) {
+        newW = Math.max(30, d.bboxW - dx);
+        newX = d.bboxX + (d.bboxW - newW);
+      }
+      if (d.handle.includes("n")) {
+        newH = Math.max(30, d.bboxH - dy);
+        newY = d.bboxY + (d.bboxH - newH);
+      }
       // Hold Shift for uniform (aspect-locked) scaling; default = per-axis so the
       // axis you're NOT dragging (and paragraph vertical spacing) stays put.
       if (e.shiftKey && hasH && hasV) {
@@ -197,11 +277,13 @@ export function PosterCanvas({
       const y1 = Math.min(d.startY, d.curY);
       const y2 = Math.max(d.startY, d.curY);
       if (Math.abs(x2 - x1) > 3 && Math.abs(y2 - y1) > 3) {
-        const hits = blocks.filter((b) => {
-          const bw = b.w;
-          const bh = b.type === "image" ? b.h : 30;
-          return b.x < x2 && b.x + bw > x1 && b.y < y2 && b.y + bh > y1;
-        }).map((b) => b.id);
+        const hits = blocks
+          .filter((b) => {
+            const bw = b.w;
+            const bh = b.type === "image" ? b.h : 30;
+            return b.x < x2 && b.x + bw > x1 && b.y < y2 && b.y + bh > y1;
+          })
+          .map((b) => b.id);
         if (d.additive) {
           const merged = new Set(selectedIds);
           hits.forEach((id) => merged.add(id));
@@ -211,7 +293,11 @@ export function PosterCanvas({
         }
       }
     }
-    try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch { /* noop */ }
+    try {
+      (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+    } catch {
+      /* noop */
+    }
     dragRef.current = null;
     rerender();
   }
@@ -224,7 +310,10 @@ export function PosterCanvas({
     if (selectedIds.size < 2) return null;
     const sel = blocks.filter((b) => selectedIds.has(b.id));
     if (sel.length < 2) return null;
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
     for (const b of sel) {
       const bh = b.type === "image" ? b.h : 40;
       minX = Math.min(minX, b.x);
@@ -243,7 +332,8 @@ export function PosterCanvas({
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       style={{
-        width: displayWidth, height,
+        width: displayWidth,
+        height,
         background: palette.background,
         position: "relative",
         boxShadow: "0 20px 60px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.05)",
@@ -251,17 +341,28 @@ export function PosterCanvas({
         touchAction: "none",
       }}
     >
-      <div style={{
-        position: "absolute", top: 0, left: 0,
-        width: POSTER_W, height: POSTER_H,
-        transform: `scale(${scale})`, transformOrigin: "top left",
-      }}>
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: POSTER_W,
+          height: POSTER_H,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+        }}
+      >
         {blocks.map((b) => {
           const selected = selectedIds.has(b.id);
           return (
             <div key={b.id} style={{ position: "absolute", left: b.x, top: b.y }}>
               {b.type === "text" ? (
-                <TextEl block={b} selected={selected} onChangeText={onChangeText} onPointerDown={(e) => startBlockPointer(e, b)} />
+                <TextEl
+                  block={b}
+                  selected={selected}
+                  onChangeText={onChangeText}
+                  onPointerDown={(e) => startBlockPointer(e, b)}
+                />
               ) : (
                 <ImageEl
                   block={b}
@@ -291,8 +392,10 @@ export function PosterCanvas({
           <div
             style={{
               position: "absolute",
-              left: groupBBox.x, top: groupBBox.y,
-              width: groupBBox.w, height: groupBBox.h,
+              left: groupBBox.x,
+              top: groupBBox.y,
+              width: groupBBox.w,
+              height: groupBBox.h,
               border: "1.5px dashed #4c8dff",
               pointerEvents: "none",
               zIndex: 9,
@@ -328,42 +431,69 @@ export function PosterCanvas({
   );
 }
 
-function ResizeHandles({ w, h, isText, onStart }: {
-  w: number; h: number | undefined; isText: boolean;
+function ResizeHandles({
+  w,
+  h,
+  isText,
+  onStart,
+}: {
+  w: number;
+  h: number | undefined;
+  isText: boolean;
   onStart: (handle: Handle, e: React.PointerEvent) => void;
 }) {
   const handles: Array<{ h: Handle; l: number; t: number; cursor: string; visible: boolean }> = [
     { h: "nw", l: 0, t: 0, cursor: "nwse-resize", visible: !isText },
-    { h: "n",  l: w / 2, t: 0, cursor: "ns-resize", visible: !isText },
+    { h: "n", l: w / 2, t: 0, cursor: "ns-resize", visible: !isText },
     { h: "ne", l: w, t: 0, cursor: "nesw-resize", visible: !isText },
-    { h: "e",  l: w, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true },
+    { h: "e", l: w, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true },
     { h: "se", l: w, t: h ?? 20, cursor: "nwse-resize", visible: !isText },
-    { h: "s",  l: w / 2, t: h ?? 20, cursor: "ns-resize", visible: !isText },
+    { h: "s", l: w / 2, t: h ?? 20, cursor: "ns-resize", visible: !isText },
     { h: "sw", l: 0, t: h ?? 20, cursor: "nesw-resize", visible: !isText },
-    { h: "w",  l: 0, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true },
+    { h: "w", l: 0, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true },
   ];
   const size = 12;
   return (
     <>
-      {handles.filter((x) => x.visible).map((x) => (
-        <div
-          key={x.h}
-          onPointerDown={(e) => { e.stopPropagation(); onStart(x.h, e); }}
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: "absolute", left: x.l - size / 2, top: x.t - size / 2,
-            width: size, height: size,
-            background: "white", border: "2px solid #4c8dff", borderRadius: 2,
-            cursor: x.cursor, touchAction: "none", zIndex: 10,
-          }}
-        />
-      ))}
+      {handles
+        .filter((x) => x.visible)
+        .map((x) => (
+          <div
+            key={x.h}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              onStart(x.h, e);
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute",
+              left: x.l - size / 2,
+              top: x.t - size / 2,
+              width: size,
+              height: size,
+              background: "white",
+              border: "2px solid #4c8dff",
+              borderRadius: 2,
+              cursor: x.cursor,
+              touchAction: "none",
+              zIndex: 10,
+            }}
+          />
+        ))}
     </>
   );
 }
 
-function TextEl({ block, selected, onChangeText, onPointerDown }: {
-  block: TextBlock; selected: boolean; onChangeText: (id: string, text: string) => void; onPointerDown: (e: React.PointerEvent) => void;
+function TextEl({
+  block,
+  selected,
+  onChangeText,
+  onPointerDown,
+}: {
+  block: TextBlock;
+  selected: boolean;
+  onChangeText: (id: string, text: string) => void;
+  onPointerDown: (e: React.PointerEvent) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const editRef = useRef<HTMLTextAreaElement>(null);
@@ -379,9 +509,12 @@ function TextEl({ block, selected, onChangeText, onPointerDown }: {
     letterSpacing: block.letterSpacing ? `${block.letterSpacing}px` : undefined,
     textTransform: block.textTransform,
     whiteSpace: "pre-wrap",
-    cursor: editing ? "text" : "move", userSelect: editing ? "text" : "none", touchAction: "none",
+    cursor: editing ? "text" : "move",
+    userSelect: editing ? "text" : "none",
+    touchAction: "none",
     outline: editing ? "2px solid #b0692b" : selected ? "2px solid #4c8dff" : "none",
-    outlineOffset: 4, borderRadius: 2,
+    outlineOffset: 4,
+    borderRadius: 2,
   };
   useEffect(() => {
     if (!editing) return;
@@ -396,7 +529,12 @@ function TextEl({ block, selected, onChangeText, onPointerDown }: {
         value={block.text}
         onChange={(e) => onChangeText(block.id, e.target.value)}
         onBlur={() => setEditing(false)}
-        onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setEditing(false); } }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            setEditing(false);
+          }
+        }}
         onPointerDown={(e) => e.stopPropagation()}
         style={{
           ...style,
@@ -411,11 +549,30 @@ function TextEl({ block, selected, onChangeText, onPointerDown }: {
       />
     );
   }
-  return <div style={style} onDoubleClick={(e) => { e.stopPropagation(); setEditing(true); }} onPointerDown={onPointerDown}>{block.text}</div>;
+  return (
+    <div
+      style={style}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        setEditing(true);
+      }}
+      onPointerDown={onPointerDown}
+    >
+      {block.text}
+    </div>
+  );
 }
 
-function ImageEl({ block, palette, selected, onPointerDown, onContextMenu }: {
-  block: ImageBlock; palette: Palette; selected: boolean;
+function ImageEl({
+  block,
+  palette,
+  selected,
+  onPointerDown,
+  onContextMenu,
+}: {
+  block: ImageBlock;
+  palette: Palette;
+  selected: boolean;
   onPointerDown: (e: React.PointerEvent) => void;
   onContextMenu: (e: React.MouseEvent) => void;
 }) {
@@ -424,25 +581,46 @@ function ImageEl({ block, palette, selected, onPointerDown, onContextMenu }: {
       onPointerDown={onPointerDown}
       onContextMenu={onContextMenu}
       style={{
-        width: block.w, height: block.h,
+        width: block.w,
+        height: block.h,
         border: block.src ? "none" : "2px dashed rgba(0,0,0,0.25)",
         background: block.src ? "transparent" : "rgba(0,0,0,0.03)",
-        display: "flex", alignItems: "center", justifyContent: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         color: palette.muted,
-        fontFamily: FAMILY.serif, fontStyle: "italic", fontSize: 14,
-        textAlign: "center", padding: 6, boxSizing: "border-box",
-        cursor: "move", userSelect: "none", touchAction: "none",
+        fontFamily: FAMILY.serif,
+        fontStyle: "italic",
+        fontSize: 14,
+        textAlign: "center",
+        padding: 6,
+        boxSizing: "border-box",
+        cursor: "move",
+        userSelect: "none",
+        touchAction: "none",
         outline: selected ? "2px solid #4c8dff" : "none",
-        outlineOffset: 4, overflow: "hidden",
+        outlineOffset: 4,
+        overflow: "hidden",
       }}
     >
       {block.src ? (
-        <img src={block.src} alt={block.label} draggable={false}
-          style={{ width: "100%", height: "100%", objectFit: block.src.startsWith("data:image/svg+xml") ? "fill" : "cover", pointerEvents: "none" }} />
+        <img
+          src={block.src}
+          alt={block.label}
+          draggable={false}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: block.src.startsWith("data:image/svg+xml") ? "fill" : "cover",
+            pointerEvents: "none",
+          }}
+        />
       ) : (
         <>
           {block.label}
-          <div style={{ position: "absolute", fontSize: 10, marginTop: 40, opacity: 0.6 }}>右键上传/搜索/去背景</div>
+          <div style={{ position: "absolute", fontSize: 10, marginTop: 40, opacity: 0.6 }}>
+            右键上传/搜索/去背景
+          </div>
         </>
       )}
     </div>

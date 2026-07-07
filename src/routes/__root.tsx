@@ -78,17 +78,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "植物科普海报 AI 编辑器" },
-      { name: "description", content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多页面、AI 编辑与多格式导出。" },
+      {
+        name: "description",
+        content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多页面、AI 编辑与多格式导出。",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "植物科普海报 AI 编辑器" },
-      { property: "og:description", content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多页面、AI 编辑与多格式导出。" },
+      {
+        property: "og:description",
+        content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多页面、AI 编辑与多格式导出。",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "植物科普海报 AI 编辑器" },
-      { name: "twitter:description", content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多页面、AI 编辑与多格式导出。" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fd7bcb0b-2594-4fbe-9bac-1fec22a65c49/id-preview-eff66fba--98385b8b-a49c-4537-89d1-fda4ae083b01.lovable.app-1783361061038.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fd7bcb0b-2594-4fbe-9bac-1fec22a65c49/id-preview-eff66fba--98385b8b-a49c-4537-89d1-fda4ae083b01.lovable.app-1783361061038.png" },
+      {
+        name: "twitter:description",
+        content: "Canva 风格的 A3 植物科普海报编辑器，支持拖动、多页面、AI 编辑与多格式导出。",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fd7bcb0b-2594-4fbe-9bac-1fec22a65c49/id-preview-eff66fba--98385b8b-a49c-4537-89d1-fda4ae083b01.lovable.app-1783361061038.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fd7bcb0b-2594-4fbe-9bac-1fec22a65c49/id-preview-eff66fba--98385b8b-a49c-4537-89d1-fda4ae083b01.lovable.app-1783361061038.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

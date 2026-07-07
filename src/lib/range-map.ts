@@ -15,11 +15,11 @@ export type RangePoint = {
 };
 
 export type RangeMapOpts = {
-  title?: string;         // e.g. "Helianthemum songaricum · Global Distribution"
-  subtitle?: string;      // e.g. "Equirectangular projection · Wikimedia CC0 base"
-  source?: string;        // caption line (data source, date, license)
-  legendNative?: string;  // default "Native · 原生分布"
-  legendIntro?: string;   // default "Introduced · 引入记录"
+  title?: string; // e.g. "Helianthemum songaricum · Global Distribution"
+  subtitle?: string; // e.g. "Equirectangular projection · Wikimedia CC0 base"
+  source?: string; // caption line (data source, date, license)
+  legendNative?: string; // default "Native · 原生分布"
+  legendIntro?: string; // default "Introduced · 引入记录"
 };
 
 export function projectLonLat(lat: number, lon: number): { x: number; y: number } {
@@ -38,9 +38,14 @@ async function loadBaseMap(): Promise<string> {
   // source styling so every generated map has identical fill/stroke.
   const paths = text.match(/<path\b[\s\S]*?(?:\/>|<\/path>)/gi) ?? [];
   cachedBase = paths
-    .map((path) => path
-      .replace(/\s(?:style|fill|stroke|stroke-width|stroke-dasharray|stroke-linejoin|stroke-linecap|opacity)="[^"]*"/gi, "")
-      .replace(/\s+\/?>$/, (end) => end.includes("/") ? "/>" : ">"))
+    .map((path) =>
+      path
+        .replace(
+          /\s(?:style|fill|stroke|stroke-width|stroke-dasharray|stroke-linejoin|stroke-linecap|opacity)="[^"]*"/gi,
+          "",
+        )
+        .replace(/\s+\/?>$/, (end) => (end.includes("/") ? "/>" : ">")),
+    )
     .join("\n");
   return cachedBase;
 }
@@ -51,7 +56,8 @@ export async function composeRangeMapSVG(
 ): Promise<string> {
   const base = await loadBaseMap();
   const title = opts.title ?? "Global Distribution";
-  const subtitle = opts.subtitle ?? "Wikimedia CC0 low-resolution base · Equirectangular projection";
+  const subtitle =
+    opts.subtitle ?? "Wikimedia CC0 low-resolution base · Equirectangular projection";
   const source = opts.source ?? "Base map: Wikimedia Commons (World map - low resolution.svg, CC0)";
   const legendNative = opts.legendNative ?? "Native · 原生分布";
   const legendIntro = opts.legendIntro ?? "Introduced · 引入记录";
@@ -105,9 +111,10 @@ export async function composeRangeMapSVG(
 </svg>`;
 
   // btoa cannot handle non-latin1; encode UTF-8 safely
-  const b64 = typeof window === "undefined"
-    ? Buffer.from(svg, "utf8").toString("base64")
-    : btoa(unescape(encodeURIComponent(svg)));
+  const b64 =
+    typeof window === "undefined"
+      ? Buffer.from(svg, "utf8").toString("base64")
+      : btoa(unescape(encodeURIComponent(svg)));
   return `data:image/svg+xml;base64,${b64}`;
 }
 

@@ -32,7 +32,9 @@ export default defineTool({
       return { ...p, x, y };
     });
     return {
-      content: [{ type: "text", text: JSON.stringify({ viewBox: "0 0 950 620", projected }, null, 2) }],
+      content: [
+        { type: "text", text: JSON.stringify({ viewBox: "0 0 950 620", projected }, null, 2) },
+      ],
       structuredContent: { viewBox: "0 0 950 620", projected },
     };
   },

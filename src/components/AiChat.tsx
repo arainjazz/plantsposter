@@ -11,7 +11,12 @@ type Props = {
 };
 
 type ModelKind = "chat" | "image" | "native";
-type ModelEntry = { id: string; label: string; kind: ModelKind; custom?: { baseURL: string; apiKey: string } };
+type ModelEntry = {
+  id: string;
+  label: string;
+  kind: ModelKind;
+  custom?: { baseURL: string; apiKey: string };
+};
 
 const BUILTIN_CHAT: ModelEntry[] = [
   { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash（默认）", kind: "chat" },
@@ -36,7 +41,9 @@ function loadCustom(): ModelEntry[] {
   try {
     const raw = localStorage.getItem(CUSTOM_KEY);
     return raw ? (JSON.parse(raw) as ModelEntry[]) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 function saveCustom(list: ModelEntry[]) {
   localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
@@ -67,17 +74,30 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
     setCustomModels(loadCustom());
   }, []);
 
-  const allChat = [...BUILTIN_CHAT, ...customModels.filter((m) => m.kind === "chat" || m.kind === "native")];
-  const allImage = [...BUILTIN_IMAGE, ...customModels.filter((m) => m.kind === "image" || m.kind === "native")];
+  const allChat = [
+    ...BUILTIN_CHAT,
+    ...customModels.filter((m) => m.kind === "chat" || m.kind === "native"),
+  ];
+  const allImage = [
+    ...BUILTIN_IMAGE,
+    ...customModels.filter((m) => m.kind === "image" || m.kind === "native"),
+  ];
 
-  function pickModel(id: string) { setModel(id); localStorage.setItem(MODEL_KEY, id); }
-  function pickImgModel(id: string) { setImgModel(id); localStorage.setItem(IMG_MODEL_KEY, id); }
+  function pickModel(id: string) {
+    setModel(id);
+    localStorage.setItem(MODEL_KEY, id);
+  }
+  function pickImgModel(id: string) {
+    setImgModel(id);
+    localStorage.setItem(IMG_MODEL_KEY, id);
+  }
 
   function addCustomModel(entry: ModelEntry) {
     const next = [...customModels.filter((m) => m.id !== entry.id), entry];
     setCustomModels(next);
     saveCustom(next);
-    if (entry.kind === "chat") pickModel(entry.id); else pickImgModel(entry.id);
+    if (entry.kind === "chat") pickModel(entry.id);
+    else pickImgModel(entry.id);
   }
   function removeCustom(id: string) {
     const next = customModels.filter((m) => m.id !== id);
@@ -142,7 +162,10 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
     } catch (err) {
       setMessages([
         ...nextHistory,
-        { role: "assistant", content: `请求失败：${err instanceof Error ? err.message : "unknown"}` },
+        {
+          role: "assistant",
+          content: `请求失败：${err instanceof Error ? err.message : "unknown"}`,
+        },
       ]);
     } finally {
       setLoading(false);
@@ -183,7 +206,10 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
         onApplyOperations([{ type: "set_image", id: targetId, src: data.dataUrl }]);
         setMessages([
           ...nextHistory,
-          { role: "assistant", content: `✔ 已生成并放入「${targetId}」${data.text ? `\n\n${data.text}` : ""}` },
+          {
+            role: "assistant",
+            content: `✔ 已生成并放入「${targetId}」${data.text ? `\n\n${data.text}` : ""}`,
+          },
         ]);
       } else {
         setMessages([
@@ -194,7 +220,10 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
     } catch (err) {
       setMessages([
         ...nextHistory,
-        { role: "assistant", content: `请求失败：${err instanceof Error ? err.message : "unknown"}` },
+        {
+          role: "assistant",
+          content: `请求失败：${err instanceof Error ? err.message : "unknown"}`,
+        },
       ]);
     } finally {
       setLoading(false);
@@ -202,34 +231,67 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#fafaf7" }}>
+    <div
+      style={{ display: "flex", flexDirection: "column", height: "100%", background: "#fafaf7" }}
+    >
       {/* ── 顶部配置区 ─────────────────────────────────────── */}
       <div style={{ padding: "10px 12px", borderBottom: "1px solid #eee", background: "white" }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>AI 页面编辑助理配置</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 6 }}>
-          <select value={model} onChange={(e) => pickModel(e.target.value)} style={cfgSel} title="文本模型">
+          <select
+            value={model}
+            onChange={(e) => pickModel(e.target.value)}
+            style={cfgSel}
+            title="文本模型"
+          >
             {allChat.map((m) => (
-              <option key={m.id} value={m.id}>{m.custom ? "⚙ " : ""}{m.label}</option>
+              <option key={m.id} value={m.id}>
+                {m.custom ? "⚙ " : ""}
+                {m.label}
+              </option>
             ))}
           </select>
-          <select value={imgModel} onChange={(e) => pickImgModel(e.target.value)} style={cfgSel} title="图像模型">
+          <select
+            value={imgModel}
+            onChange={(e) => pickImgModel(e.target.value)}
+            style={cfgSel}
+            title="图像模型"
+          >
             {allImage.map((m) => (
-              <option key={m.id} value={m.id}>{m.custom ? "⚙ " : "🖼 "}{m.label}</option>
+              <option key={m.id} value={m.id}>
+                {m.custom ? "⚙ " : "🖼 "}
+                {m.label}
+              </option>
             ))}
           </select>
-          <button onClick={() => setShowConfig(true)} style={cfgBtn} title="添加自定义模型 / API">⚙ 配置新模型</button>
+          <button onClick={() => setShowConfig(true)} style={cfgBtn} title="添加自定义模型 / API">
+            ⚙ 配置新模型
+          </button>
         </div>
       </div>
 
       {/* ── 对话区 ────────────────────────────────────────── */}
-      <div style={{ flex: 1, overflowY: "auto", padding: 12, display: "flex", flexDirection: "column", gap: 10 }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: 12,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
         {messages.map((m, i) => (
           <div
             key={i}
             style={{
               alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-              maxWidth: "88%", padding: "8px 10px", borderRadius: 8,
-              fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-wrap",
+              maxWidth: "88%",
+              padding: "8px 10px",
+              borderRadius: 8,
+              fontSize: 13,
+              lineHeight: 1.5,
+              whiteSpace: "pre-wrap",
               background: m.role === "user" ? "#2a2622" : "white",
               color: m.role === "user" ? "white" : "#222",
               border: m.role === "assistant" ? "1px solid #eee" : "none",
@@ -238,53 +300,140 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
             {m.content}
           </div>
         ))}
-        {loading && <div style={{ alignSelf: "flex-start", fontSize: 12, color: "#888" }}>思考中…</div>}
+        {loading && (
+          <div style={{ alignSelf: "flex-start", fontSize: 12, color: "#888" }}>思考中…</div>
+        )}
       </div>
 
       {image && (
-        <div style={{ padding: "6px 12px", borderTop: "1px solid #eee", fontSize: 12, color: "#555", display: "flex", alignItems: "center", gap: 8 }}>
-          <img src={`data:${image.mimeType};base64,${image.data}`} alt="" style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4 }} />
-          <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{image.name}</span>
-          <button onClick={() => setImage(null)} style={{ border: "none", background: "transparent", cursor: "pointer", color: "#888" }}>✕</button>
+        <div
+          style={{
+            padding: "6px 12px",
+            borderTop: "1px solid #eee",
+            fontSize: 12,
+            color: "#555",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <img
+            src={`data:${image.mimeType};base64,${image.data}`}
+            alt=""
+            style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 4 }}
+          />
+          <span
+            style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+          >
+            {image.name}
+          </span>
+          <button
+            onClick={() => setImage(null)}
+            style={{ border: "none", background: "transparent", cursor: "pointer", color: "#888" }}
+          >
+            ✕
+          </button>
         </div>
       )}
 
       {/* ── 输入 + 发送 ─────────────────────────────────── */}
-      <div style={{ padding: "10px 10px 6px", borderTop: "1px solid #eee", display: "flex", gap: 6, alignItems: "flex-end" }}>
+      <div
+        style={{
+          padding: "10px 10px 6px",
+          borderTop: "1px solid #eee",
+          display: "flex",
+          gap: 6,
+          alignItems: "flex-end",
+        }}
+      >
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              send();
+            }
+          }}
           placeholder="用中文或英文告诉我要改什么…（Enter 发送，Shift+Enter 换行）"
           rows={2}
-          style={{ flex: 1, resize: "none", border: "1px solid #d9d9d9", borderRadius: 6, padding: 8, fontSize: 13, fontFamily: "inherit" }}
+          style={{
+            flex: 1,
+            resize: "none",
+            border: "1px solid #d9d9d9",
+            borderRadius: 6,
+            padding: 8,
+            fontSize: 13,
+            fontFamily: "inherit",
+          }}
         />
         <button
           onClick={send}
           disabled={loading || (!input.trim() && !image)}
-          style={{ padding: "0 16px", height: 46, background: "#2a2622", color: "white", border: "none", borderRadius: 6, cursor: loading ? "wait" : "pointer", fontSize: 13, opacity: loading || (!input.trim() && !image) ? 0.5 : 1 }}
-        >发送</button>
+          style={{
+            padding: "0 16px",
+            height: 46,
+            background: "#2a2622",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: loading ? "wait" : "pointer",
+            fontSize: 13,
+            opacity: loading || (!input.trim() && !image) ? 0.5 : 1,
+          }}
+        >
+          发送
+        </button>
       </div>
 
       {/* ── 动作行 ─────────────── */}
-      <div style={{ padding: "6px 10px 10px", display: "flex", gap: 6, borderTop: "1px dashed #eee" }}>
-        <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: "none" }} />
-        <button onClick={() => fileRef.current?.click()} style={actBtn} title="附加参考图">📎 上传附件</button>
+      <div
+        style={{ padding: "6px 10px 10px", display: "flex", gap: 6, borderTop: "1px dashed #eee" }}
+      >
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          onChange={onPickImage}
+          style={{ display: "none" }}
+        />
+        <button onClick={() => fileRef.current?.click()} style={actBtn} title="附加参考图">
+          📎 上传附件
+        </button>
         <button
           onClick={generateImage}
           disabled={loading || !input.trim() || !selectedImageId}
-          style={{ ...actBtn, background: selectedImageId ? "#b0692b" : "#ded1c1", color: selectedImageId ? "white" : "#8a7a68", cursor: !selectedImageId || !input.trim() ? "not-allowed" : "pointer" }}
+          style={{
+            ...actBtn,
+            background: selectedImageId ? "#b0692b" : "#ded1c1",
+            color: selectedImageId ? "white" : "#8a7a68",
+            cursor: !selectedImageId || !input.trim() ? "not-allowed" : "pointer",
+          }}
           title={selectedImageId ? "生成图并填入选中图片框" : "先在画布点选一个图片框"}
-        >🖼️ 生成配图</button>
+        >
+          🖼️ 生成配图
+        </button>
         <button
           onClick={() => {
-            if (!selectedImageId) { alert("请先在画布点选一个已含图片的图片框"); return; }
-            window.dispatchEvent(new CustomEvent("banrihua:remove-bg", { detail: { id: selectedImageId } }));
+            if (!selectedImageId) {
+              alert("请先在画布点选一个已含图片的图片框");
+              return;
+            }
+            window.dispatchEvent(
+              new CustomEvent("banrihua:remove-bg", { detail: { id: selectedImageId } }),
+            );
           }}
           disabled={!selectedImageId}
-          style={{ ...actBtn, background: selectedImageId ? "#5a7a5b" : "#d3dcd3", color: selectedImageId ? "white" : "#7a8a7a", cursor: !selectedImageId ? "not-allowed" : "pointer" }}
+          style={{
+            ...actBtn,
+            background: selectedImageId ? "#5a7a5b" : "#d3dcd3",
+            color: selectedImageId ? "white" : "#7a8a7a",
+            cursor: !selectedImageId ? "not-allowed" : "pointer",
+          }}
           title="一键去除选中图片的背景"
-        >✨ 一键去背景</button>
+        >
+          ✨ 一键去背景
+        </button>
       </div>
 
       {showConfig && (
@@ -300,7 +449,10 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
 }
 
 function ConfigModal({
-  existing, onClose, onAdd, onRemove,
+  existing,
+  onClose,
+  onAdd,
+  onRemove,
 }: {
   existing: ModelEntry[];
   onClose: () => void;
@@ -324,65 +476,200 @@ function ConfigModal({
       kind,
       custom: { baseURL: baseURL.trim(), apiKey: apiKey.trim() },
     });
-    setLabel(""); setModelId(""); setApiKey("");
+    setLabel("");
+    setModelId("");
+    setApiKey("");
   }
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
-      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1500,
-    }}>
-      <div style={{ width: 460, maxWidth: "92vw", background: "white", borderRadius: 10, padding: 20, boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.45)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1500,
+      }}
+    >
+      <div
+        style={{
+          width: 460,
+          maxWidth: "92vw",
+          background: "white",
+          borderRadius: 10,
+          padding: 20,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 12,
+          }}
+        >
           <div style={{ fontSize: 15, fontWeight: 700 }}>⚙ 配置新模型</div>
-          <button onClick={onClose} style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 18, color: "#888" }}>✕</button>
+          <button
+            onClick={onClose}
+            style={{
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              fontSize: 18,
+              color: "#888",
+            }}
+          >
+            ✕
+          </button>
         </div>
         <div style={{ fontSize: 12, color: "#666", marginBottom: 12 }}>
-          填写任意 OpenAI 兼容 endpoint（例如 Lovable AI Gateway、OpenAI、DeepSeek、OpenRouter 等）。保存后模型会自动出现在上方下拉框，选中即生效。
+          填写任意 OpenAI 兼容 endpoint（例如 Lovable AI Gateway、OpenAI、DeepSeek、OpenRouter
+          等）。保存后模型会自动出现在上方下拉框，选中即生效。
         </div>
 
         <div style={{ display: "grid", gap: 8 }}>
-          <label style={fLbl}>类型
-            <select value={kind} onChange={(e) => setKind(e.target.value as ModelKind)} style={fInp}>
+          <label style={fLbl}>
+            类型
+            <select
+              value={kind}
+              onChange={(e) => setKind(e.target.value as ModelKind)}
+              style={fInp}
+            >
               <option value="chat">文本 / 编辑指令 (chat)</option>
               <option value="image">图像生成 (image)</option>
               <option value="native">原生多模态 (native · 同时支持文本+图像)</option>
             </select>
           </label>
-          <label style={fLbl}>显示名称（可选）
-            <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="例如：DeepSeek V3" style={fInp} />
+          <label style={fLbl}>
+            显示名称（可选）
+            <input
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="例如：DeepSeek V3"
+              style={fInp}
+            />
           </label>
-          <label style={fLbl}>模型 ID <span style={{ color: "#c33" }}>*</span>
-            <input value={modelId} onChange={(e) => setModelId(e.target.value)} placeholder="例如：google/gemini-2.5-flash 或 deepseek-chat" style={fInp} />
+          <label style={fLbl}>
+            模型 ID <span style={{ color: "#c33" }}>*</span>
+            <input
+              value={modelId}
+              onChange={(e) => setModelId(e.target.value)}
+              placeholder="例如：google/gemini-2.5-flash 或 deepseek-chat"
+              style={fInp}
+            />
           </label>
-          <label style={fLbl}>Base URL <span style={{ color: "#c33" }}>*</span>
-            <input value={baseURL} onChange={(e) => setBaseURL(e.target.value)} placeholder="https://api.openai.com/v1" style={fInp} />
+          <label style={fLbl}>
+            Base URL <span style={{ color: "#c33" }}>*</span>
+            <input
+              value={baseURL}
+              onChange={(e) => setBaseURL(e.target.value)}
+              placeholder="https://api.openai.com/v1"
+              style={fInp}
+            />
           </label>
-          <div style={{ fontSize: 11, color: "#666", background: "#f7f5f0", padding: "8px 10px", borderRadius: 4, lineHeight: 1.55 }}>
-            <b>Base URL 尾部 <code>/v1</code> 规则：</b><br/>
-            ✅ <b>需要</b> <code>/v1</code>：OpenAI (<code>https://api.openai.com/v1</code>)、Lovable Gateway (<code>https://ai.gateway.lovable.dev/v1</code>)、DeepSeek (<code>https://api.deepseek.com/v1</code>)、OpenRouter (<code>https://openrouter.ai/api/v1</code>)、Moonshot、通义、SiliconFlow、Together、Groq、Anthropic OpenAI-compat 等。<br/>
-            ❌ <b>不要</b> <code>/v1</code>：Google Gemini 原生 API (<code>https://generativelanguage.googleapis.com</code>)、Azure OpenAI（用 <code>/openai/deployments/&lt;name&gt;</code>）、Vertex AI、部分 Ollama 本地 (<code>http://localhost:11434</code>)。<br/>
-            <b>「原生多模态」</b>类型专为 Gemini 原生 / Anthropic 原生等<b>非</b> OpenAI 兼容协议保留：填厂商官方 endpoint，无需 /v1。
+          <div
+            style={{
+              fontSize: 11,
+              color: "#666",
+              background: "#f7f5f0",
+              padding: "8px 10px",
+              borderRadius: 4,
+              lineHeight: 1.55,
+            }}
+          >
+            <b>
+              Base URL 尾部 <code>/v1</code> 规则：
+            </b>
+            <br />✅ <b>需要</b> <code>/v1</code>：OpenAI (<code>https://api.openai.com/v1</code>
+            )、Lovable Gateway (<code>https://ai.gateway.lovable.dev/v1</code>)、DeepSeek (
+            <code>https://api.deepseek.com/v1</code>)、OpenRouter (
+            <code>https://openrouter.ai/api/v1</code>
+            )、Moonshot、通义、SiliconFlow、Together、Groq、Anthropic OpenAI-compat 等。
+            <br />❌ <b>不要</b> <code>/v1</code>：Google Gemini 原生 API (
+            <code>https://generativelanguage.googleapis.com</code>)、Azure OpenAI（用{" "}
+            <code>/openai/deployments/&lt;name&gt;</code>）、Vertex AI、部分 Ollama 本地 (
+            <code>http://localhost:11434</code>)。
+            <br />
+            <b>「原生多模态」</b>类型专为 Gemini 原生 / Anthropic 原生等<b>非</b> OpenAI
+            兼容协议保留：填厂商官方 endpoint，无需 /v1。
           </div>
-          <label style={fLbl}>API Key <span style={{ color: "#c33" }}>*</span>
-            <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." style={fInp} />
+          <label style={fLbl}>
+            API Key <span style={{ color: "#c33" }}>*</span>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="sk-..."
+              style={fInp}
+            />
           </label>
         </div>
 
-        <button onClick={submit} style={{ marginTop: 14, width: "100%", padding: "10px 12px", background: "#2a2622", color: "white", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
+        <button
+          onClick={submit}
+          style={{
+            marginTop: 14,
+            width: "100%",
+            padding: "10px 12px",
+            background: "#2a2622",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
           保存并激活
         </button>
 
         {existing.length > 0 && (
           <div style={{ marginTop: 16, borderTop: "1px solid #eee", paddingTop: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, color: "#666" }}>已保存的自定义模型</div>
+            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, color: "#666" }}>
+              已保存的自定义模型
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {existing.map((m) => (
-                <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, background: "#f7f5f0", padding: "6px 8px", borderRadius: 4 }}>
-                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    <b>{m.label}</b> <span style={{ color: "#888" }}>· {m.kind} · {m.id}</span>
+                <div
+                  key={m.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: 12,
+                    background: "#f7f5f0",
+                    padding: "6px 8px",
+                    borderRadius: 4,
+                  }}
+                >
+                  <span
+                    style={{
+                      flex: 1,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <b>{m.label}</b>{" "}
+                    <span style={{ color: "#888" }}>
+                      · {m.kind} · {m.id}
+                    </span>
                   </span>
-                  <button onClick={() => onRemove(m.id)} style={{ border: "none", background: "transparent", color: "#c33", cursor: "pointer", fontSize: 12 }}>删除</button>
+                  <button
+                    onClick={() => onRemove(m.id)}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: "#c33",
+                      cursor: "pointer",
+                      fontSize: 12,
+                    }}
+                  >
+                    删除
+                  </button>
                 </div>
               ))}
             </div>
@@ -390,7 +677,8 @@ function ConfigModal({
         )}
 
         <div style={{ marginTop: 14, fontSize: 11, color: "#888" }}>
-          注意：API Key 只保存在你的浏览器 localStorage，随请求发送到本项目 /api/chat 或 /api/gen-image 后端，再由后端调用你填写的 endpoint。
+          注意：API Key 只保存在你的浏览器 localStorage，随请求发送到本项目 /api/chat 或
+          /api/gen-image 后端，再由后端调用你填写的 endpoint。
         </div>
       </div>
     </div>
@@ -398,17 +686,43 @@ function ConfigModal({
 }
 
 const cfgSel: React.CSSProperties = {
-  fontSize: 11, padding: "4px 6px", border: "1px solid #ddd",
-  borderRadius: 4, background: "white", width: "100%",
+  fontSize: 11,
+  padding: "4px 6px",
+  border: "1px solid #ddd",
+  borderRadius: 4,
+  background: "white",
+  width: "100%",
 };
 const cfgBtn: React.CSSProperties = {
-  fontSize: 11, padding: "4px 8px", border: "1px solid #ddd",
-  borderRadius: 4, background: "white", cursor: "pointer", whiteSpace: "nowrap",
+  fontSize: 11,
+  padding: "4px 8px",
+  border: "1px solid #ddd",
+  borderRadius: 4,
+  background: "white",
+  cursor: "pointer",
+  whiteSpace: "nowrap",
 };
 const actBtn: React.CSSProperties = {
-  flex: 1, padding: "8px 10px", border: "1px solid #d9d9d9",
-  background: "white", borderRadius: 6, cursor: "pointer",
-  fontSize: 12, whiteSpace: "nowrap",
+  flex: 1,
+  padding: "8px 10px",
+  border: "1px solid #d9d9d9",
+  background: "white",
+  borderRadius: 6,
+  cursor: "pointer",
+  fontSize: 12,
+  whiteSpace: "nowrap",
 };
-const fLbl: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 4, fontSize: 12, color: "#333" };
-const fInp: React.CSSProperties = { padding: "6px 8px", border: "1px solid #ddd", borderRadius: 4, fontSize: 12, fontFamily: "inherit" };
+const fLbl: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+  fontSize: 12,
+  color: "#333",
+};
+const fInp: React.CSSProperties = {
+  padding: "6px 8px",
+  border: "1px solid #ddd",
+  borderRadius: 4,
+  fontSize: 12,
+  fontFamily: "inherit",
+};

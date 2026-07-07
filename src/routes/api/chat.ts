@@ -14,7 +14,14 @@ const OPERATIONS_SCHEMA = {
         properties: {
           type: {
             type: "string",
-            enum: ["update_text", "update_style", "replace_all", "recolor_scheme", "set_image", "set_range_map"],
+            enum: [
+              "update_text",
+              "update_style",
+              "replace_all",
+              "recolor_scheme",
+              "set_image",
+              "set_range_map",
+            ],
           },
           id: { type: "string" },
           text: { type: "string" },
@@ -42,7 +49,10 @@ const OPERATIONS_SCHEMA = {
           align: { type: "string", enum: ["left", "center", "right"] },
           lineHeight: { type: "number" },
           letterSpacing: { type: "number" },
-          fontFamily: { type: "string", enum: ["serif", "sans", "display", "kai", "wenkai", "mono", "playfair", "inter"] },
+          fontFamily: {
+            type: "string",
+            enum: ["serif", "sans", "display", "kai", "wenkai", "mono", "playfair", "inter"],
+          },
           textTransform: { type: "string", enum: ["none", "uppercase"] },
           find: { type: "string" },
           replace: { type: "string" },
@@ -155,8 +165,7 @@ export const Route = createFileRoute("/api/chat")({
 
         const catalog = body.blocks
           .map(
-            (b) =>
-              `- ${b.id}${b.text ? `  :: "${b.text.slice(0, 80).replace(/\n/g, " ")}"` : ""}`,
+            (b) => `- ${b.id}${b.text ? `  :: "${b.text.slice(0, 80).replace(/\n/g, " ")}"` : ""}`,
           )
           .join("\n");
 
@@ -190,7 +199,10 @@ export const Route = createFileRoute("/api/chat")({
                 content: body.image?.data
                   ? [
                       { type: "text", text: body.message },
-                      { type: "image_url", image_url: { url: `data:${body.image.mimeType};base64,${body.image.data}` } },
+                      {
+                        type: "image_url",
+                        image_url: { url: `data:${body.image.mimeType};base64,${body.image.data}` },
+                      },
                     ]
                   : `Block catalog:\n${catalog}\n\nUser: ${body.message}`,
               },
@@ -211,7 +223,10 @@ export const Route = createFileRoute("/api/chat")({
             if (!upstream.ok) {
               const errText = await upstream.text();
               return Response.json(
-                { message: `自定义模型出错 (${upstream.status})：${errText.slice(0, 200)}`, operations: [] },
+                {
+                  message: `自定义模型出错 (${upstream.status})：${errText.slice(0, 200)}`,
+                  operations: [],
+                },
                 { status: 200 },
               );
             }
@@ -240,7 +255,10 @@ export const Route = createFileRoute("/api/chat")({
               const errText = await upstream.text();
               console.error("gemini error", upstream.status, errText);
               return Response.json(
-                { message: `Gemini 出错 (${upstream.status})：${errText.slice(0, 200)}`, operations: [] },
+                {
+                  message: `Gemini 出错 (${upstream.status})：${errText.slice(0, 200)}`,
+                  operations: [],
+                },
                 { status: 200 },
               );
             }
@@ -259,10 +277,7 @@ export const Route = createFileRoute("/api/chat")({
         } catch (err) {
           console.error("chat error", err);
           const msg = err instanceof Error ? err.message : "unknown error";
-          return Response.json(
-            { message: `请求失败：${msg}`, operations: [] },
-            { status: 200 },
-          );
+          return Response.json({ message: `请求失败：${msg}`, operations: [] }, { status: 200 });
         }
       },
     },

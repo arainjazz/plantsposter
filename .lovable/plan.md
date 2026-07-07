@@ -17,7 +17,7 @@ Codex 支持通过 **MCP（Model Context Protocol）** 连接任何符合规范�
    - `set_image` —— 用 data URL 或 https URL 替换图片块。
    - `set_range_map` —— 严格遵循 `mem://features/global-range-map.md` 的坐标公式与固定底图生成全球分布图。
    - `generate_image` —— 走现有 `/api/gen-image` 逻辑（Lovable Gateway / Gemini / 自定义模型）。
-   
+
    工具的入参用 zod 校验，`annotations` 里正确标记 `readOnlyHint` / `destructiveHint`，Codex 才能显示合适的行为提示。
 
 3. **在 `src/lib/mcp/index.ts` 用 `defineMcp` 注册**这些工具，写清 `name` / `title` / `version` / `instructions`（告诉 Codex 这是"半日花海报编辑器"，操作前建议先 `list_pages`）。
@@ -33,14 +33,16 @@ Codex 支持通过 **MCP（Model Context Protocol）** 连接任何符合规范�
    - 如果选 5B 或你只是自己用：可以不加 auth，服务器公开——任何知道 URL 的人都能调用，仅适合个人 demo。
 
 7. **在 Codex 里添加连接**（客户端配置示例，等实现完再给你贴具体 JSON）：
+
    ```jsonc
    // ~/.codex/config.json 里的 mcpServers 段
    {
      "banrihua-poster": {
-       "transport": { "type": "http", "url": "https://plantsposter.lovable.app/mcp" }
-     }
+       "transport": { "type": "http", "url": "https://plantsposter.lovable.app/mcp" },
+     },
    }
    ```
+
    有 OAuth 时首次连接会弹浏览器授权；无 OAuth 直接就能用。
 
 8. **验证**：`app_mcp_server--extract_mcp_manifest` 生成 manifest → 发布 → Codex 里 `/mcp` 命令能看到所有工具，跑一次 `list_pages` 应该返回海报块目录。
@@ -48,11 +50,13 @@ Codex 支持通过 **MCP（Model Context Protocol）** 连接任何符合规范�
 ## 需要你先回答两个问题
 
 **Q1. 用哪种状态共享？**
+
 - A) 启用 Lovable Cloud + Supabase 存储 + OAuth，Codex 编辑的与你网页看到的是同一份（推荐，多设备也一致）。
 - B) 只做本地桥接，Codex 通过实时通道操作你当前打开的网页（关网页就失效）。
 - C) 无状态：Codex 每次调用都要自己传完整海报 JSON 进来（最简单，但对话里塞很多数据）。
 
 **Q2. 是否需要认证？**
+
 - 是（多用户 / 公开发布必选）→ 接 Supabase OAuth。
 - 否（只有你自己临时用）→ 服务器公开无认证。
 

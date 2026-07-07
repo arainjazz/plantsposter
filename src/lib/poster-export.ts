@@ -21,7 +21,10 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => { imageCache.set(src, img); resolve(img); };
+    img.onload = () => {
+      imageCache.set(src, img);
+      resolve(img);
+    };
     img.onerror = reject;
     img.src = src;
   });
@@ -33,7 +36,11 @@ async function preloadImages(blocks: Block[]): Promise<Map<string, HTMLImageElem
     blocks
       .filter((b): b is ImageBlock => b.type === "image" && !!b.src)
       .map(async (b) => {
-        try { map.set(b.src!, await loadImage(b.src!)); } catch { /* ignore */ }
+        try {
+          map.set(b.src!, await loadImage(b.src!));
+        } catch {
+          /* ignore */
+        }
       }),
   );
   return map;
@@ -41,9 +48,16 @@ async function preloadImages(blocks: Block[]): Promise<Map<string, HTMLImageElem
 
 function parseRgba(input: string): { r: number; g: number; b: number; a: number } | null {
   const hex = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(input.trim());
-  if (hex) return { r: parseInt(hex[1], 16), g: parseInt(hex[2], 16), b: parseInt(hex[3], 16), a: 1 };
+  if (hex)
+    return { r: parseInt(hex[1], 16), g: parseInt(hex[2], 16), b: parseInt(hex[3], 16), a: 1 };
   const rgba = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/i.exec(input);
-  if (rgba) return { r: Number(rgba[1]), g: Number(rgba[2]), b: Number(rgba[3]), a: rgba[4] == null ? 1 : Number(rgba[4]) };
+  if (rgba)
+    return {
+      r: Number(rgba[1]),
+      g: Number(rgba[2]),
+      b: Number(rgba[3]),
+      a: rgba[4] == null ? 1 : Number(rgba[4]),
+    };
   return null;
 }
 
@@ -58,7 +72,10 @@ function firstColor(input: string, fallback = "#f7f2e4") {
 
 function paintBackground(ctx: CanvasRenderingContext2D, background: string) {
   if (!background || background === "transparent" || background === "rgba(0,0,0,0)") return;
-  const gradient = /linear-gradient\(([-\d.]+)deg,\s*([^,]+(?:,[^,]+)*?)\s+0%,\s*([^,]+(?:,[^,]+)*?)\s+100%\)/i.exec(background);
+  const gradient =
+    /linear-gradient\(([-\d.]+)deg,\s*([^,]+(?:,[^,]+)*?)\s+0%,\s*([^,]+(?:,[^,]+)*?)\s+100%\)/i.exec(
+      background,
+    );
   if (gradient) {
     const angle = (Number(gradient[1]) * Math.PI) / 180;
     const cx = POSTER_W / 2;
@@ -136,8 +153,12 @@ export async function renderPosterToCanvas(
     else if (t.align === "right") anchorX = t.x + t.w;
     lines.forEach((line, i) => {
       drawLineWithSpacing(
-        ctx, line, anchorX, t.y + i * lineHeight,
-        t.letterSpacing ?? 0, t.align ?? "left",
+        ctx,
+        line,
+        anchorX,
+        t.y + i * lineHeight,
+        t.letterSpacing ?? 0,
+        t.align ?? "left",
         t.textTransform === "uppercase",
       );
     });
@@ -147,17 +168,25 @@ export async function renderPosterToCanvas(
 }
 
 function wrapLines(
-  ctx: CanvasRenderingContext2D, text: string, maxWidth: number, letterSpacing: number,
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  letterSpacing: number,
 ): string[] {
   const out: string[] = [];
   for (const paragraph of text.split("\n")) {
-    if (!paragraph) { out.push(""); continue; }
+    if (!paragraph) {
+      out.push("");
+      continue;
+    }
     let cur = "";
     for (const ch of Array.from(paragraph)) {
       const test = cur + ch;
       const w = measureWithSpacing(ctx, test, letterSpacing);
-      if (w > maxWidth && cur) { out.push(cur); cur = ch; }
-      else cur = test;
+      if (w > maxWidth && cur) {
+        out.push(cur);
+        cur = ch;
+      } else cur = test;
     }
     if (cur) out.push(cur);
   }
@@ -166,14 +195,25 @@ function wrapLines(
 function measureWithSpacing(ctx: CanvasRenderingContext2D, text: string, spacing: number): number {
   if (!spacing) return ctx.measureText(text).width;
   const chars = Array.from(text);
-  return chars.reduce((acc, c) => acc + ctx.measureText(c).width, 0) + spacing * Math.max(0, chars.length - 1);
+  return (
+    chars.reduce((acc, c) => acc + ctx.measureText(c).width, 0) +
+    spacing * Math.max(0, chars.length - 1)
+  );
 }
 function drawLineWithSpacing(
-  ctx: CanvasRenderingContext2D, line: string, anchorX: number, y: number,
-  spacing: number, align: "left" | "center" | "right", upper: boolean,
+  ctx: CanvasRenderingContext2D,
+  line: string,
+  anchorX: number,
+  y: number,
+  spacing: number,
+  align: "left" | "center" | "right",
+  upper: boolean,
 ) {
   const text = upper ? line.toUpperCase() : line;
-  if (!spacing) { ctx.fillText(text, anchorX, y); return; }
+  if (!spacing) {
+    ctx.fillText(text, anchorX, y);
+    return;
+  }
   const chars = Array.from(text);
   const width = measureWithSpacing(ctx, text, spacing);
   let x = anchorX;
@@ -191,12 +231,23 @@ function drawLineWithSpacing(
 export async function renderPosterToSVG(blocks: Block[], palette: Palette): Promise<string> {
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const parts: string[] = [];
-  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">`);
+  parts.push(
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">`,
+  );
   if (palette.background.startsWith("linear-gradient")) {
-    const colors = palette.background.match(/#[\da-fA-F]{6}|rgba?\([^)]*\)/g) ?? ["#f7f2e4", "#d7c7a6"];
-    parts.push(`<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[1] ?? colors[0]}"/></linearGradient></defs>`);
+    const colors = palette.background.match(/#[\da-fA-F]{6}|rgba?\([^)]*\)/g) ?? [
+      "#f7f2e4",
+      "#d7c7a6",
+    ];
+    parts.push(
+      `<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[1] ?? colors[0]}"/></linearGradient></defs>`,
+    );
     parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="url(#bg)"/>`);
-  } else if (palette.background && palette.background !== "rgba(0,0,0,0)" && palette.background !== "transparent") {
+  } else if (
+    palette.background &&
+    palette.background !== "rgba(0,0,0,0)" &&
+    palette.background !== "transparent"
+  ) {
     parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="${palette.background}"/>`);
   }
   for (const b of blocks) {
@@ -204,9 +255,13 @@ export async function renderPosterToSVG(blocks: Block[], palette: Palette): Prom
       if (b.src) {
         try {
           const dataUrl = await imageToDataUrl(b.src);
-          parts.push(`<image x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" href="${dataUrl}" preserveAspectRatio="xMidYMid slice"/>`);
+          parts.push(
+            `<image x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" href="${dataUrl}" preserveAspectRatio="xMidYMid slice"/>`,
+          );
         } catch {
-          parts.push(`<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="rgba(0,0,0,0.04)"/>`);
+          parts.push(
+            `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="rgba(0,0,0,0.04)"/>`,
+          );
         }
       } else {
         parts.push(
@@ -224,7 +279,10 @@ export async function renderPosterToSVG(blocks: Block[], palette: Palette): Prom
     const lines = t.text.split("\n");
     parts.push(
       `<text x="${x}" y="${t.y + t.fontSize}" font-family='${family}' font-size="${t.fontSize}" font-weight="${t.fontWeight}" font-style="${t.fontStyle ?? "normal"}" letter-spacing="${t.letterSpacing ?? 0}" text-anchor="${anchor}" fill="${t.color}">${lines
-        .map((l, i) => `<tspan x="${x}" dy="${i === 0 ? 0 : lineHeight}">${esc(t.textTransform === "uppercase" ? l.toUpperCase() : l)}</tspan>`)
+        .map(
+          (l, i) =>
+            `<tspan x="${x}" dy="${i === 0 ? 0 : lineHeight}">${esc(t.textTransform === "uppercase" ? l.toUpperCase() : l)}</tspan>`,
+        )
         .join("")}</text>`,
     );
   }
@@ -250,14 +308,24 @@ export async function exportPng(blocks: Block[], palette: Palette, transparent: 
     2,
   );
   await new Promise<void>((resolve) => {
-    canvas.toBlob((blob) => { if (blob) downloadBlob(blob, "banrihua.png"); resolve(); }, "image/png");
+    canvas.toBlob((blob) => {
+      if (blob) downloadBlob(blob, "banrihua.png");
+      resolve();
+    }, "image/png");
   });
 }
 
 export async function exportJpg(blocks: Block[], palette: Palette) {
   const canvas = await renderPosterToCanvas(blocks, palette, 2);
   await new Promise<void>((resolve) => {
-    canvas.toBlob((blob) => { if (blob) downloadBlob(blob, "banrihua.jpg"); resolve(); }, "image/jpeg", 0.92);
+    canvas.toBlob(
+      (blob) => {
+        if (blob) downloadBlob(blob, "banrihua.jpg");
+        resolve();
+      },
+      "image/jpeg",
+      0.92,
+    );
   });
 }
 
@@ -291,7 +359,11 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
   for (const page of pages) {
     const slide = pptx.addSlide();
     const bg = parseRgba(firstColor(palette.background));
-    slide.background = { color: bg ? [bg.r, bg.g, bg.b].map((n) => n.toString(16).padStart(2, "0")).join("") : "F7F2E4" };
+    slide.background = {
+      color: bg
+        ? [bg.r, bg.g, bg.b].map((n) => n.toString(16).padStart(2, "0")).join("")
+        : "F7F2E4",
+    };
 
     for (const b of page.blocks) {
       if (b.type === "image") {
@@ -300,30 +372,44 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
             const data = await imageToDataUrl(b.src);
             slide.addImage({ data, x: toInX(b.x), y: toInY(b.y), w: toInX(b.w), h: toInY(b.h) });
             continue;
-          } catch { /* fall through */ }
+          } catch {
+            /* fall through */
+          }
         }
         slide.addShape("rect", {
-          x: toInX(b.x), y: toInY(b.y), w: toInX(b.w), h: toInY(b.h),
+          x: toInX(b.x),
+          y: toInY(b.y),
+          w: toInX(b.w),
+          h: toInY(b.h),
           fill: { color: "F5F0E4" },
           line: { color: "888888", dashType: "dash", width: 0.5 },
         });
         slide.addText(b.label, {
-          x: toInX(b.x), y: toInY(b.y), w: toInX(b.w), h: toInY(b.h),
-          align: "center", valign: "middle", italic: true,
-          color: palette.muted.replace("#", ""), fontSize: 11,
+          x: toInX(b.x),
+          y: toInY(b.y),
+          w: toInX(b.w),
+          h: toInY(b.h),
+          align: "center",
+          valign: "middle",
+          italic: true,
+          color: palette.muted.replace("#", ""),
+          fontSize: 11,
         });
         continue;
       }
       const t = b;
       slide.addText(t.text, {
-        x: toInX(t.x), y: toInY(t.y), w: toInX(t.w),
+        x: toInX(t.x),
+        y: toInY(t.y),
+        w: toInX(t.w),
         h: toInY(t.fontSize * (t.lineHeight ?? 1.4) * Math.max(1, t.text.split("\n").length) + 20),
         fontSize: Math.round(t.fontSize * 0.75),
         color: t.color.replace("#", ""),
         bold: (t.fontWeight ?? 400) >= 600,
         italic: t.fontStyle === "italic",
         align: (t.align ?? "left") as "left" | "center" | "right",
-        fontFace: t.fontFamily === "serif" || t.fontFamily === "display" ? "Songti SC" : "PingFang SC",
+        fontFace:
+          t.fontFamily === "serif" || t.fontFamily === "display" ? "Songti SC" : "PingFang SC",
         charSpacing: t.letterSpacing ? t.letterSpacing * 5 : 0,
       });
     }

@@ -65,22 +65,14 @@
                   },
                   "kind": {
                     "type": "string",
-                    "enum": [
-                      "native",
-                      "introduced"
-                    ]
+                    "enum": ["native", "introduced"]
                   }
                 },
-                "required": [
-                  "lat",
-                  "lon"
-                ]
+                "required": ["lat", "lon"]
               }
             }
           },
-          "required": [
-            "points"
-          ]
+          "required": ["points"]
         },
         "outputSchema": null
       },
@@ -108,9 +100,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "prompt"
-          ]
+          "required": ["prompt"]
         },
         "outputSchema": null
       }

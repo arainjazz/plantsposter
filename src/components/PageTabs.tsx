@@ -10,7 +10,15 @@ type Props = {
   onRename: (id: string, name: string) => void;
 };
 
-export function PageTabs({ pages, activeId, onSelect, onAdd, onDuplicate, onDelete, onRename }: Props) {
+export function PageTabs({
+  pages,
+  activeId,
+  onSelect,
+  onAdd,
+  onDuplicate,
+  onDelete,
+  onRename,
+}: Props) {
   return (
     <div
       style={{
@@ -58,16 +66,26 @@ export function PageTabs({ pages, activeId, onSelect, onAdd, onDuplicate, onDele
               }}
             />
             <button
-              onClick={(e) => { e.stopPropagation(); onDuplicate(p.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicate(p.id);
+              }}
               title="复制此页"
               style={iconBtn(active)}
-            >⧉</button>
+            >
+              ⧉
+            </button>
             {pages.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); if (confirm(`删除页面「${p.name}」？`)) onDelete(p.id); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm(`删除页面「${p.name}」？`)) onDelete(p.id);
+                }}
                 title="删除此页"
                 style={iconBtn(active)}
-              >✕</button>
+              >
+                ✕
+              </button>
             )}
           </div>
         );

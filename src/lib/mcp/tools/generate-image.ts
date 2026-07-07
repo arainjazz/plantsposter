@@ -44,7 +44,9 @@ export default defineTool({
       };
     }
     const j = (await upstream.json()) as {
-      choices?: Array<{ message?: { content?: string; images?: Array<{ image_url?: { url?: string } }> } }>;
+      choices?: Array<{
+        message?: { content?: string; images?: Array<{ image_url?: { url?: string } }> };
+      }>;
     };
     const msg = j.choices?.[0]?.message;
     let dataUrl = msg?.images?.[0]?.image_url?.url ?? null;
@@ -54,7 +56,12 @@ export default defineTool({
     }
     if (!dataUrl) {
       return {
-        content: [{ type: "text", text: `Model returned no image. Raw: ${(msg?.content ?? "").slice(0, 200)}` }],
+        content: [
+          {
+            type: "text",
+            text: `Model returned no image. Raw: ${(msg?.content ?? "").slice(0, 200)}`,
+          },
+        ],
         isError: true,
       };
     }
