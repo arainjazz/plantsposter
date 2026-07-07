@@ -10,6 +10,21 @@ import { ImageSearchModal } from "@/components/ImageSearchModal";
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
 import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage, deriveAutoName } from "@/lib/poster-data";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
+import { composeRangeMapSVG } from "@/lib/range-map";
+
+const STORAGE_KEY = "banrihua.editor.v1";
+type PersistedState = { pages: PosterPage[]; activeId: string; palette: Palette };
+
+function loadPersisted(): PersistedState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedState;
+    if (!parsed?.pages?.length) return null;
+    return parsed;
+  } catch { return null; }
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
