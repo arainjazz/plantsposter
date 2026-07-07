@@ -89,9 +89,6 @@ function Editor() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ pages, activeId, palette }));
     } catch { /* quota exceeded — silently ignore */ }
   }, [hydrated, pages, activeId, palette]);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const stageRef = useRef<HTMLDivElement>(null);
-  const [displayWidth, setDisplayWidth] = useState(600);
 
   // context menu + search modal
   const [ctxMenu, setCtxMenu] = useState<{ id: string; x: number; y: number } | null>(null);
