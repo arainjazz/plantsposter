@@ -61,11 +61,34 @@ async function urlToBase64(src: string): Promise<{ mimeType: string; data: strin
 }
 
 function Editor() {
+  const [hydrated, setHydrated] = useState(false);
   const [pages, setPages] = useState<PosterPage[]>([
     { id: "page-1", name: "封面·半日花", autoName: false, blocks: INITIAL_BLOCKS },
   ]);
   const [activeId, setActiveId] = useState<string>("page-1");
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [displayWidth, setDisplayWidth] = useState(600);
+
+  // Load persisted state once on mount (client only, so SSR stays deterministic).
+  useEffect(() => {
+    const p = loadPersisted();
+    if (p) {
+      setPages(p.pages);
+      setActiveId(p.activeId);
+      setPalette(p.palette);
+    }
+    setHydrated(true);
+  }, []);
+
+  // Persist on every change (after hydration to avoid overwriting with defaults).
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ pages, activeId, palette }));
+    } catch { /* quota exceeded — silently ignore */ }
+  }, [hydrated, pages, activeId, palette]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const stageRef = useRef<HTMLDivElement>(null);
   const [displayWidth, setDisplayWidth] = useState(600);
