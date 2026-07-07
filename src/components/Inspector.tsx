@@ -2,15 +2,36 @@ import type { Block, TextBlock } from "@/lib/poster-data";
 
 type Props = {
   block: Block | null;
+  background: string;
   onChange: (patch: Partial<TextBlock>) => void;
   onChangeImage: (src: string | null) => void;
+  onChangeBackground: (color: string) => void;
 };
 
-export function Inspector({ block, onChange, onChangeImage }: Props) {
+export function Inspector({ block, background, onChange, onChangeImage, onChangeBackground }: Props) {
   if (!block) {
     return (
-      <div style={{ padding: 16, color: "#888", fontSize: 13 }}>
-        点击海报上的任意文字或图片框，在这里调整样式；或使用左下方 AI 侧栏发指令。
+      <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
+        <Field label="海报背景色">
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              type="color"
+              value={background}
+              onChange={(e) => onChangeBackground(e.target.value)}
+              style={{ width: 40, height: 32, border: "1px solid #ddd", borderRadius: 4 }}
+            />
+            <input
+              value={background}
+              onChange={(e) => onChangeBackground(e.target.value)}
+              style={{ ...inp, flex: 1 }}
+            />
+          </div>
+        </Field>
+        <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
+          点击画布上的任意文字或图片框可编辑其样式；<br/>
+          支持 ⌘/Ctrl+点击 多选、拖拽框选、Del 删除、⌘/Ctrl+C/V 复制粘贴。
+        </div>
       </div>
     );
   }

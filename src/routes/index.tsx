@@ -213,11 +213,72 @@ function Editor() {
     }
   }
 
+  // ── resizable side panels ────────────────────────────────
+  const [leftW, setLeftW] = useState(320);
+  const [rightW, setRightW] = useState(320);
+  const dragRef = useRef<{ side: "left" | "right"; startX: number; startW: number } | null>(null);
+  useEffect(() => {
+    function onMove(e: MouseEvent) {
+      const d = dragRef.current;
+      if (!d) return;
+      const delta = e.clientX - d.startX;
+      const w = d.side === "left" ? d.startW + delta : d.startW - delta;
+      const clamped = Math.max(220, Math.min(560, w));
+      if (d.side === "left") setLeftW(clamped);
+      else setRightW(clamped);
+    }
+    function onUp() { dragRef.current = null; document.body.style.cursor = ""; }
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+  }, []);
+  function startDrag(side: "left" | "right", e: React.MouseEvent) {
+    dragRef.current = { side, startX: e.clientX, startW: side === "left" ? leftW : rightW };
+    document.body.style.cursor = "col-resize";
+  }
+
+  // ── clipboard: copy/paste blocks (⌘/Ctrl + C/V) ─────────
+  const clipboardRef = useRef<Block[]>([]);
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
+      const meta = e.metaKey || e.ctrlKey;
+      if (meta && e.key.toLowerCase() === "c" && selectedIds.size > 0) {
+        e.preventDefault();
+        clipboardRef.current = blocks.filter((b) => selectedIds.has(b.id)).map((b) => ({ ...b }));
+      } else if (meta && e.key.toLowerCase() === "v" && clipboardRef.current.length > 0) {
+        e.preventDefault();
+        const now = Date.now();
+        const cloned = clipboardRef.current.map((b, i) => ({
+          ...b,
+          id: `${b.id}-copy-${now}-${i}`,
+          x: b.x + 24,
+          y: b.y + 24,
+        })) as Block[];
+        updateActiveBlocks((bs) => [...bs, ...cloned]);
+        setSelectedIds(new Set(cloned.map((b) => b.id)));
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [blocks, selectedIds, updateActiveBlocks]);
+
+  // ── one-click remove background from AiChat ─────────────
+  useEffect(() => {
+    function onRemove(e: Event) {
+      const id = (e as CustomEvent<{ id: string }>).detail?.id;
+      if (id) removeBackground(id);
+    }
+    window.addEventListener("banrihua:remove-bg", onRemove);
+    return () => window.removeEventListener("banrihua:remove-bg", onRemove);
+  });
+
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "300px 1fr 320px",
+        gridTemplateColumns: `${leftW}px 6px 1fr 6px ${rightW}px`,
         gridTemplateRows: "56px 1fr auto",
         height: "100vh",
         fontFamily: '"Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif',
@@ -228,20 +289,26 @@ function Editor() {
       <header style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", padding: "0 20px", background: "white", borderBottom: "1px solid #e5e5e5", gap: 16 }}>
         <div style={{ fontWeight: 700, fontSize: 15 }}>🌾 Ordos Plantspedia · Editor</div>
         <div style={{ color: "#888", fontSize: 12 }}>
-          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · 拖拽框选
+          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · ⌘/Ctrl+C/V 复制粘贴
         </div>
         <div style={{ marginLeft: "auto" }}>
           <ExportMenu pages={pages} activePageId={activeId} palette={palette} />
         </div>
       </header>
 
-      <aside style={{ borderRight: "1px solid #e5e5e5", background: "white" }}>
+      <aside style={{ borderRight: "1px solid #e5e5e5", background: "white", overflow: "hidden" }}>
         <AiChat
           blocks={blocks}
           selectedImageId={soloSelected?.type === "image" ? soloSelected.id : null}
           onApplyOperations={apply}
         />
       </aside>
+
+      <div
+        onMouseDown={(e) => startDrag("left", e)}
+        style={{ cursor: "col-resize", background: "#e5e5e5", userSelect: "none" }}
+        title="拖动调整宽度"
+      />
 
       <main
         ref={stageRef}
@@ -259,11 +326,23 @@ function Editor() {
         />
       </main>
 
+      <div
+        onMouseDown={(e) => startDrag("right", e)}
+        style={{ cursor: "col-resize", background: "#e5e5e5", userSelect: "none" }}
+        title="拖动调整宽度"
+      />
+
       <aside style={{ borderLeft: "1px solid #e5e5e5", background: "white", overflowY: "auto" }}>
         <div style={{ padding: "12px 14px", borderBottom: "1px solid #eee", fontSize: 13, fontWeight: 600 }}>
           属性面板 {selectedIds.size > 1 ? `（已选 ${selectedIds.size} 个，仅显示单选属性）` : ""}
         </div>
-        <Inspector block={soloSelected} onChange={patchSelected} onChangeImage={setImage} />
+        <Inspector
+          block={soloSelected}
+          background={palette.background}
+          onChange={patchSelected}
+          onChangeImage={setImage}
+          onChangeBackground={(c) => setPalette((p) => ({ ...p, background: c }))}
+        />
       </aside>
 
       <div style={{ gridColumn: "1 / -1" }}>

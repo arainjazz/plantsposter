@@ -1,14 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// Gemini image-generation endpoint. Uses Google generativelanguage direct API
-// with the user's own GEMINI_API_KEY. Returns { dataUrl, text }.
+// Image generation. Prefers Lovable AI Gateway (LOVABLE_API_KEY) because
+// personal GEMINI_API_KEY on free tier hits 429 quickly. Falls back to the
+// user's own GEMINI_API_KEY when the gateway key is absent.
 //
-// Models known to return image bytes:
-//   gemini-2.5-flash-image        (Nano Banana, GA)
-//   gemini-3.1-flash-image        (Nano Banana 2)
-//   gemini-3.1-flash-image-preview
-//   gemini-3-pro-image            (highest quality, slower)
-//   gemini-3-pro-image-preview
+// Model IDs accepted from the client are the "short" Gemini ids
+// (gemini-2.5-flash-image, gemini-3.1-flash-image, gemini-3-pro-image).
+// We normalise them for the chosen backend.
 
 type Body = {
   prompt: string;
@@ -22,14 +20,96 @@ export const Route = createFileRoute("/api/gen-image")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const key = process.env.GEMINI_API_KEY;
-        if (!key) return new Response("Missing GEMINI_API_KEY", { status: 500 });
-
         const body = (await request.json()) as Body;
         const prompt = (body.prompt || "").trim();
         if (!prompt) return Response.json({ error: "empty prompt" }, { status: 400 });
 
-        const model = body.model || DEFAULT_MODEL;
+        const shortModel = body.model || DEFAULT_MODEL;
+        const lovableKey = process.env.LOVABLE_API_KEY;
+        const geminiKey = process.env.GEMINI_API_KEY;
+
+        // ── Prefer Lovable AI Gateway ────────────────────────────────────
+        if (lovableKey) {
+          const gatewayModel = shortModel.startsWith("google/")
+            ? shortModel
+            : `google/${shortModel}`;
+
+          const parts: Array<Record<string, unknown>> = [{ type: "text", text: prompt }];
+          if (body.reference?.data) {
+            const mime = body.reference.mimeType || "image/png";
+            parts.push({
+              type: "image_url",
+              image_url: { url: `data:${mime};base64,${body.reference.data}` },
+            });
+          }
+
+          try {
+            const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${lovableKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: gatewayModel,
+                messages: [{ role: "user", content: parts }],
+                modalities: ["image", "text"],
+              }),
+            });
+
+            if (!upstream.ok) {
+              const errText = await upstream.text();
+              // If gateway itself errors and user has a personal key, fall through.
+              if (!geminiKey) {
+                return Response.json({
+                  error: `Gateway 出错 (${upstream.status})：${errText.slice(0, 300)}`,
+                });
+              }
+              console.warn("gateway image error, falling back", upstream.status, errText);
+            } else {
+              const json = (await upstream.json()) as {
+                choices?: Array<{
+                  message?: {
+                    content?: string;
+                    images?: Array<{ image_url?: { url?: string } }>;
+                  };
+                }>;
+              };
+              const msg = json.choices?.[0]?.message;
+              let dataUrl: string | null = null;
+              let text = "";
+              // Preferred: message.images[].image_url.url
+              const img0 = msg?.images?.[0]?.image_url?.url;
+              if (img0) dataUrl = img0;
+              // Some responses put a data URL inside content
+              if (!dataUrl && typeof msg?.content === "string") {
+                const m = msg.content.match(/data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+/);
+                if (m) dataUrl = m[0];
+                else text = msg.content;
+              }
+              if (dataUrl) return Response.json({ dataUrl, text });
+              if (!geminiKey) {
+                return Response.json({
+                  error: `模型未返回图像。原始回复：${(msg?.content ?? "").slice(0, 200)}`,
+                  text,
+                });
+              }
+            }
+          } catch (err) {
+            if (!geminiKey) {
+              const msg = err instanceof Error ? err.message : "unknown error";
+              return Response.json({ error: `Gateway 请求失败：${msg}` });
+            }
+            console.warn("gateway threw, falling back", err);
+          }
+        }
+
+        // ── Fallback: personal GEMINI_API_KEY (Google direct) ─────────────
+        if (!geminiKey) {
+          return Response.json({
+            error: "未配置 LOVABLE_API_KEY 或 GEMINI_API_KEY。",
+          });
+        }
 
         const parts: Array<Record<string, unknown>> = [{ text: prompt }];
         if (body.reference?.data) {
@@ -40,10 +120,9 @@ export const Route = createFileRoute("/api/gen-image")({
             },
           });
         }
-
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
-          model,
-        )}:generateContent?key=${encodeURIComponent(key)}`;
+          shortModel,
+        )}:generateContent?key=${encodeURIComponent(geminiKey)}`;
 
         try {
           const upstream = await fetch(url, {
@@ -51,28 +130,21 @@ export const Route = createFileRoute("/api/gen-image")({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               contents: [{ role: "user", parts }],
-              generationConfig: {
-                responseModalities: ["IMAGE", "TEXT"],
-              },
+              generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
             }),
           });
-
           if (!upstream.ok) {
             const errText = await upstream.text();
-            console.error("gemini image error", upstream.status, errText);
-            return Response.json(
-              { error: `Gemini 出错 (${upstream.status})：${errText.slice(0, 300)}` },
-              { status: 200 },
-            );
+            return Response.json({
+              error: `Gemini 出错 (${upstream.status})：${errText.slice(0, 300)}`,
+            });
           }
-
           const json = (await upstream.json()) as {
             candidates?: Array<{
               content?: { parts?: Array<{ text?: string; inlineData?: { mimeType?: string; data?: string } }> };
               finishReason?: string;
             }>;
           };
-
           const parts0 = json.candidates?.[0]?.content?.parts ?? [];
           let dataUrl: string | null = null;
           let text = "";
@@ -82,18 +154,16 @@ export const Route = createFileRoute("/api/gen-image")({
             }
             if (p.text) text += p.text;
           }
-
           if (!dataUrl) {
             return Response.json({
-              error: `模型未返回图像 (finish=${json.candidates?.[0]?.finishReason ?? "?"}）。请换用图像模型：gemini-2.5-flash-image / gemini-3.1-flash-image / gemini-3-pro-image。`,
+              error: `模型未返回图像 (finish=${json.candidates?.[0]?.finishReason ?? "?"}）`,
               text,
             });
           }
-
           return Response.json({ dataUrl, text });
         } catch (err) {
           const msg = err instanceof Error ? err.message : "unknown error";
-          return Response.json({ error: `请求失败：${msg}` }, { status: 200 });
+          return Response.json({ error: `请求失败：${msg}` });
         }
       },
     },
