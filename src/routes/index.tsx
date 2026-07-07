@@ -188,8 +188,26 @@ function Editor() {
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedIds, updateActiveBlocks]);
 
-  function apply(ops: Operation[]) {
-    const { blocks: nb, palette: np } = applyOperations(blocks, palette, ops);
+  async function apply(ops: Operation[]) {
+    // Expand any set_range_map into a set_image with a freshly composed SVG data URL.
+    const expanded: Operation[] = [];
+    for (const op of ops) {
+      if (op.type === "set_range_map") {
+        try {
+          const dataUrl = await composeRangeMapSVG(op.points, {
+            title: op.title,
+            subtitle: op.subtitle,
+            source: op.source,
+          });
+          expanded.push({ type: "set_image", id: op.id, src: dataUrl });
+        } catch (e) {
+          console.error("range map compose failed", e);
+        }
+      } else {
+        expanded.push(op);
+      }
+    }
+    const { blocks: nb, palette: np } = applyOperations(blocks, palette, expanded);
     updateActiveBlocks(() => nb);
     setPalette(np);
   }
