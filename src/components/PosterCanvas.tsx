@@ -1,6 +1,6 @@
 import { Block, TextBlock, ImageBlock, POSTER_H, POSTER_W } from "@/lib/poster-data";
 import type { Palette } from "@/lib/poster-ops";
-import { CSSProperties, useMemo, useRef, useState } from "react";
+import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 
 export const FAMILY: Record<string, string> = {
   serif: '"Noto Serif SC", "Source Han Serif SC", Georgia, "Songti SC", serif',
@@ -25,6 +25,7 @@ type Props = {
   onMoveMany: (dx: number, dy: number) => void;
   onResize: (id: string, patch: { x: number; y: number; w: number; h?: number }) => void;
   onResizeMany?: (patches: ResizePatch[]) => void;
+  onChangeText: (id: string, text: string) => void;
   onImageContextMenu: (id: string, clientX: number, clientY: number) => void;
   displayWidth: number;
 };
@@ -45,7 +46,7 @@ type MarqueeState = { kind: "marquee"; startX: number; startY: number; curX: num
 type DragState = MoveState | ResizeState | GroupResizeState | MarqueeState | null;
 
 export function PosterCanvas({
-  blocks, palette, selectedIds, onSelectIds, onMoveMany, onResize, onResizeMany, onImageContextMenu, displayWidth,
+  blocks, palette, selectedIds, onSelectIds, onMoveMany, onResize, onResizeMany, onChangeText, onImageContextMenu, displayWidth,
 }: Props) {
   const scale = displayWidth / POSTER_W;
   const height = POSTER_H * scale;
@@ -260,7 +261,7 @@ export function PosterCanvas({
           return (
             <div key={b.id} style={{ position: "absolute", left: b.x, top: b.y }}>
               {b.type === "text" ? (
-                <TextEl block={b} selected={selected} onPointerDown={(e) => startBlockPointer(e, b)} />
+                <TextEl block={b} selected={selected} onChangeText={onChangeText} onPointerDown={(e) => startBlockPointer(e, b)} />
               ) : (
                 <ImageEl
                   block={b}
@@ -361,9 +362,11 @@ function ResizeHandles({ w, h, isText, onStart }: {
   );
 }
 
-function TextEl({ block, selected, onPointerDown }: {
-  block: TextBlock; selected: boolean; onPointerDown: (e: React.PointerEvent) => void;
+function TextEl({ block, selected, onChangeText, onPointerDown }: {
+  block: TextBlock; selected: boolean; onChangeText: (id: string, text: string) => void; onPointerDown: (e: React.PointerEvent) => void;
 }) {
+  const [editing, setEditing] = useState(false);
+  const editRef = useRef<HTMLTextAreaElement>(null);
   const style: CSSProperties = {
     width: block.w,
     fontFamily: FAMILY[block.fontFamily ?? "sans"] ?? FAMILY.sans,
@@ -376,11 +379,39 @@ function TextEl({ block, selected, onPointerDown }: {
     letterSpacing: block.letterSpacing ? `${block.letterSpacing}px` : undefined,
     textTransform: block.textTransform,
     whiteSpace: "pre-wrap",
-    cursor: "move", userSelect: "none", touchAction: "none",
-    outline: selected ? "2px solid #4c8dff" : "none",
+    cursor: editing ? "text" : "move", userSelect: editing ? "text" : "none", touchAction: "none",
+    outline: editing ? "2px solid #b0692b" : selected ? "2px solid #4c8dff" : "none",
     outlineOffset: 4, borderRadius: 2,
   };
-  return <div style={style} onPointerDown={onPointerDown}>{block.text}</div>;
+  useEffect(() => {
+    if (!editing) return;
+    editRef.current?.focus();
+    editRef.current?.setSelectionRange(editRef.current.value.length, editRef.current.value.length);
+  }, [editing]);
+  if (editing) {
+    const lines = Math.max(1, block.text.split("\n").length);
+    return (
+      <textarea
+        ref={editRef}
+        value={block.text}
+        onChange={(e) => onChangeText(block.id, e.target.value)}
+        onBlur={() => setEditing(false)}
+        onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setEditing(false); } }}
+        onPointerDown={(e) => e.stopPropagation()}
+        style={{
+          ...style,
+          minHeight: block.fontSize * (block.lineHeight ?? 1.4) * lines + 12,
+          resize: "none",
+          overflow: "hidden",
+          border: "none",
+          background: "rgba(255,255,255,0.78)",
+          padding: 0,
+          margin: 0,
+        }}
+      />
+    );
+  }
+  return <div style={style} onDoubleClick={(e) => { e.stopPropagation(); setEditing(true); }} onPointerDown={onPointerDown}>{block.text}</div>;
 }
 
 function ImageEl({ block, palette, selected, onPointerDown, onContextMenu }: {
@@ -407,7 +438,7 @@ function ImageEl({ block, palette, selected, onPointerDown, onContextMenu }: {
     >
       {block.src ? (
         <img src={block.src} alt={block.label} draggable={false}
-          style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
+          style={{ width: "100%", height: "100%", objectFit: block.src.startsWith("data:image/svg+xml") ? "fill" : "cover", pointerEvents: "none" }} />
       ) : (
         <>
           {block.label}

@@ -13,7 +13,7 @@ export type Operation =
       align?: "left" | "center" | "right";
       lineHeight?: number;
       letterSpacing?: number;
-      fontFamily?: "serif" | "sans" | "display";
+      fontFamily?: TextBlock["fontFamily"];
       textTransform?: "none" | "uppercase";
     }
   | { type: "replace_all"; find: string; replace: string; caseSensitive?: boolean }
@@ -95,7 +95,9 @@ export function applyOperations(
       case "recolor_scheme": {
         const prev = nextPalette;
         nextPalette = {
-          background: op.background ?? prev.background,
+          // AI operations are not allowed to change the page background; users
+          // control background color/gradient/transparency from the Inspector.
+          background: prev.background,
           ink: op.ink ?? prev.ink,
           accent: op.accent ?? prev.accent,
           muted: op.muted ?? prev.muted,

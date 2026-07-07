@@ -1,4 +1,5 @@
 import type { Block, TextBlock } from "@/lib/poster-data";
+import { useEffect, useState } from "react";
 
 type Props = {
   block: Block | null;
@@ -13,21 +14,7 @@ export function Inspector({ block, background, onChange, onChangeImage, onChange
     return (
       <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
-        <Field label="海报背景色">
-          <div style={{ display: "flex", gap: 8 }}>
-            <input
-              type="color"
-              value={background}
-              onChange={(e) => onChangeBackground(e.target.value)}
-              style={{ width: 40, height: 32, border: "1px solid #ddd", borderRadius: 4 }}
-            />
-            <input
-              value={background}
-              onChange={(e) => onChangeBackground(e.target.value)}
-              style={{ ...inp, flex: 1 }}
-            />
-          </div>
-        </Field>
+        <BackgroundPicker value={background} onChange={onChangeBackground} />
         <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
           点击画布上的任意文字或图片框可编辑其样式；<br/>
           支持 ⌘/Ctrl+点击 多选、拖拽框选、Del 删除、⌘/Ctrl+C/V 复制粘贴。
@@ -186,6 +173,82 @@ export function Inspector({ block, background, onChange, onChangeImage, onChange
   );
 }
 
+function BackgroundPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [mode, setMode] = useState<"solid" | "gradient" | "transparent">("solid");
+  const [c1, setC1] = useState("#f7f2e4");
+  const [c2, setC2] = useState("#d7c7a6");
+  const [alpha, setAlpha] = useState(100);
+  const [angle, setAngle] = useState(135);
+
+  useEffect(() => {
+    if (value.startsWith("linear-gradient")) setMode("gradient");
+    else if (value === "transparent" || value === "rgba(0,0,0,0)") setMode("transparent");
+    else setMode("solid");
+    const colors = value.match(/#[0-9a-fA-F]{6}/g);
+    if (colors?.[0]) setC1(colors[0]);
+    if (colors?.[1]) setC2(colors[1]);
+    const rgb = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (rgb) {
+      const hex = `#${Number(rgb[1]).toString(16).padStart(2, "0")}${Number(rgb[2]).toString(16).padStart(2, "0")}${Number(rgb[3]).toString(16).padStart(2, "0")}`;
+      setC1(hex);
+      if (rgb[4]) setAlpha(Math.round(Number(rgb[4]) * 100));
+    }
+    const deg = value.match(/linear-gradient\(([-\d.]+)deg/);
+    if (deg) setAngle(Number(deg[1]));
+  }, [value]);
+
+  function emit(nextMode = mode, nextC1 = c1, nextC2 = c2, nextAlpha = alpha, nextAngle = angle) {
+    if (nextMode === "transparent") onChange("rgba(0,0,0,0)");
+    else if (nextMode === "gradient") onChange(`linear-gradient(${nextAngle}deg, ${hexToRgba(nextC1, nextAlpha / 100)} 0%, ${hexToRgba(nextC2, nextAlpha / 100)} 100%)`);
+    else onChange(hexToRgba(nextC1, nextAlpha / 100));
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <Field label="背景类型">
+        <select value={mode} onChange={(e) => { const m = e.target.value as typeof mode; setMode(m); emit(m); }} style={inp}>
+          <option value="solid">纯色</option>
+          <option value="gradient">线性渐变</option>
+          <option value="transparent">透明</option>
+        </select>
+      </Field>
+      {mode !== "transparent" && (
+        <>
+          <Field label={mode === "gradient" ? "起始颜色" : "背景颜色"}>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input type="color" value={c1} onChange={(e) => { setC1(e.target.value); emit(mode, e.target.value); }} style={swatch} />
+              <input value={c1} onChange={(e) => { setC1(e.target.value); emit(mode, e.target.value); }} style={{ ...inp, flex: 1 }} />
+            </div>
+          </Field>
+          {mode === "gradient" && (
+            <>
+              <Field label="结束颜色">
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input type="color" value={c2} onChange={(e) => { setC2(e.target.value); emit(mode, c1, e.target.value); }} style={swatch} />
+                  <input value={c2} onChange={(e) => { setC2(e.target.value); emit(mode, c1, e.target.value); }} style={{ ...inp, flex: 1 }} />
+                </div>
+              </Field>
+              <Field label={`渐变角度 ${angle}°`}>
+                <input type="range" min="0" max="360" value={angle} onChange={(e) => { const a = Number(e.target.value); setAngle(a); emit(mode, c1, c2, alpha, a); }} />
+              </Field>
+            </>
+          )}
+          <Field label={`透明度 ${alpha}%`}>
+            <input type="range" min="0" max="100" value={alpha} onChange={(e) => { const a = Number(e.target.value); setAlpha(a); emit(mode, c1, c2, a); }} />
+          </Field>
+          <input value={value} onChange={(e) => onChange(e.target.value)} style={inp} />
+        </>
+      )}
+    </div>
+  );
+}
+
+function hexToRgba(hex: string, a: number): string {
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
+  if (!m) return hex;
+  return `rgba(${parseInt(m[1], 16)},${parseInt(m[2], 16)},${parseInt(m[3], 16)},${Math.max(0, Math.min(1, a)).toFixed(2)})`;
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12, color: "#555" }}>
@@ -204,6 +267,8 @@ const inp: React.CSSProperties = {
   width: "100%",
   boxSizing: "border-box",
 };
+
+const swatch: React.CSSProperties = { width: 40, height: 32, border: "1px solid #ddd", borderRadius: 4 };
 
 const ta: React.CSSProperties = {
   ...inp,

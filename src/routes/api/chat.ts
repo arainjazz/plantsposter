@@ -42,7 +42,7 @@ const OPERATIONS_SCHEMA = {
           align: { type: "string", enum: ["left", "center", "right"] },
           lineHeight: { type: "number" },
           letterSpacing: { type: "number" },
-          fontFamily: { type: "string", enum: ["serif", "sans", "display"] },
+          fontFamily: { type: "string", enum: ["serif", "sans", "display", "kai", "wenkai", "mono", "playfair", "inter"] },
           textTransform: { type: "string", enum: ["none", "uppercase"] },
           find: { type: "string" },
           replace: { type: "string" },
@@ -73,7 +73,7 @@ Operations available (set "type" plus the fields listed):
                     fontStyle (normal|italic), align (left|center|right), lineHeight, letterSpacing,
                     fontFamily (serif|sans|display), textTransform (none|uppercase)
 - replace_all     : find, replace, caseSensitive?
-- recolor_scheme  : any of background, ink, accent, muted (all #RRGGBB)
+- recolor_scheme  : ink, accent, muted only (all #RRGGBB). NEVER output background.
 - set_image       : id (must be an image block id), src (a full data:image/... URL or https URL).
 - set_range_map   : id (image block id, e.g. img-map), points: [{ lat, lon, kind: "native"|"introduced", label? }],
                     optional title / subtitle / source. Use this for ANY "全球分布 / GLOBAL RANGE" map request —
@@ -85,6 +85,7 @@ General rules:
 - When the user gives a vague instruction, pick reasonable values yourself.
 - Colors must be #RRGGBB hex.
 - If the user attaches an image, you may use it as visual reference (e.g. to pick a matching color palette).
+- Do not change the poster background color/gradient/transparency through AI edits. Background is user-controlled only.
 - If nothing needs changing, return an empty operations array and explain.
 - Keep the message under 3 sentences.
 

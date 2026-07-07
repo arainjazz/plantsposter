@@ -39,6 +39,43 @@ async function preloadImages(blocks: Block[]): Promise<Map<string, HTMLImageElem
   return map;
 }
 
+function parseRgba(input: string): { r: number; g: number; b: number; a: number } | null {
+  const hex = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(input.trim());
+  if (hex) return { r: parseInt(hex[1], 16), g: parseInt(hex[2], 16), b: parseInt(hex[3], 16), a: 1 };
+  const rgba = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/i.exec(input);
+  if (rgba) return { r: Number(rgba[1]), g: Number(rgba[2]), b: Number(rgba[3]), a: rgba[4] == null ? 1 : Number(rgba[4]) };
+  return null;
+}
+
+function rgbaCss(c: { r: number; g: number; b: number; a: number }) {
+  return `rgba(${c.r},${c.g},${c.b},${c.a})`;
+}
+
+function firstColor(input: string, fallback = "#f7f2e4") {
+  const match = input.match(/#[\da-fA-F]{6}|rgba?\([^)]*\)/);
+  return match?.[0] ?? fallback;
+}
+
+function paintBackground(ctx: CanvasRenderingContext2D, background: string) {
+  if (!background || background === "transparent" || background === "rgba(0,0,0,0)") return;
+  const gradient = /linear-gradient\(([-\d.]+)deg,\s*([^,]+(?:,[^,]+)*?)\s+0%,\s*([^,]+(?:,[^,]+)*?)\s+100%\)/i.exec(background);
+  if (gradient) {
+    const angle = (Number(gradient[1]) * Math.PI) / 180;
+    const cx = POSTER_W / 2;
+    const cy = POSTER_H / 2;
+    const len = Math.sqrt(POSTER_W * POSTER_W + POSTER_H * POSTER_H) / 2;
+    const x = Math.cos(angle) * len;
+    const y = Math.sin(angle) * len;
+    const g = ctx.createLinearGradient(cx - x, cy - y, cx + x, cy + y);
+    g.addColorStop(0, gradient[2].trim());
+    g.addColorStop(1, gradient[3].trim());
+    ctx.fillStyle = g;
+  } else {
+    ctx.fillStyle = background;
+  }
+  ctx.fillRect(0, 0, POSTER_W, POSTER_H);
+}
+
 async function imageToDataUrl(src: string): Promise<string> {
   const img = await loadImage(src);
   const c = document.createElement("canvas");
@@ -61,10 +98,7 @@ export async function renderPosterToCanvas(
   const ctx = canvas.getContext("2d")!;
   ctx.scale(scale, scale);
 
-  if (palette.background && palette.background !== "rgba(0,0,0,0)") {
-    ctx.fillStyle = palette.background;
-    ctx.fillRect(0, 0, POSTER_W, POSTER_H);
-  }
+  paintBackground(ctx, palette.background);
 
   for (const b of blocks) {
     if (b.type === "image") {
@@ -158,7 +192,13 @@ export async function renderPosterToSVG(blocks: Block[], palette: Palette): Prom
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const parts: string[] = [];
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">`);
-  parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="${palette.background}"/>`);
+  if (palette.background.startsWith("linear-gradient")) {
+    const colors = palette.background.match(/#[\da-fA-F]{6}|rgba?\([^)]*\)/g) ?? ["#f7f2e4", "#d7c7a6"];
+    parts.push(`<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[1] ?? colors[0]}"/></linearGradient></defs>`);
+    parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="url(#bg)"/>`);
+  } else if (palette.background && palette.background !== "rgba(0,0,0,0)" && palette.background !== "transparent") {
+    parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="${palette.background}"/>`);
+  }
   for (const b of blocks) {
     if (b.type === "image") {
       if (b.src) {
@@ -250,7 +290,8 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
 
   for (const page of pages) {
     const slide = pptx.addSlide();
-    slide.background = { color: palette.background.replace("#", "") };
+    const bg = parseRgba(firstColor(palette.background));
+    slide.background = { color: bg ? [bg.r, bg.g, bg.b].map((n) => n.toString(16).padStart(2, "0")).join("") : "F7F2E4" };
 
     for (const b of page.blocks) {
       if (b.type === "image") {
