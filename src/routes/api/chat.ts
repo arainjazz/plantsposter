@@ -161,7 +161,12 @@ export const Route = createFileRoute("/api/chat")({
         const model = body.model || "gemini-2.5-flash";
         const custom = body.custom;
         const key = process.env.GEMINI_API_KEY;
-        if (!custom && !key) return new Response("Missing GEMINI_API_KEY", { status: 500 });
+        if (!custom && !key) {
+          return Response.json(
+            { message: "Missing GEMINI_API_KEY (未配置后端环境变量，请在左上角『配置新模型』中填入你的 API Key)", operations: [] },
+            { status: 200 }
+          );
+        }
 
         const catalog = body.blocks
           .map(
