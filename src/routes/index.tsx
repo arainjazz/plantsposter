@@ -10,6 +10,21 @@ import { ImageSearchModal } from "@/components/ImageSearchModal";
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
 import { INITIAL_BLOCKS, POSTER_H, POSTER_W, makeEmptyPage, clonePage, deriveAutoName } from "@/lib/poster-data";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
+import { composeRangeMapSVG } from "@/lib/range-map";
+
+const STORAGE_KEY = "banrihua.editor.v1";
+type PersistedState = { pages: PosterPage[]; activeId: string; palette: Palette };
+
+function loadPersisted(): PersistedState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedState;
+    if (!parsed?.pages?.length) return null;
+    return parsed;
+  } catch { return null; }
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,6 +61,7 @@ async function urlToBase64(src: string): Promise<{ mimeType: string; data: strin
 }
 
 function Editor() {
+  const [hydrated, setHydrated] = useState(false);
   const [pages, setPages] = useState<PosterPage[]>([
     { id: "page-1", name: "封面·半日花", autoName: false, blocks: INITIAL_BLOCKS },
   ]);
@@ -54,6 +70,25 @@ function Editor() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const stageRef = useRef<HTMLDivElement>(null);
   const [displayWidth, setDisplayWidth] = useState(600);
+
+  // Load persisted state once on mount (client only, so SSR stays deterministic).
+  useEffect(() => {
+    const p = loadPersisted();
+    if (p) {
+      setPages(p.pages);
+      setActiveId(p.activeId);
+      setPalette(p.palette);
+    }
+    setHydrated(true);
+  }, []);
+
+  // Persist on every change (after hydration to avoid overwriting with defaults).
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ pages, activeId, palette }));
+    } catch { /* quota exceeded — silently ignore */ }
+  }, [hydrated, pages, activeId, palette]);
 
   // context menu + search modal
   const [ctxMenu, setCtxMenu] = useState<{ id: string; x: number; y: number } | null>(null);
@@ -153,8 +188,26 @@ function Editor() {
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedIds, updateActiveBlocks]);
 
-  function apply(ops: Operation[]) {
-    const { blocks: nb, palette: np } = applyOperations(blocks, palette, ops);
+  async function apply(ops: Operation[]) {
+    // Expand any set_range_map into a set_image with a freshly composed SVG data URL.
+    const expanded: Operation[] = [];
+    for (const op of ops) {
+      if (op.type === "set_range_map") {
+        try {
+          const dataUrl = await composeRangeMapSVG(op.points, {
+            title: op.title,
+            subtitle: op.subtitle,
+            source: op.source,
+          });
+          expanded.push({ type: "set_image", id: op.id, src: dataUrl });
+        } catch (e) {
+          console.error("range map compose failed", e);
+        }
+      } else {
+        expanded.push(op);
+      }
+    }
+    const { blocks: nb, palette: np } = applyOperations(blocks, palette, expanded);
     updateActiveBlocks(() => nb);
     setPalette(np);
   }

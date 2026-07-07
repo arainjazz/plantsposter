@@ -14,11 +14,27 @@ const OPERATIONS_SCHEMA = {
         properties: {
           type: {
             type: "string",
-            enum: ["update_text", "update_style", "replace_all", "recolor_scheme", "set_image"],
+            enum: ["update_text", "update_style", "replace_all", "recolor_scheme", "set_image", "set_range_map"],
           },
           id: { type: "string" },
           text: { type: "string" },
           src: { type: "string" },
+          title: { type: "string" },
+          subtitle: { type: "string" },
+          source: { type: "string" },
+          points: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                lat: { type: "number" },
+                lon: { type: "number" },
+                kind: { type: "string", enum: ["native", "introduced"] },
+                label: { type: "string" },
+              },
+              required: ["lat", "lon"],
+            },
+          },
           fontSize: { type: "number" },
           color: { type: "string" },
           fontWeight: { type: "number" },
@@ -58,8 +74,11 @@ Operations available (set "type" plus the fields listed):
                     fontFamily (serif|sans|display), textTransform (none|uppercase)
 - replace_all     : find, replace, caseSensitive?
 - recolor_scheme  : any of background, ink, accent, muted (all #RRGGBB)
-- set_image       : id (must be an image block id), src (a full data:image/svg+xml;base64,... URL or https URL).
-                    Use this when you generate a distribution map SVG — encode the SVG as base64 and prefix with data:image/svg+xml;base64,
+- set_image       : id (must be an image block id), src (a full data:image/... URL or https URL).
+- set_range_map   : id (image block id, e.g. img-map), points: [{ lat, lon, kind: "native"|"introduced", label? }],
+                    optional title / subtitle / source. Use this for ANY "全球分布 / GLOBAL RANGE" map request —
+                    the client automatically composes the SVG on top of the fixed Wikimedia CC0 base map
+                    with the required projection formula. NEVER hand-craft the SVG yourself.
 
 General rules:
 - Use ONLY block ids from the provided catalog. Do not invent ids.
@@ -93,33 +112,26 @@ CONTENT SKILL — "全球分布"栏 (GLOBAL RANGE) 与配图 SVG 规范
     caption 记录：taxon key 或查询、筛选条件、记录数、下载/API URL、访问日期、局限性。
   - 不要凭空补点，不要臆造鄂尔多斯本地记录。原生 / 引入 / 不确定记录不得混绘。
 
-■ 配图 SVG 规范 (img-map 或任何"全球分布"图片块)
-  当用户要求"生成全球分布图 / 分布地图 / GLOBAL RANGE 图"时，你必须生成一份符合以下
-  规范的 SVG，用 base64 编码后通过 set_image (id 为地图图片块) 写入。
+■ 配图生成 (img-map 或"全球分布"图片块) — 必须使用 set_range_map
+  当用户要求"生成全球分布图 / 分布地图 / GLOBAL RANGE 图"时，你只需输出一条
+  set_range_map 操作，客户端会用固定不变的透明背景 Wikimedia CC0 底图和下面
+  的回归投影公式自动合成 SVG。禁止你自己拼 SVG。
 
-  1. 矢量底图: 基于 Wikimedia Commons CC0 底图 "World map - low resolution.svg"，
-     viewBox="0 0 950 620"。国家路径填充 #e8dcc4，描边 #8a7a5a，宽度 0.35。
-     由于路径过长，若无本地拷贝可用一个简化占位边界，并在 caption 说明。
-  2. 投影公式 (禁止用理论 Plate Carrée 中心公式，必须用回归校正公式)：
-        x = 2.6865 * lon + 449.3127
-        y = -3.4451 * lat + 339.3522
-     lon 东正西负；lat 北正南负。SVG 左上 (0,0)，右下 (950,620)。
-  3. 散点样式：
-     - 原生点：<circle cx=".." cy=".." r="4.2" fill="#3a7d2e" stroke="#fff"
-       stroke-width="0.7" opacity="0.92"/>，放在 <g id="native-points">
-     - 引入点：fill="#d97706"，其余同上，放在 <g id="introduced-points">
-  4. 经纬网 (虚线 #b9a87e 0.55 透明 0.2 宽 dasharray="2 3")：
-        赤道 y=339.35，北回归线 y=258.61，南回归线 y=420.09
-  5. 海洋背景 radialGradient (#e6eef2 → #cdd9df)。
-  6. 图例组: 绿点=Native 原生 / 橙点=Introduced 引入，中英双语。
-  7. 标题: "[Genus species] · Global Distribution" + 副标 "Equirectangular projection · low-resolution country borders"。
-  8. 数据源标注: "Base map: Wikimedia Commons (World map - low resolution.svg, CC0) · Points: POWO 2024 / GBIF 2024 / CABI 2024"。
-  9. 每个投影点必须在 message 中以文本凭证方式列出:
-        "Xinjiang - Turpan: (lat 42.9, lon 89.2) -> (x 688.95, y 191.56)"
-  10. 证据不足时不要臆造点；宁少勿假。
+  投影公式 (客户端使用，仅供你在 message 中列出坐标凭证)：
+      x = 2.6865 * lon + 449.3127
+      y = -3.4451 * lat + 339.3522
+    lon 东正西负；lat 北正南负。
 
-  输出方式: operations 中一条 set_image，src 值为
-    "data:image/svg+xml;base64,<你生成的 SVG 的 base64>"`;
+  set_range_map 字段:
+    - id       : 目标图片块 id (通常是 img-map)
+    - points   : [{ lat, lon, kind: "native"|"introduced", label }]  真实点，勿臆造
+    - title    : 例如 "Helianthemum songaricum · Global Distribution"
+    - subtitle : 例如 "Wikimedia CC0 base · GBIF/POWO records"
+    - source   : caption 一句话，写清数据源/查询/日期/许可证
+
+  每个投影点必须在 message 中以文本凭证方式列出:
+      "Xinjiang - Turpan: (lat 42.9, lon 89.2) -> (x 688.95, y 191.56)"
+  证据不足时不要臆造点；宁少勿假。`;
 
 type ChatBody = {
   message: string;

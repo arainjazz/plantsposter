@@ -149,22 +149,24 @@ export function PosterCanvas({
     if (d.kind === "group-resize") {
       const dx = (e.clientX - d.startX) / scale;
       const dy = (e.clientY - d.startY) / scale;
+      const hasH = d.handle.includes("e") || d.handle.includes("w");
+      const hasV = d.handle.includes("n") || d.handle.includes("s");
       let newX = d.bboxX, newY = d.bboxY, newW = d.bboxW, newH = d.bboxH;
       if (d.handle.includes("e")) newW = Math.max(30, d.bboxW + dx);
       if (d.handle.includes("s")) newH = Math.max(30, d.bboxH + dy);
       if (d.handle.includes("w")) { newW = Math.max(30, d.bboxW - dx); newX = d.bboxX + (d.bboxW - newW); }
       if (d.handle.includes("n")) { newH = Math.max(30, d.bboxH - dy); newY = d.bboxY + (d.bboxH - newH); }
-      // Uniform scaling by default for groups (keeps layout coherent). Hold Alt for free-scale.
-      if (!e.altKey) {
+      // Hold Shift for uniform (aspect-locked) scaling; default = per-axis so the
+      // axis you're NOT dragging (and paragraph vertical spacing) stays put.
+      if (e.shiftKey && hasH && hasV) {
         const ratio = d.bboxW / d.bboxH;
         if (Math.abs(newW - d.bboxW) > Math.abs(newH - d.bboxH)) newH = newW / ratio;
         else newW = newH * ratio;
-        // Re-anchor if using n/w handles
         if (d.handle.includes("w")) newX = d.bboxX + (d.bboxW - newW);
         if (d.handle.includes("n")) newY = d.bboxY + (d.bboxH - newH);
       }
-      const sx = newW / d.bboxW;
-      const sy = newH / d.bboxH;
+      const sx = hasH ? newW / d.bboxW : 1;
+      const sy = hasV ? newH / d.bboxH : 1;
       const patches: ResizePatch[] = d.originals.map((o) => {
         const relX = (o.x - d.bboxX) / d.bboxW;
         const relY = (o.y - d.bboxY) / d.bboxH;
