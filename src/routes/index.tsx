@@ -113,6 +113,17 @@ function Editor() {
       }),
     );
   }
+  function resizeMany(patches: Array<{ id: string; x: number; y: number; w: number; h?: number }>) {
+    const map = new Map(patches.map((p) => [p.id, p]));
+    updateActiveBlocks((bs) =>
+      bs.map((b) => {
+        const p = map.get(b.id);
+        if (!p) return b;
+        if (b.type === "image") return { ...b, x: p.x, y: p.y, w: p.w, h: p.h ?? b.h };
+        return { ...b, x: p.x, y: p.y, w: p.w };
+      }),
+    );
+  }
   function selectIds(ids: string[]) { setSelectedIds(new Set(ids)); }
 
   // Auto-rename
@@ -321,6 +332,7 @@ function Editor() {
           onSelectIds={selectIds}
           onMoveMany={moveMany}
           onResize={resizeBlock}
+          onResizeMany={resizeMany}
           onImageContextMenu={openContextMenu}
           displayWidth={displayWidth}
         />

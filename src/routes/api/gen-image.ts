@@ -12,6 +12,7 @@ type Body = {
   prompt: string;
   model?: string;
   reference?: { mimeType: string; data: string } | null;
+  custom?: { baseURL: string; apiKey: string } | null;
 };
 
 const DEFAULT_MODEL = "gemini-2.5-flash-image";
@@ -27,6 +28,47 @@ export const Route = createFileRoute("/api/gen-image")({
         const shortModel = body.model || DEFAULT_MODEL;
         const lovableKey = process.env.LOVABLE_API_KEY;
         const geminiKey = process.env.GEMINI_API_KEY;
+
+        // ── User-configured custom endpoint (highest priority) ──────────
+        if (body.custom) {
+          const { baseURL, apiKey } = body.custom;
+          const parts: Array<Record<string, unknown>> = [{ type: "text", text: prompt }];
+          if (body.reference?.data) {
+            parts.push({
+              type: "image_url",
+              image_url: { url: `data:${body.reference.mimeType || "image/png"};base64,${body.reference.data}` },
+            });
+          }
+          try {
+            const upstream = await fetch(`${baseURL.replace(/\/$/, "")}/chat/completions`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+              body: JSON.stringify({
+                model: shortModel,
+                messages: [{ role: "user", content: parts }],
+                modalities: ["image", "text"],
+              }),
+            });
+            if (!upstream.ok) {
+              return Response.json({ error: `自定义模型出错 (${upstream.status})：${(await upstream.text()).slice(0, 300)}` });
+            }
+            const j = (await upstream.json()) as {
+              choices?: Array<{ message?: { content?: string; images?: Array<{ image_url?: { url?: string } }> } }>;
+            };
+            const msg = j.choices?.[0]?.message;
+            const img0 = msg?.images?.[0]?.image_url?.url;
+            if (img0) return Response.json({ dataUrl: img0 });
+            if (typeof msg?.content === "string") {
+              const m = msg.content.match(/data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+/);
+              if (m) return Response.json({ dataUrl: m[0] });
+              return Response.json({ error: `模型未返回图像，原始回复：${msg.content.slice(0, 200)}` });
+            }
+            return Response.json({ error: "模型未返回图像" });
+          } catch (err) {
+            return Response.json({ error: `自定义模型请求失败：${err instanceof Error ? err.message : "unknown"}` });
+          }
+        }
+
 
         // ── Prefer Lovable AI Gateway ────────────────────────────────────
         if (lovableKey) {

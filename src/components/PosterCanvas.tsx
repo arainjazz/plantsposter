@@ -1,6 +1,6 @@
 import { Block, TextBlock, ImageBlock, POSTER_H, POSTER_W } from "@/lib/poster-data";
 import type { Palette } from "@/lib/poster-ops";
-import { CSSProperties, useRef, useState } from "react";
+import { CSSProperties, useMemo, useRef, useState } from "react";
 
 export const FAMILY: Record<string, string> = {
   serif: '"Noto Serif SC", "Source Han Serif SC", Georgia, "Songti SC", serif',
@@ -15,6 +15,8 @@ export const FAMILY: Record<string, string> = {
 
 type Handle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 
+export type ResizePatch = { id: string; x: number; y: number; w: number; h?: number };
+
 type Props = {
   blocks: Block[];
   palette: Palette;
@@ -22,6 +24,7 @@ type Props = {
   onSelectIds: (ids: string[], additive?: boolean) => void;
   onMoveMany: (dx: number, dy: number) => void;
   onResize: (id: string, patch: { x: number; y: number; w: number; h?: number }) => void;
+  onResizeMany?: (patches: ResizePatch[]) => void;
   onImageContextMenu: (id: string, clientX: number, clientY: number) => void;
   displayWidth: number;
 };
@@ -32,11 +35,17 @@ type ResizeState = {
   startX: number; startY: number;
   origX: number; origY: number; origW: number; origH: number; isText: boolean;
 };
+type GroupResizeState = {
+  kind: "group-resize"; handle: Handle;
+  startX: number; startY: number;
+  bboxX: number; bboxY: number; bboxW: number; bboxH: number;
+  originals: Array<{ id: string; x: number; y: number; w: number; h: number; isText: boolean }>;
+};
 type MarqueeState = { kind: "marquee"; startX: number; startY: number; curX: number; curY: number; additive: boolean };
-type DragState = MoveState | ResizeState | MarqueeState | null;
+type DragState = MoveState | ResizeState | GroupResizeState | MarqueeState | null;
 
 export function PosterCanvas({
-  blocks, palette, selectedIds, onSelectIds, onMoveMany, onResize, onImageContextMenu, displayWidth,
+  blocks, palette, selectedIds, onSelectIds, onMoveMany, onResize, onResizeMany, onImageContextMenu, displayWidth,
 }: Props) {
   const scale = displayWidth / POSTER_W;
   const height = POSTER_H * scale;
@@ -68,6 +77,24 @@ export function PosterCanvas({
       startX: e.clientX, startY: e.clientY,
       origX: b.x, origY: b.y, origW: b.w, origH: h,
       isText: b.type === "text",
+    };
+  }
+
+  function startGroupResize(e: React.PointerEvent, handle: Handle, bbox: { x: number; y: number; w: number; h: number }) {
+    e.stopPropagation();
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    const originals = blocks
+      .filter((b) => selectedIds.has(b.id))
+      .map((b) => ({
+        id: b.id, x: b.x, y: b.y, w: b.w,
+        h: b.type === "image" ? b.h : 100,
+        isText: b.type === "text",
+      }));
+    dragRef.current = {
+      kind: "group-resize", handle,
+      startX: e.clientX, startY: e.clientY,
+      bboxX: bbox.x, bboxY: bbox.y, bboxW: bbox.w, bboxH: bbox.h,
+      originals,
     };
   }
 
@@ -119,6 +146,38 @@ export function PosterCanvas({
       });
       return;
     }
+    if (d.kind === "group-resize") {
+      const dx = (e.clientX - d.startX) / scale;
+      const dy = (e.clientY - d.startY) / scale;
+      let newX = d.bboxX, newY = d.bboxY, newW = d.bboxW, newH = d.bboxH;
+      if (d.handle.includes("e")) newW = Math.max(30, d.bboxW + dx);
+      if (d.handle.includes("s")) newH = Math.max(30, d.bboxH + dy);
+      if (d.handle.includes("w")) { newW = Math.max(30, d.bboxW - dx); newX = d.bboxX + (d.bboxW - newW); }
+      if (d.handle.includes("n")) { newH = Math.max(30, d.bboxH - dy); newY = d.bboxY + (d.bboxH - newH); }
+      // Uniform scaling by default for groups (keeps layout coherent). Hold Alt for free-scale.
+      if (!e.altKey) {
+        const ratio = d.bboxW / d.bboxH;
+        if (Math.abs(newW - d.bboxW) > Math.abs(newH - d.bboxH)) newH = newW / ratio;
+        else newW = newH * ratio;
+        // Re-anchor if using n/w handles
+        if (d.handle.includes("w")) newX = d.bboxX + (d.bboxW - newW);
+        if (d.handle.includes("n")) newY = d.bboxY + (d.bboxH - newH);
+      }
+      const sx = newW / d.bboxW;
+      const sy = newH / d.bboxH;
+      const patches: ResizePatch[] = d.originals.map((o) => {
+        const relX = (o.x - d.bboxX) / d.bboxW;
+        const relY = (o.y - d.bboxY) / d.bboxH;
+        const x = Math.round(newX + relX * newW);
+        const y = Math.round(newY + relY * newH);
+        const w = Math.max(20, Math.round(o.w * sx));
+        const h = Math.max(20, Math.round(o.h * sy));
+        return o.isText ? { id: o.id, x, y, w } : { id: o.id, x, y, w, h };
+      });
+      if (onResizeMany) onResizeMany(patches);
+      else patches.forEach((p) => onResize(p.id, p));
+      return;
+    }
     if (d.kind === "marquee") {
       const rect = containerRef.current!.getBoundingClientRect();
       d.curX = (e.clientX - rect.left) / scale;
@@ -156,6 +215,22 @@ export function PosterCanvas({
 
   const marquee = dragRef.current?.kind === "marquee" ? dragRef.current : null;
   const soloSelected = selectedIds.size === 1 ? blocks.find((b) => selectedIds.has(b.id)) : null;
+
+  // Compute group bbox when multi-selected
+  const groupBBox = useMemo(() => {
+    if (selectedIds.size < 2) return null;
+    const sel = blocks.filter((b) => selectedIds.has(b.id));
+    if (sel.length < 2) return null;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const b of sel) {
+      const bh = b.type === "image" ? b.h : 40;
+      minX = Math.min(minX, b.x);
+      minY = Math.min(minY, b.y);
+      maxX = Math.max(maxX, b.x + b.w);
+      maxY = Math.max(maxY, b.y + bh);
+    }
+    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+  }, [blocks, selectedIds]);
 
   return (
     <div
@@ -208,6 +283,28 @@ export function PosterCanvas({
             </div>
           );
         })}
+
+        {groupBBox && (
+          <div
+            style={{
+              position: "absolute",
+              left: groupBBox.x, top: groupBBox.y,
+              width: groupBBox.w, height: groupBBox.h,
+              border: "1.5px dashed #4c8dff",
+              pointerEvents: "none",
+              zIndex: 9,
+            }}
+          >
+            <div style={{ pointerEvents: "auto" }}>
+              <ResizeHandles
+                w={groupBBox.w}
+                h={groupBBox.h}
+                isText={false}
+                onStart={(h, e) => startGroupResize(e, h, groupBBox)}
+              />
+            </div>
+          </div>
+        )}
 
         {marquee && (
           <div
