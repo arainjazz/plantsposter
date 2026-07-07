@@ -1,24 +1,57 @@
 import type { Block, TextBlock } from "@/lib/poster-data";
 import { useEffect, useState } from "react";
 
+export type AlignDir = "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom";
+export type DistributeAxis = "h" | "v";
+
 type Props = {
   block: Block | null;
   background: string;
+  selectionCount: number;
   onChange: (patch: Partial<TextBlock>) => void;
   onChangeImage: (src: string | null) => void;
   onChangeBackground: (color: string) => void;
+  onAlignToPage: (dir: AlignDir) => void;
+  onDistribute: (axis: DistributeAxis) => void;
 };
 
-export function Inspector({ block, background, onChange, onChangeImage, onChangeBackground }: Props) {
+export function Inspector({ block, background, selectionCount, onChange, onChangeImage, onChangeBackground, onAlignToPage, onDistribute }: Props) {
+  const AlignPanel = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "10px 12px", background: "#f7f5f0", borderRadius: 6 }}>
+      <div style={{ fontSize: 11, color: "#666", fontWeight: 600 }}>对齐到页面 · {selectionCount} 个元素</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+        <button style={alignBtn} onClick={() => onAlignToPage("left")} title="左对齐">⇤</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("hcenter")} title="水平居中">⇔</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("right")} title="右对齐">⇥</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("top")} title="顶对齐">⤒</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("vcenter")} title="垂直居中">⇕</button>
+        <button style={alignBtn} onClick={() => onAlignToPage("bottom")} title="底对齐">⤓</button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginTop: 4 }}>
+        <button style={alignBtn} onClick={() => onDistribute("h")} disabled={selectionCount < 3} title="水平等距（≥3）">↔ 水平等距</button>
+        <button style={alignBtn} onClick={() => onDistribute("v")} disabled={selectionCount < 3} title="垂直等距（≥3）">↕ 垂直等距</button>
+      </div>
+      <div style={{ fontSize: 10, color: "#888" }}>提示：单选时相对整页对齐；多选时相对整体外框对齐。</div>
+    </div>
+  );
   if (!block) {
     return (
       <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
-        <BackgroundPicker value={background} onChange={onChangeBackground} />
-        <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
-          点击画布上的任意文字或图片框可编辑其样式；<br/>
-          支持 ⌘/Ctrl+点击 多选、拖拽框选、Del 删除、⌘/Ctrl+C/V 复制粘贴。
-        </div>
+        {selectionCount >= 2 ? (
+          <>
+            <div style={{ fontSize: 12, color: "#888" }}>已选 {selectionCount} 个元素</div>
+            {AlignPanel}
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
+            <BackgroundPicker value={background} onChange={onChangeBackground} />
+            <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
+              点击画布上的任意文字或图片框可编辑其样式；<br/>
+              支持 ⌘/Ctrl+点击 多选、拖拽框选、Del 删除、⌘/Ctrl+C/V 复制粘贴、⌘/Ctrl+Z 撤销。
+            </div>
+          </>
+        )}
       </div>
     );
   }
@@ -50,6 +83,7 @@ export function Inspector({ block, background, onChange, onChangeImage, onChange
             清除图片
           </button>
         )}
+        {AlignPanel}
       </div>
     );
   }
@@ -138,16 +172,18 @@ export function Inspector({ block, background, onChange, onChangeImage, onChange
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <Field label="对齐">
-          <select
-            value={t.align ?? "left"}
-            onChange={(e) => onChange({ align: e.target.value as "left" | "center" | "right" })}
-            style={inp}
-          >
-            <option value="left">左</option>
-            <option value="center">中</option>
-            <option value="right">右</option>
-          </select>
+        <Field label="文本对齐">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4 }}>
+            {(["left", "center", "right"] as const).map((a) => (
+              <button
+                key={a}
+                onClick={() => onChange({ align: a })}
+                style={{ ...alignBtn, background: (t.align ?? "left") === a ? "#2a2622" : "white", color: (t.align ?? "left") === a ? "white" : "#333" }}
+              >
+                {a === "left" ? "⯇" : a === "center" ? "≡" : "⯈"}
+              </button>
+            ))}
+          </div>
         </Field>
         <Field label="行高">
           <input
@@ -169,9 +205,20 @@ export function Inspector({ block, background, onChange, onChangeImage, onChange
           style={inp}
         />
       </Field>
+
+      {AlignPanel}
     </div>
   );
 }
+
+const alignBtn: React.CSSProperties = {
+  padding: "6px 4px",
+  border: "1px solid #d9d9d9",
+  background: "white",
+  borderRadius: 4,
+  cursor: "pointer",
+  fontSize: 12,
+};
 
 function BackgroundPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [mode, setMode] = useState<"solid" | "gradient" | "transparent">("solid");

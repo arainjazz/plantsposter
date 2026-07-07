@@ -174,6 +174,52 @@ function Editor() {
   }
   function selectIds(ids: string[]) { setSelectedIds(new Set(ids)); }
 
+  function alignToPage(dir: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") {
+    if (selectedIds.size === 0) return;
+    const sel = blocks.filter((b) => selectedIds.has(b.id));
+    const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
+    let refX1 = 0, refX2 = POSTER_W, refY1 = 0, refY2 = POSTER_H;
+    if (sel.length >= 2) {
+      refX1 = Math.min(...sel.map((b) => b.x));
+      refX2 = Math.max(...sel.map((b) => b.x + b.w));
+      refY1 = Math.min(...sel.map((b) => b.y));
+      refY2 = Math.max(...sel.map((b) => b.y + boxH(b)));
+    }
+    updateActiveBlocks((bs) => bs.map((b) => {
+      if (!selectedIds.has(b.id)) return b;
+      const bh = boxH(b);
+      let { x, y } = b;
+      if (dir === "left") x = refX1;
+      else if (dir === "right") x = refX2 - b.w;
+      else if (dir === "hcenter") x = Math.round((refX1 + refX2) / 2 - b.w / 2);
+      else if (dir === "top") y = refY1;
+      else if (dir === "bottom") y = refY2 - bh;
+      else if (dir === "vcenter") y = Math.round((refY1 + refY2) / 2 - bh / 2);
+      return { ...b, x, y };
+    }));
+  }
+
+  function distribute(axis: "h" | "v") {
+    if (selectedIds.size < 3) return;
+    const sel = blocks.filter((b) => selectedIds.has(b.id));
+    const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
+    const sorted = [...sel].sort((a, b) => (axis === "h" ? a.x - b.x : a.y - b.y));
+    const first = sorted[0], last = sorted[sorted.length - 1];
+    const gap = axis === "h"
+      ? ((last.x + last.w) - first.x - sorted.reduce((s, b) => s + b.w, 0)) / (sorted.length - 1)
+      : ((last.y + boxH(last)) - first.y - sorted.reduce((s, b) => s + boxH(b), 0)) / (sorted.length - 1);
+    const positions = new Map<string, { x?: number; y?: number }>();
+    let cursor = axis === "h" ? first.x : first.y;
+    for (const b of sorted) {
+      if (axis === "h") { positions.set(b.id, { x: Math.round(cursor) }); cursor += b.w + gap; }
+      else { positions.set(b.id, { y: Math.round(cursor) }); cursor += boxH(b) + gap; }
+    }
+    updateActiveBlocks((bs) => bs.map((b) => {
+      const p = positions.get(b.id);
+      return p ? { ...b, ...p } : b;
+    }));
+  }
+
   // Auto-rename
   useEffect(() => {
     if (!activePage.autoName) return;
@@ -355,13 +401,40 @@ function Editor() {
     document.body.style.cursor = "col-resize";
   }
 
-  // ── clipboard: copy/paste blocks (⌘/Ctrl + C/V) ─────────
+  // ── clipboard: copy/paste blocks (⌘/Ctrl + C/V) + undo (⌘/Ctrl+Z) ─────
   const clipboardRef = useRef<Block[]>([]);
+  const historyRef = useRef<Array<{ pages: PosterPage[]; activeId: string; palette: Palette }>>([]);
+  const skipHistoryRef = useRef(false);
+  const prevSnapRef = useRef<{ pages: PosterPage[]; activeId: string; palette: Palette } | null>(null);
+
+  // Track history: push previous snapshot before applying a new one.
+  useEffect(() => {
+    if (!hydrated) { prevSnapRef.current = { pages, activeId, palette }; return; }
+    if (skipHistoryRef.current) { skipHistoryRef.current = false; prevSnapRef.current = { pages, activeId, palette }; return; }
+    if (prevSnapRef.current) {
+      historyRef.current.push(prevSnapRef.current);
+      if (historyRef.current.length > 100) historyRef.current.shift();
+    }
+    prevSnapRef.current = { pages, activeId, palette };
+  }, [hydrated, pages, activeId, palette]);
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
       const meta = e.metaKey || e.ctrlKey;
+      if (meta && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        const snap = historyRef.current.pop();
+        if (snap) {
+          skipHistoryRef.current = true;
+          setPages(snap.pages);
+          setActiveId(snap.activeId);
+          setPalette(snap.palette);
+          setSelectedIds(new Set());
+        }
+        return;
+      }
       if (meta && e.key.toLowerCase() === "c" && selectedIds.size > 0) {
         e.preventDefault();
         clipboardRef.current = blocks.filter((b) => selectedIds.has(b.id)).map((b) => ({ ...b }));
@@ -407,7 +480,7 @@ function Editor() {
       <header style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", padding: "0 20px", background: "white", borderBottom: "1px solid #e5e5e5", gap: 16 }}>
         <div style={{ fontWeight: 700, fontSize: 15 }}>🌾 Ordos Plantspedia · Editor</div>
         <div style={{ color: "#888", fontSize: 12 }}>
-          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · ⌘/Ctrl+C/V 复制粘贴
+          A3 竖版 ｜ {pages.length} 页 ｜ 已选 {selectedIds.size} · Del删除 · ⌘/Ctrl 多选 · ⌘/Ctrl+C/V 复制粘贴 · ⌘/Ctrl+Z 撤销
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           <ExportMenu pages={pages} activePageId={activeId} palette={palette} />
@@ -469,9 +542,12 @@ function Editor() {
         <Inspector
           block={soloSelected}
           background={palette.background}
+          selectionCount={selectedIds.size}
           onChange={patchSelected}
           onChangeImage={setImage}
           onChangeBackground={(c) => setPalette((p) => ({ ...p, background: c }))}
+          onAlignToPage={alignToPage}
+          onDistribute={distribute}
         />
       </aside>
 

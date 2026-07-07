@@ -10,7 +10,8 @@ type Props = {
   onApplyOperations: (ops: Operation[]) => void;
 };
 
-type ModelEntry = { id: string; label: string; kind: "chat" | "image"; custom?: { baseURL: string; apiKey: string } };
+type ModelKind = "chat" | "image" | "native";
+type ModelEntry = { id: string; label: string; kind: ModelKind; custom?: { baseURL: string; apiKey: string } };
 
 const BUILTIN_CHAT: ModelEntry[] = [
   { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash（默认）", kind: "chat" },
@@ -66,8 +67,8 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
     setCustomModels(loadCustom());
   }, []);
 
-  const allChat = [...BUILTIN_CHAT, ...customModels.filter((m) => m.kind === "chat")];
-  const allImage = [...BUILTIN_IMAGE, ...customModels.filter((m) => m.kind === "image")];
+  const allChat = [...BUILTIN_CHAT, ...customModels.filter((m) => m.kind === "chat" || m.kind === "native")];
+  const allImage = [...BUILTIN_IMAGE, ...customModels.filter((m) => m.kind === "image" || m.kind === "native")];
 
   function pickModel(id: string) { setModel(id); localStorage.setItem(MODEL_KEY, id); }
   function pickImgModel(id: string) { setImgModel(id); localStorage.setItem(IMG_MODEL_KEY, id); }
@@ -310,7 +311,7 @@ function ConfigModal({
   const [modelId, setModelId] = useState("");
   const [baseURL, setBaseURL] = useState("https://ai.gateway.lovable.dev/v1");
   const [apiKey, setApiKey] = useState("");
-  const [kind, setKind] = useState<"chat" | "image">("chat");
+  const [kind, setKind] = useState<ModelKind>("chat");
 
   function submit() {
     if (!modelId.trim() || !baseURL.trim() || !apiKey.trim()) {
@@ -342,9 +343,10 @@ function ConfigModal({
 
         <div style={{ display: "grid", gap: 8 }}>
           <label style={fLbl}>类型
-            <select value={kind} onChange={(e) => setKind(e.target.value as "chat" | "image")} style={fInp}>
+            <select value={kind} onChange={(e) => setKind(e.target.value as ModelKind)} style={fInp}>
               <option value="chat">文本 / 编辑指令 (chat)</option>
               <option value="image">图像生成 (image)</option>
+              <option value="native">原生多模态 (native · 同时支持文本+图像)</option>
             </select>
           </label>
           <label style={fLbl}>显示名称（可选）
@@ -356,6 +358,12 @@ function ConfigModal({
           <label style={fLbl}>Base URL <span style={{ color: "#c33" }}>*</span>
             <input value={baseURL} onChange={(e) => setBaseURL(e.target.value)} placeholder="https://api.openai.com/v1" style={fInp} />
           </label>
+          <div style={{ fontSize: 11, color: "#666", background: "#f7f5f0", padding: "8px 10px", borderRadius: 4, lineHeight: 1.55 }}>
+            <b>Base URL 尾部 <code>/v1</code> 规则：</b><br/>
+            ✅ <b>需要</b> <code>/v1</code>：OpenAI (<code>https://api.openai.com/v1</code>)、Lovable Gateway (<code>https://ai.gateway.lovable.dev/v1</code>)、DeepSeek (<code>https://api.deepseek.com/v1</code>)、OpenRouter (<code>https://openrouter.ai/api/v1</code>)、Moonshot、通义、SiliconFlow、Together、Groq、Anthropic OpenAI-compat 等。<br/>
+            ❌ <b>不要</b> <code>/v1</code>：Google Gemini 原生 API (<code>https://generativelanguage.googleapis.com</code>)、Azure OpenAI（用 <code>/openai/deployments/&lt;name&gt;</code>）、Vertex AI、部分 Ollama 本地 (<code>http://localhost:11434</code>)。<br/>
+            <b>「原生多模态」</b>类型专为 Gemini 原生 / Anthropic 原生等<b>非</b> OpenAI 兼容协议保留：填厂商官方 endpoint，无需 /v1。
+          </div>
           <label style={fLbl}>API Key <span style={{ color: "#c33" }}>*</span>
             <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." style={fInp} />
           </label>
