@@ -26,6 +26,22 @@ import {
   saveEditorState,
 } from "@/lib/editor-storage";
 import { importDocumentAsPage } from "@/lib/editor-import";
+import type { PersistedEditorState } from "@/lib/editor-storage";
+
+const _initialPage: PosterPage = {
+  id: "p-banrihua",
+  name: "封面·半日花",
+  blocks: INITIAL_BLOCKS,
+};
+const defaultPlantsState: PersistedEditorState = {
+  pages: [_initialPage],
+  activeId: _initialPage.id,
+  palette: DEFAULT_PALETTE,
+};
+
+type SearchParams = { page?: string };
+
+
 
 
 export const Route = createFileRoute("/")({
