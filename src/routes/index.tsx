@@ -528,6 +528,19 @@ function Editor() {
     }
   }
 
+  function forceSaveToIDB() {
+    setSaveStatus("saving");
+    setSaveMessage("正在手动保存...");
+    const state = { pages, activeId, palette };
+    saveEditorState(state).then(() => {
+      setSaveStatus("saved");
+      setSaveMessage(`已手动保存 · ${new Date().toLocaleTimeString()}`);
+    }).catch(() => {
+      setSaveStatus("error");
+      setSaveMessage("手动保存失败");
+    });
+  }
+
   function manualSave() {
     const state = { pages, activeId, palette };
     downloadEditorStateFile(state);
@@ -717,11 +730,14 @@ function Editor() {
             {saveStatus === "saving" ? "⏳ " : saveStatus === "error" ? "⚠ " : "✓ "}
             {saveMessage}
           </div>
-          <button onClick={manualSave} style={headerBtn}>
-            保存数据在本地
+          <button onClick={forceSaveToIDB} style={{ ...headerBtn, background: "#4a6c2f", color: "white", border: "1px solid #3c5a24" }}>
+            立即保存
           </button>
-          <button onClick={() => importInputRef.current?.click()} style={headerBtn}>
-            导入
+          <button onClick={manualSave} style={headerBtn} title="下载JSON备份文件到电脑">
+            下载备份
+          </button>
+          <button onClick={() => importInputRef.current?.click()} style={headerBtn} title="导入下载的JSON备份文件">
+            导入备份
           </button>
         </div>
       </header>
