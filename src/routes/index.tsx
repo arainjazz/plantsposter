@@ -93,8 +93,8 @@ function Editor() {
       
       if (true) {
         try {
-          // Add a cache buster so Cloudflare doesn't serve stale JSON
-          const res = await fetch("/banrihua-editor-20plants.json?t=" + Date.now());
+          // Fetch from GitHub raw content to bypass Cloudflare Worker size and static asset limitations
+          const res = await fetch("https://raw.githubusercontent.com/arainjazz/plantsposter/main/public/banrihua-editor-20plants.json?t=" + Date.now());
           const fetchedState = await res.json();
           p = fetchedState as any;
         } catch (e) {
@@ -717,6 +717,7 @@ function Editor() {
         <PosterCanvas
           blocks={blocks}
           palette={palette}
+          pageBackground={pages.find(p => p.id === activeId)?.background}
           selectedIds={selectedIds}
           onSelectIds={selectIds}
           onMoveMany={moveMany}
@@ -747,11 +748,20 @@ function Editor() {
         </div>
         <Inspector
           block={soloSelected}
-          background={palette.background}
+          pages={pages}
+          activeId={activeId}
+          background={pages.find(p => p.id === activeId)?.background ?? palette.background}
           selectionCount={selectedIds.size}
           onChange={patchSelected}
           onChangeImage={setImage}
-          onChangeBackground={(c) => setPalette((p) => ({ ...p, background: c }))}
+          onChangeBackground={(c) => {
+            setPages(prev => prev.map(p => p.id === activeId ? { ...p, background: c } : p));
+            void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), palette });
+          }}
+          onApplyBackgroundToPages={(ids, c) => {
+            setPages(prev => prev.map(p => ids.includes(p.id) ? { ...p, background: c } : p));
+            void saveEditorState({ pages: pages.map(p => ids.includes(p.id) ? { ...p, background: c } : p), palette });
+          }}
           onAlignToPage={alignToPage}
           onDistribute={distribute}
         />

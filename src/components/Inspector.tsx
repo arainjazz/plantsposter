@@ -1,4 +1,4 @@
-import type { Block, TextBlock } from "@/lib/poster-data";
+import type { Block, TextBlock, PosterPage } from "@/lib/poster-data";
 import { useEffect, useState } from "react";
 
 export type AlignDir = "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom";
@@ -7,10 +7,13 @@ export type DistributeAxis = "h" | "v";
 type Props = {
   block: Block | null;
   background: string;
+  pages: PosterPage[];
+  activeId: string;
   selectionCount: number;
   onChange: (patch: Partial<TextBlock>) => void;
   onChangeImage: (src: string | null) => void;
   onChangeBackground: (color: string) => void;
+  onApplyBackgroundToPages: (pageIds: string[], color: string) => void;
   onAlignToPage: (dir: AlignDir) => void;
   onDistribute: (axis: DistributeAxis) => void;
 };
@@ -18,10 +21,13 @@ type Props = {
 export function Inspector({
   block,
   background,
+  pages,
+  activeId,
   selectionCount,
   onChange,
   onChangeImage,
   onChangeBackground,
+  onApplyBackgroundToPages,
   onAlignToPage,
   onDistribute,
 }: Props) {
@@ -94,6 +100,12 @@ export function Inspector({
           <>
             <div style={{ fontSize: 12, color: "#888" }}>未选中元素 · 页面属性</div>
             <BackgroundPicker value={background} onChange={onChangeBackground} />
+            <ApplyBackgroundToPages 
+              pages={pages} 
+              activeId={activeId} 
+              background={background} 
+              onApply={onApplyBackgroundToPages} 
+            />
             <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
               点击画布上的任意文字或图片框可编辑其样式；
               <br />
@@ -451,3 +463,99 @@ const btn: React.CSSProperties = {
   cursor: "pointer",
   fontSize: 12,
 };
+
+function ApplyBackgroundToPages({ 
+  pages, 
+  activeId, 
+  background, 
+  onApply 
+}: { 
+  pages: PosterPage[]; 
+  activeId: string; 
+  background: string; 
+  onApply: (ids: string[], bg: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const otherPages = pages.filter(p => p.id !== activeId);
+
+  if (otherPages.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "100%",
+          padding: "6px 12px",
+          background: "#f0f0f0",
+          border: "1px solid #ddd",
+          borderRadius: 4,
+          fontSize: 12,
+          cursor: "pointer",
+          textAlign: "left",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <span>应用到其他页面...</span>
+        <span>{open ? "▲" : "▼"}</span>
+      </button>
+
+      {open && (
+        <div style={{
+          marginTop: 8,
+          border: "1px solid #ddd",
+          borderRadius: 4,
+          padding: 8,
+          background: "white"
+        }}>
+          <div style={{ maxHeight: 150, overflowY: "auto", marginBottom: 8 }}>
+            {otherPages.map(p => (
+              <label key={p.id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 4 }}>
+                <input 
+                  type="checkbox" 
+                  checked={selectedIds.has(p.id)}
+                  onChange={(e) => {
+                    const next = new Set(selectedIds);
+                    if (e.target.checked) next.add(p.id);
+                    else next.delete(p.id);
+                    setSelectedIds(next);
+                  }}
+                />
+                {p.name || "未命名页面"}
+              </label>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={() => setSelectedIds(new Set(otherPages.map(p => p.id)))}
+              style={{ flex: 1, fontSize: 11, padding: "4px", background: "#eee", border: "none", borderRadius: 4, cursor: "pointer" }}
+            >
+              全选
+            </button>
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              style={{ flex: 1, fontSize: 11, padding: "4px", background: "#eee", border: "none", borderRadius: 4, cursor: "pointer" }}
+            >
+              清空
+            </button>
+            <button
+              disabled={selectedIds.size === 0}
+              onClick={() => {
+                onApply(Array.from(selectedIds), background);
+                setOpen(false);
+                setSelectedIds(new Set());
+              }}
+              style={{ flex: 2, fontSize: 11, padding: "4px", background: selectedIds.size > 0 ? "#4a4a4a" : "#ccc", color: "white", border: "none", borderRadius: 4, cursor: selectedIds.size > 0 ? "pointer" : "default" }}
+            >
+              确定应用
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -45,6 +45,7 @@ export type PosterPage = {
   name: string;
   blocks: Block[];
   autoName?: boolean; // if true, title auto-derives from largest text block
+  background?: string; // page-specific background color
 };
 
 export const INITIAL_BLOCKS: Block[] = [
@@ -1076,6 +1077,7 @@ export function clonePage(page: PosterPage, name?: string): PosterPage {
     id: `page-${Date.now()}-${suffix}`,
     name: name ?? speciesName,
     autoName: true,
+    background: page.background,
     blocks: page.blocks.map((b) => ({ ...b, id: `${b.id}-c${suffix}` })),
   };
 }
