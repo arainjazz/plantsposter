@@ -20,6 +20,7 @@ export type ResizePatch = { id: string; x: number; y: number; w: number; h?: num
 type Props = {
   blocks: Block[];
   palette: Palette;
+  pageBackground?: string;
   selectedIds: Set<string>;
   onSelectIds: (ids: string[], additive?: boolean) => void;
   onMoveMany: (dx: number, dy: number) => void;
@@ -29,6 +30,7 @@ type Props = {
   onImageContextMenu: (id: string, clientX: number, clientY: number) => void;
   displayWidth: number;
 };
+
 
 type MoveState = {
   kind: "move";
