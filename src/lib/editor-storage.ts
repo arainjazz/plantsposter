@@ -116,6 +116,48 @@ export async function clearEditorState(): Promise<void> {
   try { localStorage.removeItem(EDITOR_STORAGE_KEY); } catch { /* ignore */ }
 }
 
+// ── Global published state (shared by all visitors, stored in R2) ─────────
+
+// Fetch the globally published state from the server (/api/state).
+// Returns null on any failure so callers can fall back to local/default.
+export async function loadPublishedState(): Promise<PersistedEditorState | null> {
+  if (typeof window === "undefined") return null;
+  try {
+    const res = await fetch("/api/state?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = (await res.json()) as unknown;
+    return isState(data) ? (data as PersistedEditorState) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Publish the current state globally so every visitor sees it. POSTs to
+// /api/state, which writes to R2. Throws with a readable message on failure.
+export async function publishEditorState(
+  state: PersistedEditorState,
+  editKey?: string,
+): Promise<void> {
+  const res = await fetch("/api/state", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...(editKey ? { "x-edit-key": editKey } : {}),
+    },
+    body: JSON.stringify(state),
+  });
+  if (!res.ok) {
+    let msg = `发布失败 (${res.status})`;
+    try {
+      const j = (await res.json()) as { error?: string };
+      if (j?.error) msg = j.error;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(msg);
+  }
+}
+
 export function downloadEditorStateFile(state: PersistedEditorState) {
   const blob = new Blob([JSON.stringify({ version: 1, ...state }, null, 2)], {
     type: "application/json",

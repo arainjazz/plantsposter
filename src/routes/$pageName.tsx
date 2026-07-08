@@ -15,7 +15,10 @@ import {
   makeEmptyPage,
   clonePage,
   deriveAutoName,
+  uniquePageName,
+  ensureUniquePageNames,
 } from "@/lib/poster-data";
+import { publishEditorState } from "@/lib/editor-storage";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
 import { composeRangeMapSVG } from "@/lib/range-map";
 import { cleanupImageBackground } from "@/lib/image-edit";
@@ -28,34 +31,13 @@ import {
 import { importDocumentAsPage } from "@/lib/editor-import";
 import type { PersistedEditorState } from "@/lib/editor-storage";
 
+import defaultPlantsStateSSRRaw from "../lib/default-plants-ssr.json";
+
+const defaultPlantsStateSSR = defaultPlantsStateSSRRaw as unknown as PersistedEditorState;
+
 export const Route = createFileRoute("/$pageName")({
-  loader: async ({ request }) => {
-    let jsonUrl = "/banrihua-editor-20plants.json";
-    if (request && request.url) {
-      try {
-        const url = new URL(request.url);
-        jsonUrl = new URL("/banrihua-editor-20plants.json", url.origin).toString();
-      } catch (e) {
-        console.error("Failed to parse request URL in loader:", e);
-      }
-    } else if (typeof window !== "undefined") {
-      jsonUrl = new URL("/banrihua-editor-20plants.json", window.location.origin).toString();
-    }
-    
-    try {
-      const res = await fetch(jsonUrl);
-      if (!res.ok) throw new Error("Fetch failed");
-      const defaultState = await res.json();
-      return defaultState as PersistedEditorState;
-    } catch (e) {
-      console.error("Loader failed to fetch default state:", e);
-      // Minimal fallback to satisfy typescript and render something
-      return {
-        pages: [{ id: "p-banrihua", name: "封面·半日花", blocks: [] }],
-        activeId: "p-banrihua",
-        palette: { colors: [] }
-      } as unknown as PersistedEditorState;
-    }
+  loader: async () => {
+    return defaultPlantsStateSSR;
   },
   head: ({ params }) => {
     const pageName = decodeURIComponent(params.pageName);
@@ -107,98 +89,92 @@ function Editor() {
   const [saveStatus, setSaveStatus] = useState<"loading" | "saving" | "saved" | "error">("loading");
   const [saveMessage, setSaveMessage] = useState("正在读取本地草稿…");
   const [pages, setPages] = useState<PosterPage[]>(defaultPlantsState.pages as PosterPage[]);
-  const [activeId, setActiveId] = useState<string>(defaultPlantsState.activeId);
+  const initialActiveId = useMemo(() => {
+    if (decodedPageName) {
+      const matched = defaultPlantsState.pages.find(
+        (pg) => pg.id === decodedPageName || pg.name === decodedPageName
+      );
+      if (matched) return matched.id;
+    }
+    return defaultPlantsState.activeId;
+  }, [decodedPageName, defaultPlantsState]);
+  const [activeId, setActiveId] = useState<string>(initialActiveId);
   const [palette, setPalette] = useState<Palette>(defaultPlantsState.palette as Palette);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const stageRef = useRef<HTMLDivElement>(null);
   const [displayWidth, setDisplayWidth] = useState(600);
 
-  // Load persisted state once on mount (client only, so SSR stays deterministic).
+  // Load state once on mount (client only, so SSR stays deterministic).
+  //
+  // Source-of-truth order:
+  //   1. The globally published state from the server (/api/state → R2). This
+  //      is authoritative: it always carries full images/maps and is what every
+  //      visitor sees, so "全球配图" always render and shared links show real
+  //      content.
+  //   2. Local IndexedDB draft — only used when the server is unreachable
+  //      (offline), so an editor doesn't lose work mid-session.
+  //   3. The bundled SSR default — last-resort fallback.
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      let p = await loadEditorState();
-      
-      let fetchedState: any = null;
-      try {
-        // Fetch directly from the deployed Cloudflare static asset to bypass GitHub Raw's 5-minute cache
-        const res = await fetch("/banrihua-editor-20plants.json?t=" + Date.now());
-        fetchedState = await res.json();
-      } catch (e) {
-        console.error("Failed to fetch default state", e);
-      }
-
-      // Handle ?reset=1 URL param: wipe local state and reload without the param
+      // Handle ?reset=1: wipe local draft and drop the param.
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("reset") === "1") {
         const { clearEditorState } = await import("@/lib/editor-storage");
         await clearEditorState();
-        p = null;
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.delete("reset");
         window.history.replaceState({}, "", newUrl.toString());
       }
 
-      if (!p && fetchedState) {
-        p = fetchedState;
-      } else if (p && fetchedState) {
-        // ALWAYS inject the latest SVG maps from the server into the local state.
-        // This ensures any stale/broken cached maps are corrected on every load.
-        // All other user data (text, background, positions) is preserved.
-        p.pages.forEach((page: any) => {
-          const defaultPage = fetchedState.pages.find((dp: any) => dp.name === page.name);
-          if (defaultPage) {
-            const mapBlock = page.blocks.find((b: any) => b.id.includes('img-map'));
-            const defaultMapBlock = defaultPage.blocks.find((b: any) => b.id.includes('img-map'));
-            if (mapBlock && defaultMapBlock && defaultMapBlock.src?.startsWith('data:image/svg')) {
-              mapBlock.src = defaultMapBlock.src;
-            }
-          }
-        });
-        await saveEditorState(p);
-      }
+      const { loadPublishedState } = await import("@/lib/editor-storage");
+      const published = await loadPublishedState();
+      const local = published ? null : await loadEditorState();
+      const source = published ?? local ?? defaultPlantsState;
 
       if (cancelled) return;
-      if (p) {
-        setPages(p.pages);
-        
-        let targetActiveId = p.activeId;
-        if (decodedPageName) {
-          const matched = p.pages.find((pg: any) => pg.id === decodedPageName || pg.name === decodedPageName);
-          if (matched) {
-            targetActiveId = matched.id;
-          }
-        }
-        
-        setActiveId(targetActiveId);
-        setPalette(p.palette);
 
-        const currentActivePage = p.pages.find((pg: any) => pg.id === targetActiveId);
-        if (currentActivePage && currentActivePage.name !== decodedPageName) {
-          void navigate({
-            to: "/$pageName",
-            params: { pageName: currentActivePage.name },
-            replace: true,
-          });
-        }
-      } else {
-        // No saved state
-        if (decodedPageName) {
-          const matched = defaultPlantsState.pages.find((pg: any) => pg.id === decodedPageName || pg.name === decodedPageName);
-          if (matched) {
-            setActiveId(matched.id);
-          }
-        } else {
-          void navigate({
-            to: "/$pageName",
-            params: { pageName: "封面·半日花" },
-            replace: true,
-          });
+      // Guarantee every page has a unique name → unique URL.
+      const pages = ensureUniquePageNames(source.pages as PosterPage[]);
+
+      // Resolve which page the URL asks for; never silently fall back to page 1
+      // unless the URL matches nothing.
+      let targetActiveId = source.activeId;
+      let matchedName: string | null = null;
+      if (decodedPageName) {
+        const matched = pages.find(
+          (pg) => pg.id === decodedPageName || pg.name === decodedPageName,
+        );
+        if (matched) {
+          targetActiveId = matched.id;
+          matchedName = matched.name;
         }
       }
+      if (!pages.some((pg) => pg.id === targetActiveId)) {
+        targetActiveId = pages[0].id;
+      }
+
+      setPages(pages);
+      setActiveId(targetActiveId);
+      setPalette(source.palette as Palette);
+
+      // Cache authoritative state locally for offline recovery.
+      void saveEditorState({ pages, activeId: targetActiveId, palette: source.palette as Palette });
+
+      // Keep the address bar in sync with the resolved page name (handles the
+      // unique-name repair above and id-based deep links).
+      const activePage = pages.find((pg) => pg.id === targetActiveId);
+      if (activePage && activePage.name !== matchedName && activePage.name !== decodedPageName) {
+        void navigate({
+          to: "/$pageName",
+          params: { pageName: activePage.name },
+          replace: true,
+        });
+      }
+
       setHydrated(true);
       setSaveStatus("saved");
-      setSaveMessage(p ? "已恢复并自动保存到本地" : "已启用本地自动保存");
+      setSaveMessage(published ? "已载入线上发布内容" : local ? "离线：已恢复本地草稿" : "已载入默认内容");
     })();
     return () => {
       cancelled = true;
@@ -209,16 +185,16 @@ function Editor() {
   useEffect(() => {
     if (!hydrated) return;
     setSaveStatus("saving");
-    setSaveMessage("正在自动保存到本地…");
+    setSaveMessage("正在保存本地草稿…");
     const t = window.setTimeout(() => {
       void saveEditorState({ pages, activeId, palette })
         .then(() => {
           setSaveStatus("saved");
-          setSaveMessage(`已自动保存 · ${new Date().toLocaleTimeString()}`);
+          setSaveMessage(`本地草稿已存 · ${new Date().toLocaleTimeString()} ·『立即保存』发布上线`);
         })
         .catch(() => {
           setSaveStatus("error");
-          setSaveMessage("自动保存失败，可能导致刷新后丢失，请点击保存数据在本地");
+          setSaveMessage("本地草稿保存失败，请点击『立即保存』发布到线上");
         });
     }, 250);
     return () => window.clearTimeout(t);
@@ -383,8 +359,14 @@ function Editor() {
   useEffect(() => {
     if (!hydrated) return;
     if (!activePage.autoName) return;
-    const suggested = deriveAutoName(activePage.blocks);
-    if (suggested && suggested !== activePage.name) {
+    const derived = deriveAutoName(activePage.blocks);
+    if (!derived) return;
+    // Never let an auto-derived name collide with another page's URL.
+    const suggested = uniquePageName(
+      derived,
+      pages.filter((p) => p.id !== activePage.id).map((p) => p.name),
+    );
+    if (suggested !== activePage.name) {
       setPages((prev) => prev.map((p) => (p.id === activePage.id ? { ...p, name: suggested } : p)));
       void navigate({
         to: "/$pageName",
@@ -392,7 +374,7 @@ function Editor() {
         replace: true,
       });
     }
-  }, [hydrated, activePage.blocks, activePage.autoName, activePage.id, activePage.name, navigate]);
+  }, [hydrated, activePage.blocks, activePage.autoName, activePage.id, activePage.name, pages, navigate]);
 
   const pagesRef = useRef(pages);
   pagesRef.current = pages;
@@ -458,7 +440,7 @@ function Editor() {
 
   // ── page ops ────────────────────────────────────────────
   function addPage() {
-    const p = makeEmptyPage(`新页面 ${pages.length + 1}`);
+    const p = makeEmptyPage(uniquePageName(`新页面 ${pages.length + 1}`, pages.map((x) => x.name)));
     setPages((prev) => [...prev, p]);
     setActiveId(p.id);
     setSelectedIds(new Set());
@@ -472,6 +454,8 @@ function Editor() {
     const src = pages.find((p) => p.id === id);
     if (!src) return;
     const c = clonePage(src);
+    c.name = uniquePageName(c.name, pages.map((x) => x.name));
+    c.autoName = false; // keep the deliberately-unique copy name
     setPages((prev) => {
       const i = prev.findIndex((p) => p.id === id);
       const out = [...prev];
@@ -504,13 +488,18 @@ function Editor() {
   function renamePage(id: string, name: string) {
     const trimmed = name.trim();
     if (!trimmed) return;
+    // Keep every page name (and therefore its URL) unique.
+    const unique = uniquePageName(
+      trimmed,
+      pages.filter((p) => p.id !== id).map((p) => p.name),
+    );
     setPages((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, name: trimmed, autoName: false } : p)),
+      prev.map((p) => (p.id === id ? { ...p, name: unique, autoName: false } : p)),
     );
     if (id === activeId) {
       void navigate({
         to: "/$pageName",
-        params: { pageName: trimmed },
+        params: { pageName: unique },
         replace: true,
       });
     }
@@ -565,17 +554,41 @@ function Editor() {
     }
   }
 
-  function forceSaveToIDB() {
+  // "立即保存" = publish globally so every visitor sees it (writes to R2 via
+  // /api/state). Also caches locally. This is the durable, effective save.
+  async function forceSaveToIDB() {
     setSaveStatus("saving");
-    setSaveMessage("正在手动保存...");
+    setSaveMessage("正在发布到线上（所有访客可见）…");
     const state = { pages, activeId, palette };
-    saveEditorState(state).then(() => {
+    void saveEditorState(state).catch(() => undefined);
+    try {
+      const editKey =
+        (typeof window !== "undefined" && window.localStorage.getItem("banrihua.editKey")) || undefined;
+      await publishEditorState(state, editKey || undefined);
       setSaveStatus("saved");
-      setSaveMessage(`已手动保存 · ${new Date().toLocaleTimeString()}`);
-    }).catch(() => {
+      setSaveMessage(`已全局发布 · ${new Date().toLocaleTimeString()}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "发布失败";
+      // If the server requires an edit key, prompt once and retry.
+      if (typeof window !== "undefined" && /密钥/.test(msg)) {
+        const entered = window.prompt("请输入发布密钥（EDIT_KEY）：") || "";
+        if (entered) {
+          window.localStorage.setItem("banrihua.editKey", entered);
+          try {
+            await publishEditorState(state, entered);
+            setSaveStatus("saved");
+            setSaveMessage(`已全局发布 · ${new Date().toLocaleTimeString()}`);
+            return;
+          } catch (e2) {
+            setSaveStatus("error");
+            setSaveMessage(e2 instanceof Error ? e2.message : "发布失败");
+            return;
+          }
+        }
+      }
       setSaveStatus("error");
-      setSaveMessage("手动保存失败");
-    });
+      setSaveMessage(`${msg}（已保存到本地）`);
+    }
   }
 
   function manualSave() {
@@ -769,7 +782,7 @@ function Editor() {
             {saveStatus === "saving" ? "⏳ " : saveStatus === "error" ? "⚠ " : "✓ "}
             {saveMessage}
           </div>
-          <button onClick={forceSaveToIDB} style={{ ...headerBtn, background: "#4a6c2f", color: "white", border: "1px solid #3c5a24" }}>
+          <button onClick={() => void forceSaveToIDB()} style={{ ...headerBtn, background: "#4a6c2f", color: "white", border: "1px solid #3c5a24" }} title="发布到线上，所有访客都能看到最新内容">
             立即保存
           </button>
           <button onClick={manualSave} style={headerBtn} title="下载JSON备份文件到电脑">

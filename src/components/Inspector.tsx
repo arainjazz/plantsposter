@@ -292,19 +292,19 @@ function BackgroundPicker({ value, onChange }: { value: string; onChange: (v: st
   const [angle, setAngle] = useState(135);
 
   useEffect(() => {
-    if (value.startsWith("linear-gradient")) setMode("gradient");
+    if (value && value.startsWith("linear-gradient")) setMode("gradient");
     else if (value === "transparent" || value === "rgba(0,0,0,0)") setMode("transparent");
     else setMode("solid");
-    const colors = value.match(/#[0-9a-fA-F]{6}/g);
+    const colors = value ? value.match(/#[0-9a-fA-F]{6}/g) : null;
     if (colors?.[0]) setC1(colors[0]);
     if (colors?.[1]) setC2(colors[1]);
-    const rgb = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    const rgb = value ? value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/) : null;
     if (rgb) {
       const hex = `#${Number(rgb[1]).toString(16).padStart(2, "0")}${Number(rgb[2]).toString(16).padStart(2, "0")}${Number(rgb[3]).toString(16).padStart(2, "0")}`;
       setC1(hex);
       if (rgb[4]) setAlpha(Math.round(Number(rgb[4]) * 100));
     }
-    const deg = value.match(/linear-gradient\(([-\d.]+)deg/);
+    const deg = value ? value.match(/linear-gradient\(([-\d.]+)deg/) : null;
     if (deg) setAngle(Number(deg[1]));
   }, [value]);
 

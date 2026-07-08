@@ -1094,3 +1094,25 @@ export function deriveAutoName(blocks: Block[]): string | null {
 export function blockPatch(blocks: Block[], id: string, patch: Partial<Block>): Block[] {
   return blocks.map((b) => (b.id === id ? ({ ...b, ...patch } as Block) : b));
 }
+
+// Ensure a page name is unique among `taken`. If `base` is already taken,
+// append " 2", " 3", … until free. Guarantees each page maps to a distinct URL.
+export function uniquePageName(base: string, taken: Iterable<string>): string {
+  const set = new Set(taken);
+  const trimmed = (base || "未命名").trim() || "未命名";
+  if (!set.has(trimmed)) return trimmed;
+  let n = 2;
+  while (set.has(`${trimmed} ${n}`)) n++;
+  return `${trimmed} ${n}`;
+}
+
+// Repair a set of pages so every page has a unique, non-empty name.
+// Returns the same array reference-updated only where a rename was needed.
+export function ensureUniquePageNames(pages: PosterPage[]): PosterPage[] {
+  const seen = new Set<string>();
+  return pages.map((p) => {
+    const name = uniquePageName(p.name, seen);
+    seen.add(name);
+    return name === p.name ? p : { ...p, name };
+  });
+}

@@ -1,0 +1,19 @@
+{
+  // Root wrangler config, merged by Nitro's cloudflare preset into the
+  // generated .output/server/wrangler.json.
+  //
+  // NOTE: the R2 binding is intentionally NOT declared here. `wrangler deploy`
+  // fails if it references an R2 bucket that doesn't exist yet, which would
+  // break any build that doesn't first create the bucket (e.g. a Lovable
+  // auto-deploy). Instead, the GitHub Actions workflow (.github/workflows/
+  // deploy.yml) creates the bucket and injects this binding into the built
+  // config right before deploying:
+  //
+  //   "r2_buckets": [
+  //     { "binding": "POSTER_STATE", "bucket_name": "plantsposter-state" }
+  //   ]
+  //
+  // For local `wrangler dev`, create the bucket once
+  // (`wrangler r2 bucket create plantsposter-state`) and uncomment the block.
+  "$schema": "node_modules/wrangler/config-schema.json"
+}
