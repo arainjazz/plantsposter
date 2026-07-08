@@ -772,11 +772,11 @@ function Editor() {
           onChangeImage={setImage}
           onChangeBackground={(c) => {
             setPages(prev => prev.map(p => p.id === activeId ? { ...p, background: c } : p));
-            void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), palette });
+            void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), activeId, palette });
           }}
           onApplyBackgroundToPages={(ids, c) => {
             setPages(prev => prev.map(p => ids.includes(p.id) ? { ...p, background: c } : p));
-            void saveEditorState({ pages: pages.map(p => ids.includes(p.id) ? { ...p, background: c } : p), palette });
+            void saveEditorState({ pages: pages.map(p => ids.includes(p.id) ? { ...p, background: c } : p), activeId, palette });
           }}
           onAlignToPage={alignToPage}
           onDistribute={distribute}
