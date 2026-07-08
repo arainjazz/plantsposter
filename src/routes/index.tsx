@@ -110,7 +110,8 @@ function Editor() {
       if (true) {
         try {
           // Fetch from GitHub raw content to bypass Cloudflare Worker size and static asset limitations
-          const res = await fetch("https://raw.githubusercontent.com/arainjazz/plantsposter/main/public/banrihua-editor-20plants.json?t=" + Date.now());
+          // Fetch directly from the deployed Cloudflare static asset to bypass GitHub Raw's 5-minute cache
+          const res = await fetch("/banrihua-editor-20plants.json?t=" + Date.now());
           const fetchedState = await res.json();
           p = fetchedState as any;
         } catch (e) {

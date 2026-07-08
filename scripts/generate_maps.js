@@ -209,6 +209,11 @@ const plants = [
       { name: "Shanxi", lat: 37.5, lon: 112.0, spread: 1.0, count: 8 },
       { name: "Hebei", lat: 40.0, lon: 116.0, spread: 1.5, count: 8 },
       { name: "Liaoning", lat: 41.5, lon: 121.0, spread: 1.0, count: 5 }
+    ],
+    introRegions: [
+      { name: "Xinjiang", lat: 43.8, lon: 87.6, spread: 1.5, count: 6 },
+      { name: "Gansu", lat: 38.0, lon: 102.0, spread: 1.0, count: 4 },
+      { name: "Inner Mongolia", lat: 41.0, lon: 110.0, spread: 1.5, count: 5 }
     ]
   },
   {
@@ -325,12 +330,14 @@ for (let i = 0; i < 20; i++) {
   const dataUrl = "data:image/svg+xml;base64," + Buffer.from(svg).toString('base64');
   
   // Find the page in editor state and replace map image src
-  const page = editorState.pages[i];
+  const page = editorState.pages.find(p => p.name && p.name.includes(pData.name));
   if (page) {
     const mapBlock = page.blocks.find(b => b.id.includes('img-map'));
     if (mapBlock) {
       mapBlock.src = dataUrl;
     }
+  } else {
+    console.warn(`Warning: Could not find page for plant ${pData.name}`);
   }
 }
 
