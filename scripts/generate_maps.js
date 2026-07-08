@@ -2,6 +2,7 @@ const fs = require('fs');
 
 // Project coordinates formula provided by the user
 function projectCoordinates(lat, lon) {
+  // Use corrected empirical regression formula
   const x = 2.6865 * lon + 449.3127;
   const y = -3.4451 * lat + 339.3522;
   return { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) };

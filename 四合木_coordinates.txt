@@ -1,0 +1,8 @@
+Voucher for 四合木 (Tetraena mongolica)
+=================================
+Native Points:
+Inner Mongolia - Wuhai: (lat 39.79, lon 106.65) -> (x 735.81, y 202.25)
+Inner Mongolia - Wuhai: (lat 39.74, lon 106.65) -> (x 735.83, y 202.43)
+Inner Mongolia - Wuhai: (lat 39.44, lon 106.61) -> (x 735.72, y 203.47)
+Inner Mongolia - Wuhai: (lat 39.70, lon 106.97) -> (x 736.68, y 202.57)
+Inner Mongolia - Wuhai: (lat 39.42, lon 106.61) -> (x 735.72, y 203.56)

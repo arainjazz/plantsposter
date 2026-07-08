@@ -1,0 +1,18 @@
+Voucher for 半日花 (Helianthemum soongoricum)
+=================================
+Native Points:
+Inner Mongolia - Wuhai: (lat 39.78, lon 106.76) -> (x 736.13, y 202.3)
+Inner Mongolia - Wuhai: (lat 39.77, lon 106.78) -> (x 736.17, y 202.36)
+Inner Mongolia - Wuhai: (lat 39.73, lon 106.86) -> (x 736.38, y 202.47)
+Xinjiang - Ili: (lat 43.04, lon 82.00) -> (x 669.61, y 191.09)
+Xinjiang - Ili: (lat 43.62, lon 82.94) -> (x 672.12, y 189.09)
+Xinjiang - Ili: (lat 44.41, lon 81.92) -> (x 669.39, y 186.35)
+Xinjiang - Ili: (lat 43.19, lon 82.64) -> (x 671.33, y 190.54)
+Xinjiang - Ili: (lat 44.01, lon 81.54) -> (x 668.37, y 187.74)
+Xinjiang - Ili: (lat 43.91, lon 81.91) -> (x 669.38, y 188.09)
+Xinjiang - Turpan: (lat 43.35, lon 89.07) -> (x 688.61, y 190)
+Xinjiang - Turpan: (lat 43.38, lon 89.38) -> (x 689.43, y 189.89)
+Gansu - Hexi: (lat 40.59, lon 97.06) -> (x 710.08, y 199.51)
+Gansu - Hexi: (lat 39.60, lon 97.85) -> (x 712.19, y 202.91)
+Gansu - Hexi: (lat 39.72, lon 97.71) -> (x 711.82, y 202.53)
+Gansu - Hexi: (lat 40.41, lon 97.18) -> (x 710.38, y 200.15)

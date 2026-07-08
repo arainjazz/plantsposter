@@ -1,0 +1,25 @@
+Voucher for 鄂尔多斯蒿 (Artemisia ordosica)
+=================================
+Native Points:
+Inner Mongolia - Mu Us: (lat 38.58, lon 108.65) -> (x 741.2, y 206.45)
+Inner Mongolia - Mu Us: (lat 39.41, lon 107.34) -> (x 737.69, y 203.59)
+Inner Mongolia - Mu Us: (lat 39.51, lon 107.40) -> (x 737.83, y 203.25)
+Inner Mongolia - Mu Us: (lat 38.71, lon 107.75) -> (x 738.78, y 206.01)
+Inner Mongolia - Mu Us: (lat 38.69, lon 109.13) -> (x 742.48, y 206.05)
+Inner Mongolia - Mu Us: (lat 37.13, lon 109.90) -> (x 744.55, y 211.43)
+Inner Mongolia - Mu Us: (lat 38.80, lon 109.22) -> (x 742.74, y 205.69)
+Inner Mongolia - Mu Us: (lat 39.25, lon 107.69) -> (x 738.63, y 204.12)
+Inner Mongolia - Mu Us: (lat 38.65, lon 107.44) -> (x 737.95, y 206.2)
+Inner Mongolia - Mu Us: (lat 37.97, lon 107.95) -> (x 739.33, y 208.53)
+Inner Mongolia - Mu Us: (lat 39.39, lon 108.25) -> (x 740.12, y 203.65)
+Inner Mongolia - Mu Us: (lat 38.38, lon 107.15) -> (x 737.16, y 207.12)
+Inner Mongolia - Mu Us: (lat 37.95, lon 108.86) -> (x 741.77, y 208.62)
+Inner Mongolia - Mu Us: (lat 39.76, lon 109.95) -> (x 744.7, y 202.37)
+Inner Mongolia - Mu Us: (lat 38.72, lon 108.80) -> (x 741.6, y 205.95)
+
+Introduced Points:
+Shaanxi - Yulin: (lat 38.50, lon 109.76) -> (x 744.19, y 206.73)
+Shaanxi - Yulin: (lat 37.54, lon 110.27) -> (x 745.55, y 210.04)
+Shaanxi - Yulin: (lat 38.15, lon 109.96) -> (x 744.72, y 207.91)
+Shaanxi - Yulin: (lat 37.99, lon 109.66) -> (x 743.91, y 208.48)
+Shaanxi - Yulin: (lat 38.04, lon 109.49) -> (x 743.45, y 208.31)

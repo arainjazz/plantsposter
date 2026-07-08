@@ -1,0 +1,15 @@
+Voucher for 蒙古沙冬青 (Ammopiptanthus mongolicus)
+=================================
+Native Points:
+Inner Mongolia - Alxa: (lat 38.05, lon 105.77) -> (x 733.47, y 208.25)
+Inner Mongolia - Alxa: (lat 38.45, lon 106.73) -> (x 736.05, y 206.9)
+Inner Mongolia - Alxa: (lat 39.11, lon 104.25) -> (x 729.37, y 204.63)
+Inner Mongolia - Alxa: (lat 38.32, lon 104.30) -> (x 729.5, y 207.35)
+Inner Mongolia - Alxa: (lat 38.64, lon 106.02) -> (x 734.13, y 206.24)
+Inner Mongolia - Alxa: (lat 39.46, lon 104.77) -> (x 730.78, y 203.41)
+Inner Mongolia - Alxa: (lat 39.67, lon 104.15) -> (x 729.12, y 202.68)
+Inner Mongolia - Alxa: (lat 39.85, lon 106.89) -> (x 736.46, y 202.06)
+Inner Mongolia - Alxa: (lat 40.34, lon 106.86) -> (x 736.39, y 200.39)
+Inner Mongolia - Alxa: (lat 39.27, lon 106.79) -> (x 736.19, y 204.06)
+Inner Mongolia - Alxa: (lat 40.91, lon 105.55) -> (x 732.88, y 198.43)
+Inner Mongolia - Alxa: (lat 38.69, lon 104.94) -> (x 731.23, y 206.07)

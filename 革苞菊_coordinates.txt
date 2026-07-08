@@ -1,0 +1,17 @@
+Voucher for 革苞菊 (Tugarinovia mongolica)
+=================================
+Native Points:
+Inner Mongolia - Darhan: (lat 41.05, lon 110.63) -> (x 746.53, y 197.94)
+Inner Mongolia - Darhan: (lat 40.92, lon 109.50) -> (x 743.5, y 198.36)
+Inner Mongolia - Darhan: (lat 41.95, lon 110.54) -> (x 746.27, y 194.83)
+Inner Mongolia - Darhan: (lat 42.47, lon 109.80) -> (x 744.3, y 193.05)
+Inner Mongolia - Darhan: (lat 41.01, lon 110.05) -> (x 744.97, y 198.07)
+Inner Mongolia - Darhan: (lat 41.94, lon 110.16) -> (x 745.25, y 194.85)
+Inner Mongolia - Darhan: (lat 40.93, lon 110.00) -> (x 744.82, y 198.35)
+Inner Mongolia - Darhan: (lat 40.81, lon 110.39) -> (x 745.87, y 198.75)
+Mongolia - Dornogovi: (lat 43.13, lon 108.45) -> (x 740.67, y 190.77)
+Mongolia - Dornogovi: (lat 43.49, lon 108.76) -> (x 741.51, y 189.52)
+Mongolia - Dornogovi: (lat 42.95, lon 109.12) -> (x 742.47, y 191.4)
+Mongolia - Dornogovi: (lat 43.07, lon 108.22) -> (x 740.05, y 190.97)
+Mongolia - Dornogovi: (lat 42.42, lon 108.37) -> (x 740.45, y 193.23)
+Mongolia - Dornogovi: (lat 43.35, lon 108.30) -> (x 740.26, y 190.02)

@@ -75,6 +75,7 @@ type DragState = MoveState | ResizeState | GroupResizeState | MarqueeState | nul
 export function PosterCanvas({
   blocks,
   palette,
+  pageBackground,
   selectedIds,
   onSelectIds,
   onMoveMany,
@@ -336,7 +337,7 @@ export function PosterCanvas({
       style={{
         width: displayWidth,
         height,
-        background: palette.background,
+        background: pageBackground ?? palette.background,
         position: "relative",
         boxShadow: "0 20px 60px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.05)",
         overflow: "hidden",

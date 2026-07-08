@@ -1,0 +1,27 @@
+Voucher for 肉苁蓉 (Cistanche deserticola)
+=================================
+Native Points:
+Xinjiang - Junggar: (lat 46.75, lon 86.85) -> (x 682.64, y 178.28)
+Xinjiang - Junggar: (lat 43.71, lon 84.93) -> (x 677.48, y 188.76)
+Xinjiang - Junggar: (lat 45.15, lon 85.73) -> (x 679.62, y 183.8)
+Xinjiang - Junggar: (lat 47.19, lon 85.50) -> (x 679.01, y 176.76)
+Xinjiang - Junggar: (lat 46.42, lon 86.99) -> (x 683, y 179.44)
+Xinjiang - Junggar: (lat 45.51, lon 87.83) -> (x 685.27, y 182.56)
+Xinjiang - Junggar: (lat 44.59, lon 86.00) -> (x 680.36, y 185.74)
+Xinjiang - Junggar: (lat 43.96, lon 84.53) -> (x 676.41, y 187.91)
+Xinjiang - Junggar: (lat 46.94, lon 84.12) -> (x 675.31, y 177.64)
+Xinjiang - Junggar: (lat 44.04, lon 86.84) -> (x 682.6, y 187.64)
+Inner Mongolia - Alxa: (lat 40.58, lon 102.94) -> (x 725.87, y 199.54)
+Inner Mongolia - Alxa: (lat 40.37, lon 103.68) -> (x 727.85, y 200.28)
+Inner Mongolia - Alxa: (lat 41.91, lon 103.93) -> (x 728.53, y 194.95)
+Inner Mongolia - Alxa: (lat 40.38, lon 104.31) -> (x 729.54, y 200.22)
+Inner Mongolia - Alxa: (lat 41.99, lon 104.43) -> (x 729.87, y 194.68)
+Inner Mongolia - Alxa: (lat 40.95, lon 104.19) -> (x 729.21, y 198.28)
+Inner Mongolia - Alxa: (lat 39.17, lon 102.34) -> (x 724.26, y 204.4)
+Inner Mongolia - Alxa: (lat 39.16, lon 104.36) -> (x 729.66, y 204.44)
+
+Introduced Points:
+Inner Mongolia - Ulan Buh: (lat 39.87, lon 106.85) -> (x 736.38, y 202.01)
+Inner Mongolia - Ulan Buh: (lat 39.88, lon 106.90) -> (x 736.51, y 201.96)
+Inner Mongolia - Ulan Buh: (lat 39.53, lon 106.89) -> (x 736.47, y 203.17)
+Inner Mongolia - Ulan Buh: (lat 39.55, lon 106.26) -> (x 734.78, y 203.09)
