@@ -27,6 +27,8 @@ import {
 } from "@/lib/editor-storage";
 import { importDocumentAsPage } from "@/lib/editor-import";
 
+import defaultPlantsState from "../../banrihua-editor-20plants.json";
+
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
@@ -77,11 +79,9 @@ function Editor() {
   const [hydrated, setHydrated] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"loading" | "saving" | "saved" | "error">("loading");
   const [saveMessage, setSaveMessage] = useState("正在读取本地草稿…");
-  const [pages, setPages] = useState<PosterPage[]>([
-    { id: "page-1", name: "封面·半日花", autoName: false, blocks: INITIAL_BLOCKS },
-  ]);
-  const [activeId, setActiveId] = useState<string>("page-1");
-  const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
+  const [pages, setPages] = useState<PosterPage[]>(defaultPlantsState.pages as PosterPage[]);
+  const [activeId, setActiveId] = useState<string>(defaultPlantsState.activeId);
+  const [palette, setPalette] = useState<Palette>(defaultPlantsState.palette as Palette);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const stageRef = useRef<HTMLDivElement>(null);
   const [displayWidth, setDisplayWidth] = useState(600);
@@ -90,7 +90,13 @@ function Editor() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const p = await loadEditorState();
+      let p = await loadEditorState();
+      
+      // Force load the latest generated state to apply the SVG maps
+      if (true) {
+        p = defaultPlantsState as any;
+      }
+
       if (cancelled) return;
       if (p) {
         setPages(p.pages);
@@ -100,7 +106,7 @@ function Editor() {
         // Sync URL search param 'page' if missing
         const url = new URL(window.location.href);
         if (!url.searchParams.get("page")) {
-          const activePage = p.pages.find((pg) => pg.id === p.activeId) ?? p.pages[0];
+          const activePage = p.pages.find((pg: any) => pg.id === p.activeId) ?? p.pages[0];
           if (activePage) {
             void navigate({
               search: (prev) => ({ ...prev, page: activePage.name }),

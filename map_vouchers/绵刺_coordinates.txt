@@ -1,0 +1,15 @@
+Voucher for 绵刺 (Potaninia mongolica)
+=================================
+Native Points:
+Inner Mongolia - Urad: (lat 41.75, lon 107.55) -> (x 738.25, y 195.52)
+Inner Mongolia - Urad: (lat 42.43, lon 107.79) -> (x 738.89, y 193.17)
+Inner Mongolia - Urad: (lat 41.82, lon 107.80) -> (x 738.93, y 195.29)
+Inner Mongolia - Urad: (lat 41.66, lon 106.94) -> (x 736.62, y 195.82)
+Inner Mongolia - Urad: (lat 41.57, lon 107.70) -> (x 738.64, y 196.13)
+Inner Mongolia - Urad: (lat 40.83, lon 106.81) -> (x 736.27, y 198.68)
+Inner Mongolia - Urad: (lat 41.67, lon 108.42) -> (x 740.59, y 195.79)
+Inner Mongolia - Urad: (lat 40.57, lon 107.03) -> (x 736.85, y 199.57)
+Mongolia - South Gobi: (lat 43.26, lon 103.57) -> (x 727.55, y 190.32)
+Mongolia - South Gobi: (lat 42.53, lon 104.39) -> (x 729.75, y 192.83)
+Mongolia - South Gobi: (lat 43.75, lon 104.20) -> (x 729.25, y 188.62)
+Mongolia - South Gobi: (lat 44.47, lon 105.31) -> (x 732.23, y 186.15)

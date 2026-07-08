@@ -1,0 +1,21 @@
+Voucher for 白沙蒿 (Artemisia sphaerocephala)
+=================================
+Native Points:
+Inner Mongolia - Tengger: (lat 40.44, lon 103.28) -> (x 726.76, y 200.04)
+Inner Mongolia - Tengger: (lat 38.64, lon 103.43) -> (x 727.17, y 206.23)
+Inner Mongolia - Tengger: (lat 38.35, lon 103.72) -> (x 727.96, y 207.22)
+Inner Mongolia - Tengger: (lat 39.72, lon 102.86) -> (x 725.65, y 202.53)
+Inner Mongolia - Tengger: (lat 40.05, lon 105.45) -> (x 732.61, y 201.38)
+Inner Mongolia - Tengger: (lat 38.87, lon 105.37) -> (x 732.39, y 205.46)
+Inner Mongolia - Tengger: (lat 38.64, lon 104.51) -> (x 730.08, y 206.23)
+Inner Mongolia - Tengger: (lat 40.18, lon 105.23) -> (x 732.01, y 200.92)
+Inner Mongolia - Tengger: (lat 39.39, lon 105.32) -> (x 732.25, y 203.66)
+Inner Mongolia - Tengger: (lat 38.16, lon 104.38) -> (x 729.74, y 207.88)
+Inner Mongolia - Tengger: (lat 38.53, lon 105.34) -> (x 732.32, y 206.62)
+Inner Mongolia - Tengger: (lat 38.96, lon 105.31) -> (x 732.22, y 205.14)
+
+Introduced Points:
+Gansu - Minqin: (lat 38.83, lon 103.31) -> (x 726.86, y 205.58)
+Gansu - Minqin: (lat 38.20, lon 103.02) -> (x 726.08, y 207.75)
+Gansu - Minqin: (lat 38.88, lon 102.96) -> (x 725.92, y 205.42)
+Gansu - Minqin: (lat 38.31, lon 103.28) -> (x 726.78, y 207.37)

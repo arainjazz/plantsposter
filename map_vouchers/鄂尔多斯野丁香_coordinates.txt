@@ -1,0 +1,9 @@
+Voucher for 鄂尔多斯野丁香 (Leptodermis ordosica)
+=================================
+Native Points:
+Inner Mongolia - Ordos: (lat 38.64, lon 109.93) -> (x 744.64, y 206.24)
+Inner Mongolia - Ordos: (lat 39.40, lon 108.84) -> (x 741.72, y 203.62)
+Inner Mongolia - Ordos: (lat 38.52, lon 109.79) -> (x 744.26, y 206.65)
+Inner Mongolia - Ordos: (lat 39.43, lon 109.22) -> (x 742.73, y 203.5)
+Inner Mongolia - Ordos: (lat 39.85, lon 109.80) -> (x 744.3, y 202.05)
+Inner Mongolia - Ordos: (lat 39.78, lon 109.60) -> (x 743.76, y 202.32)

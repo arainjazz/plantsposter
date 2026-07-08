@@ -1,0 +1,24 @@
+Voucher for 黄柳 (Salix gordejevii)
+=================================
+Native Points:
+Inner Mongolia - Horqin: (lat 42.99, lon 119.08) -> (x 769.23, y 191.24)
+Inner Mongolia - Horqin: (lat 42.09, lon 119.23) -> (x 769.64, y 194.36)
+Inner Mongolia - Horqin: (lat 43.12, lon 121.17) -> (x 774.83, y 190.79)
+Inner Mongolia - Horqin: (lat 43.44, lon 120.63) -> (x 773.38, y 189.68)
+Inner Mongolia - Horqin: (lat 44.48, lon 121.90) -> (x 776.78, y 186.1)
+Inner Mongolia - Horqin: (lat 44.43, lon 119.94) -> (x 771.52, y 186.29)
+Inner Mongolia - Horqin: (lat 43.65, lon 119.32) -> (x 769.87, y 188.98)
+Inner Mongolia - Horqin: (lat 42.62, lon 119.19) -> (x 769.51, y 192.53)
+Inner Mongolia - Horqin: (lat 42.15, lon 120.98) -> (x 774.32, y 194.13)
+Inner Mongolia - Horqin: (lat 44.86, lon 121.99) -> (x 777.05, y 184.82)
+Inner Mongolia - Horqin: (lat 43.25, lon 121.41) -> (x 775.47, y 190.36)
+Inner Mongolia - Horqin: (lat 43.94, lon 121.29) -> (x 775.16, y 187.96)
+Inner Mongolia - Horqin: (lat 43.83, lon 121.78) -> (x 776.47, y 188.34)
+Inner Mongolia - Horqin: (lat 43.42, lon 121.59) -> (x 775.96, y 189.76)
+
+Introduced Points:
+Inner Mongolia - Mu Us: (lat 37.88, lon 107.76) -> (x 738.82, y 208.85)
+Inner Mongolia - Mu Us: (lat 37.74, lon 108.87) -> (x 741.79, y 209.33)
+Inner Mongolia - Mu Us: (lat 37.81, lon 108.24) -> (x 740.1, y 209.08)
+Inner Mongolia - Mu Us: (lat 39.22, lon 108.54) -> (x 740.9, y 204.25)
+Inner Mongolia - Mu Us: (lat 39.08, lon 108.43) -> (x 740.61, y 204.7)
