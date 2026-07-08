@@ -91,10 +91,10 @@ function Editor() {
     void (async () => {
       let p = await loadEditorState();
       
-      // Force load the latest generated state to apply the SVG maps
       if (true) {
         try {
-          const res = await fetch("/banrihua-editor-20plants.json");
+          // Add a cache buster so Cloudflare doesn't serve stale JSON
+          const res = await fetch("/banrihua-editor-20plants.json?t=" + Date.now());
           const fetchedState = await res.json();
           p = fetchedState as any;
         } catch (e) {
