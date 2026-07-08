@@ -26,6 +26,22 @@ import {
   saveEditorState,
 } from "@/lib/editor-storage";
 import { importDocumentAsPage } from "@/lib/editor-import";
+import type { PersistedEditorState } from "@/lib/editor-storage";
+
+const _initialPage: PosterPage = {
+  id: "p-banrihua",
+  name: "封面·半日花",
+  blocks: INITIAL_BLOCKS,
+};
+const defaultPlantsState: PersistedEditorState = {
+  pages: [_initialPage],
+  activeId: _initialPage.id,
+  palette: DEFAULT_PALETTE,
+};
+
+type SearchParams = { page?: string };
+
+
 
 
 export const Route = createFileRoute("/")({
@@ -114,7 +130,7 @@ function Editor() {
           const activePage = p.pages.find((pg: any) => pg.id === p.activeId) ?? p.pages[0];
           if (activePage) {
             void navigate({
-              search: (prev) => ({ ...prev, page: activePage.name }),
+              search: (prev: SearchParams) => ({ ...prev, page: activePage.name }),
               replace: true,
             });
           }
@@ -124,7 +140,7 @@ function Editor() {
         const url = new URL(window.location.href);
         if (!url.searchParams.get("page")) {
           void navigate({
-            search: (prev) => ({ ...prev, page: "封面·半日花" }),
+            search: (prev: SearchParams) => ({ ...prev, page: "封面·半日花" }),
             replace: true,
           });
         }
@@ -319,7 +335,7 @@ function Editor() {
     if (suggested && suggested !== activePage.name) {
       setPages((prev) => prev.map((p) => (p.id === activePage.id ? { ...p, name: suggested } : p)));
       void navigate({
-        search: (prev) => ({ ...prev, page: suggested }),
+        search: (prev: SearchParams) => ({ ...prev, page: suggested }),
         replace: true,
       });
     }
@@ -394,7 +410,7 @@ function Editor() {
     setActiveId(p.id);
     setSelectedIds(new Set());
     void navigate({
-      search: (prev) => ({ ...prev, page: p.name }),
+      search: (prev: SearchParams) => ({ ...prev, page: p.name }),
       replace: true,
     });
   }
@@ -411,7 +427,7 @@ function Editor() {
     setActiveId(c.id);
     setSelectedIds(new Set());
     void navigate({
-      search: (prev) => ({ ...prev, page: c.name }),
+      search: (prev: SearchParams) => ({ ...prev, page: c.name }),
       replace: true,
     });
   }
@@ -423,7 +439,7 @@ function Editor() {
     if (id === activeId) {
       setActiveId(nextActive.id);
       void navigate({
-        search: (prev) => ({ ...prev, page: nextActive.name }),
+        search: (prev: SearchParams) => ({ ...prev, page: nextActive.name }),
         replace: true,
       });
     }
@@ -437,7 +453,7 @@ function Editor() {
     );
     if (id === activeId) {
       void navigate({
-        search: (prev) => ({ ...prev, page: trimmed }),
+        search: (prev: SearchParams) => ({ ...prev, page: trimmed }),
         replace: true,
       });
     }
@@ -511,7 +527,7 @@ function Editor() {
         const activePage = state.pages.find((p) => p.id === state.activeId) ?? state.pages[0];
         if (activePage) {
           void navigate({
-            search: (prev) => ({ ...prev, page: activePage.name }),
+            search: (prev: SearchParams) => ({ ...prev, page: activePage.name }),
             replace: true,
           });
         }
@@ -522,7 +538,7 @@ function Editor() {
         setSelectedIds(new Set());
         setSaveMessage(result.message);
         void navigate({
-          search: (prev) => ({ ...prev, page: result.page.name }),
+          search: (prev: SearchParams) => ({ ...prev, page: result.page.name }),
           replace: true,
         });
       }
@@ -756,11 +772,11 @@ function Editor() {
           onChangeImage={setImage}
           onChangeBackground={(c) => {
             setPages(prev => prev.map(p => p.id === activeId ? { ...p, background: c } : p));
-            void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), palette });
+            void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), activeId, palette });
           }}
           onApplyBackgroundToPages={(ids, c) => {
             setPages(prev => prev.map(p => ids.includes(p.id) ? { ...p, background: c } : p));
-            void saveEditorState({ pages: pages.map(p => ids.includes(p.id) ? { ...p, background: c } : p), palette });
+            void saveEditorState({ pages: pages.map(p => ids.includes(p.id) ? { ...p, background: c } : p), activeId, palette });
           }}
           onAlignToPage={alignToPage}
           onDistribute={distribute}
@@ -777,7 +793,7 @@ function Editor() {
             const p = pages.find((pg) => pg.id === id);
             if (p) {
               void navigate({
-                search: (prev) => ({ ...prev, page: p.name }),
+                search: (prev: SearchParams) => ({ ...prev, page: p.name }),
                 replace: true,
               });
             }
