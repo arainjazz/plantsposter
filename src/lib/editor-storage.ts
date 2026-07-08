@@ -103,6 +103,19 @@ export async function saveEditorState(state: PersistedEditorState): Promise<void
   }
 }
 
+export async function clearEditorState(): Promise<void> {
+  try {
+    const db = await openDb();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).delete(RECORD);
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    });
+  } catch { /* ignore */ }
+  try { localStorage.removeItem(EDITOR_STORAGE_KEY); } catch { /* ignore */ }
+}
+
 export function downloadEditorStateFile(state: PersistedEditorState) {
   const blob = new Blob([JSON.stringify({ version: 1, ...state }, null, 2)], {
     type: "application/json",

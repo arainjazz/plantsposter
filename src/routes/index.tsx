@@ -116,26 +116,34 @@ function Editor() {
         console.error("Failed to fetch default state", e);
       }
 
+      // Handle ?reset=1 URL param: wipe local state and reload without the param
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("reset") === "1") {
+        const { clearEditorState } = await import("@/lib/editor-storage");
+        await clearEditorState();
+        p = null;
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete("reset");
+        window.history.replaceState({}, "", newUrl.toString());
+      }
+
       if (!p && fetchedState) {
         p = fetchedState;
       } else if (p && fetchedState) {
-        // MIGRATION: Update ONLY the SVG maps if the server has newer corrected versions, 
-        // while preserving all other user modifications (texts, background, positions).
-        let migrated = false;
+        // ALWAYS inject the latest SVG maps from the server into the local state.
+        // This ensures any stale/broken cached maps are corrected on every load.
+        // All other user data (text, background, positions) is preserved.
         p.pages.forEach((page: any) => {
           const defaultPage = fetchedState.pages.find((dp: any) => dp.name === page.name);
           if (defaultPage) {
             const mapBlock = page.blocks.find((b: any) => b.id.includes('img-map'));
             const defaultMapBlock = defaultPage.blocks.find((b: any) => b.id.includes('img-map'));
-            if (mapBlock && defaultMapBlock && mapBlock.src !== defaultMapBlock.src) {
-               mapBlock.src = defaultMapBlock.src;
-               migrated = true;
+            if (mapBlock && defaultMapBlock && defaultMapBlock.src?.startsWith('data:image/svg')) {
+              mapBlock.src = defaultMapBlock.src;
             }
           }
         });
-        if (migrated) {
-          await saveEditorState(p);
-        }
+        await saveEditorState(p);
       }
 
       if (cancelled) return;
