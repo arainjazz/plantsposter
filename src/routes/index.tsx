@@ -107,15 +107,34 @@ function Editor() {
     void (async () => {
       let p = await loadEditorState();
       
-      if (true) {
-        try {
-          // Fetch from GitHub raw content to bypass Cloudflare Worker size and static asset limitations
-          // Fetch directly from the deployed Cloudflare static asset to bypass GitHub Raw's 5-minute cache
-          const res = await fetch("/banrihua-editor-20plants.json?t=" + Date.now());
-          const fetchedState = await res.json();
-          p = fetchedState as any;
-        } catch (e) {
-          console.error("Failed to fetch default state", e);
+      let fetchedState: any = null;
+      try {
+        // Fetch directly from the deployed Cloudflare static asset to bypass GitHub Raw's 5-minute cache
+        const res = await fetch("/banrihua-editor-20plants.json?t=" + Date.now());
+        fetchedState = await res.json();
+      } catch (e) {
+        console.error("Failed to fetch default state", e);
+      }
+
+      if (!p && fetchedState) {
+        p = fetchedState;
+      } else if (p && fetchedState) {
+        // MIGRATION: Update ONLY the SVG maps if the server has newer corrected versions, 
+        // while preserving all other user modifications (texts, background, positions).
+        let migrated = false;
+        p.pages.forEach((page: any) => {
+          const defaultPage = fetchedState.pages.find((dp: any) => dp.name === page.name);
+          if (defaultPage) {
+            const mapBlock = page.blocks.find((b: any) => b.id.includes('img-map'));
+            const defaultMapBlock = defaultPage.blocks.find((b: any) => b.id.includes('img-map'));
+            if (mapBlock && defaultMapBlock && mapBlock.src !== defaultMapBlock.src) {
+               mapBlock.src = defaultMapBlock.src;
+               migrated = true;
+            }
+          }
+        });
+        if (migrated) {
+          await saveEditorState(p);
         }
       }
 
