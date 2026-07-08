@@ -27,7 +27,6 @@ import {
 } from "@/lib/editor-storage";
 import { importDocumentAsPage } from "@/lib/editor-import";
 
-import defaultPlantsState from "../../banrihua-editor-20plants.json";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -94,7 +93,13 @@ function Editor() {
       
       // Force load the latest generated state to apply the SVG maps
       if (true) {
-        p = defaultPlantsState as any;
+        try {
+          const res = await fetch("/banrihua-editor-20plants.json");
+          const fetchedState = await res.json();
+          p = fetchedState as any;
+        } catch (e) {
+          console.error("Failed to fetch default state", e);
+        }
       }
 
       if (cancelled) return;
