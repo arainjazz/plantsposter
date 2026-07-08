@@ -149,12 +149,23 @@ function Editor() {
       if (cancelled) return;
       if (p) {
         setPages(p.pages);
-        setActiveId(p.activeId);
+        
+        const url = new URL(window.location.href);
+        const urlPage = url.searchParams.get("page");
+        
+        let targetActiveId = p.activeId;
+        if (urlPage) {
+          const matched = p.pages.find((pg: any) => pg.id === urlPage || pg.name === urlPage);
+          if (matched) {
+            targetActiveId = matched.id;
+          }
+        }
+        
+        setActiveId(targetActiveId);
         setPalette(p.palette);
 
         // Sync URL search param 'page' if missing
-        const url = new URL(window.location.href);
-        if (!url.searchParams.get("page")) {
+        if (!urlPage) {
           const activePage = p.pages.find((pg: any) => pg.id === p.activeId) ?? p.pages[0];
           if (activePage) {
             void navigate({
@@ -166,7 +177,14 @@ function Editor() {
       } else {
         // No saved state, default URL sync
         const url = new URL(window.location.href);
-        if (!url.searchParams.get("page")) {
+        const urlPage = url.searchParams.get("page");
+        
+        if (urlPage) {
+          const matched = defaultPlantsState.pages.find((pg: any) => pg.id === urlPage || pg.name === urlPage);
+          if (matched) {
+            setActiveId(matched.id);
+          }
+        } else {
           void navigate({
             search: (prev: SearchParams) => ({ ...prev, page: "封面·半日花" }),
             replace: true,
@@ -358,6 +376,7 @@ function Editor() {
 
   // Auto-rename
   useEffect(() => {
+    if (!hydrated) return;
     if (!activePage.autoName) return;
     const suggested = deriveAutoName(activePage.blocks);
     if (suggested && suggested !== activePage.name) {
@@ -367,7 +386,7 @@ function Editor() {
         replace: true,
       });
     }
-  }, [activePage.blocks, activePage.autoName, activePage.id, activePage.name, navigate]);
+  }, [hydrated, activePage.blocks, activePage.autoName, activePage.id, activePage.name, navigate]);
 
   const pagesRef = useRef(pages);
   pagesRef.current = pages;
