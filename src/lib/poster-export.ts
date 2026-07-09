@@ -301,30 +301,39 @@ export function downloadBlob(blob: Blob, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export async function exportPng(blocks: Block[], palette: Palette, transparent: boolean) {
+function cleanName(name?: string): string {
+  return (name || "poster").replace(/[\\/:*?"<>|\n\r\t]/g, "_").trim().slice(0, 60);
+}
+
+export async function exportPng(
+  blocks: Block[],
+  palette: Palette,
+  transparent: boolean,
+  name?: string,
+) {
   const canvas = await renderPosterToCanvas(
     blocks,
     transparent ? { ...palette, background: "rgba(0,0,0,0)" } : palette,
-    2,
+    3,
   );
   await new Promise<void>((resolve) => {
     canvas.toBlob((blob) => {
-      if (blob) downloadBlob(blob, "banrihua.png");
+      if (blob) downloadBlob(blob, `${cleanName(name)}.png`);
       resolve();
     }, "image/png");
   });
 }
 
-export async function exportJpg(blocks: Block[], palette: Palette) {
-  const canvas = await renderPosterToCanvas(blocks, palette, 2);
+export async function exportJpg(blocks: Block[], palette: Palette, name?: string) {
+  const canvas = await renderPosterToCanvas(blocks, palette, 3);
   await new Promise<void>((resolve) => {
     canvas.toBlob(
       (blob) => {
-        if (blob) downloadBlob(blob, "banrihua.jpg");
+        if (blob) downloadBlob(blob, `${cleanName(name)}.jpg`);
         resolve();
       },
       "image/jpeg",
-      0.92,
+      0.95,
     );
   });
 }
@@ -479,17 +488,39 @@ function measureVisualLines(t: TextBlock): string[] {
   return lines.length ? lines : [t.text];
 }
 
-// Render an image src to a PNG data URL, preserving transparency (so
+// Rasterise an image src at HIGH resolution for crisp export. Renders at
+// `scale`× the on-poster block size (~300 DPI on A3), so vector SVG maps come
+// out sharp and photos keep the same quality the old full-page raster produced.
+// Transparency is preserved (PNG) unless the source is an opaque JPEG, so
 // transparent range maps composite over the page background instead of turning
-// black, as JPEG would).
-async function imageToPngDataUrl(src: string): Promise<string> {
+// black. Returns the data URL and the format for jsPDF.addImage.
+async function imageToHiResDataUrl(
+  src: string,
+  targetWpx: number,
+  targetHpx: number,
+  scale = 3,
+): Promise<{ dataUrl: string; fmt: "PNG" | "JPEG" }> {
   const img = await loadImage(src);
+  const w = Math.max(1, Math.round((targetWpx || img.naturalWidth) * scale));
+  const h = Math.max(1, Math.round((targetHpx || img.naturalHeight) * scale));
   const c = document.createElement("canvas");
-  c.width = img.naturalWidth || 1;
-  c.height = img.naturalHeight || 1;
+  c.width = w;
+  c.height = h;
   const ctx = c.getContext("2d")!;
-  ctx.drawImage(img, 0, 0);
-  return c.toDataURL("image/png");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, w, h);
+  const opaque = /^data:image\/jpe?g/.test(src);
+  return opaque
+    ? { dataUrl: c.toDataURL("image/jpeg", 0.95), fmt: "JPEG" }
+    : { dataUrl: c.toDataURL("image/png"), fmt: "PNG" };
+}
+
+// Filesystem-safe base name for exports, derived from page name(s).
+function exportBaseName(pages: PosterPage[]): string {
+  const clean = (s: string) => (s || "poster").replace(/[\\/:*?"<>|\n\r\t]/g, "_").trim().slice(0, 60);
+  if (pages.length === 1) return clean(pages[0].name);
+  return `${clean(pages[0].name)}_等${pages.length}页`;
 }
 
 // Fallback: the old rasterised export (one flattened image per page).
@@ -506,7 +537,7 @@ async function exportPdfRaster(
     if (i > 0) pdf.addPage("a3", "portrait");
     pdf.addImage(dataUrl, "JPEG", 0, 0, A3_W_MM, A3_H_MM);
   }
-  pdf.save(mode === "print" ? "banrihua-print.pdf" : "banrihua.pdf");
+  pdf.save(`${exportBaseName(pages)}${mode === "print" ? "_print" : ""}.pdf`);
 }
 
 // Which embedded/built-in PDF font to use for a text block so it matches the
@@ -550,9 +581,13 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
           const ib = b as ImageBlock;
           if (!ib.src) continue;
           try {
-            // PNG keeps transparency so maps don't get a black background.
-            const dataUrl = await imageToPngDataUrl(ib.src);
-            pdf.addImage(dataUrl, "PNG", ib.x * MM_X, ib.y * MM_Y, ib.w * MM_X, ib.h * MM_Y, undefined, "FAST");
+            const { dataUrl, fmt } = await imageToHiResDataUrl(
+              ib.src,
+              ib.w,
+              ib.h,
+              mode === "print" ? 3.5 : 3,
+            );
+            pdf.addImage(dataUrl, fmt, ib.x * MM_X, ib.y * MM_Y, ib.w * MM_X, ib.h * MM_Y, undefined, "SLOW");
           } catch {
             /* skip unreadable image */
           }
@@ -575,10 +610,14 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
         const lineHeightPx = t.fontSize * (t.lineHeight ?? 1.4);
         const leadPx = (lineHeightPx - t.fontSize) / 2; // CSS half-leading
 
-        const bold = (t.fontWeight ?? 400) >= 600;
-        if (bold) {
+        // Approximate the on-screen weight: the embedded face is a single
+        // weight, so simulate heavier weights with a proportional glyph stroke
+        // (≈ the screen gradation across 400–900).
+        const weight = t.fontWeight ?? 400;
+        const strokeMm = weight > 400 ? ((weight - 400) / 300) * 0.03 * fontPt : 0;
+        if (strokeMm > 0) {
           pdf.setDrawColor(c.r, c.g, c.b);
-          pdf.setLineWidth(fontPt * 0.012);
+          pdf.setLineWidth(strokeMm);
         }
         lines.forEach((line, i) => {
           const text = t.textTransform === "uppercase" ? line.toUpperCase() : line;
@@ -586,15 +625,15 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
           pdf.text(text, anchorXpx * MM_X, yTopPx * MM_Y, {
             align,
             baseline: "top",
-            ...(bold ? { renderingMode: "fillThenStroke" } : {}),
+            ...(strokeMm > 0 ? { renderingMode: "fillThenStroke" } : {}),
           });
         });
-        if (bold) pdf.setLineWidth(0);
+        if (strokeMm > 0) pdf.setLineWidth(0);
         pdf.setCharSpace(0);
       }
     }
 
-    pdf.save(mode === "print" ? "banrihua-print.pdf" : "banrihua.pdf");
+    pdf.save(`${exportBaseName(pages)}${mode === "print" ? "_print" : ""}.pdf`);
   } catch (e) {
     // Any failure (font load, parsing, etc.) → never break export; use raster.
     console.error("vector PDF failed, falling back to raster:", e instanceof Error ? e.message : e);
@@ -602,9 +641,9 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
   }
 }
 
-export async function exportSvg(blocks: Block[], palette: Palette) {
+export async function exportSvg(blocks: Block[], palette: Palette, name?: string) {
   const svg = await renderPosterToSVG(blocks, palette);
-  downloadBlob(new Blob([svg], { type: "image/svg+xml" }), "banrihua.svg");
+  downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `${cleanName(name)}.svg`);
 }
 
 export async function exportPptx(pages: PosterPage[], palette: Palette) {
@@ -630,8 +669,8 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
       if (b.type === "image") {
         if (b.src) {
           try {
-            const data = await imageToDataUrl(b.src);
-            slide.addImage({ data, x: toInX(b.x), y: toInY(b.y), w: toInX(b.w), h: toInY(b.h) });
+            const { dataUrl } = await imageToHiResDataUrl(b.src, b.w, b.h, 3);
+            slide.addImage({ data: dataUrl, x: toInX(b.x), y: toInY(b.y), w: toInX(b.w), h: toInY(b.h) });
             continue;
           } catch {
             /* fall through */
@@ -664,17 +703,24 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
         y: toInY(t.y),
         w: toInX(t.w),
         h: toInY(t.fontSize * (t.lineHeight ?? 1.4) * Math.max(1, t.text.split("\n").length) + 20),
-        fontSize: Math.round(t.fontSize * 0.75),
+        // Accurate point size: the A3 slide is 16.54in (1190.88pt) tall,
+        // mapping POSTER_H px → pt so the text is the same visual size.
+        fontSize: Math.max(1, Math.round((t.fontSize * 16.54 * 72) / POSTER_H)),
         color: t.color.replace("#", ""),
         bold: (t.fontWeight ?? 400) >= 600,
         italic: t.fontStyle === "italic",
         align: (t.align ?? "left") as "left" | "center" | "right",
+        lineSpacingMultiple: t.lineHeight ?? 1.4,
         fontFace:
-          t.fontFamily === "serif" || t.fontFamily === "display" ? "Songti SC" : "PingFang SC",
+          t.fontFamily === "display"
+            ? "ZCOOL XiaoWei"
+            : t.fontFamily === "serif"
+              ? "Noto Serif SC"
+              : "Noto Sans SC",
         charSpacing: t.letterSpacing ? t.letterSpacing * 5 : 0,
       });
     }
   }
 
-  await pptx.writeFile({ fileName: "banrihua.pptx" });
+  await pptx.writeFile({ fileName: `${exportBaseName(pages)}.pptx` });
 }

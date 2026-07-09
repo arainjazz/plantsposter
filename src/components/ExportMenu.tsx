@@ -84,7 +84,7 @@ export function ExportMenu({ pages, activePageId, palette }: Props) {
             <button
               style={optBtn}
               disabled={busy !== null}
-              onClick={() => run("png", () => exportPng(activeBlocks, palette, transparent))}
+              onClick={() => run("png", () => exportPng(activeBlocks, palette, transparent, activePage.name))}
             >
               PNG (当前页)
             </button>
@@ -103,7 +103,7 @@ export function ExportMenu({ pages, activePageId, palette }: Props) {
           <button
             style={optBtn}
             disabled={busy !== null}
-            onClick={() => run("jpg", () => exportJpg(activeBlocks, palette))}
+            onClick={() => run("jpg", () => exportJpg(activeBlocks, palette, activePage.name))}
           >
             JPG (当前页)
           </button>
@@ -138,7 +138,7 @@ export function ExportMenu({ pages, activePageId, palette }: Props) {
           <button
             style={optBtn}
             disabled={busy !== null}
-            onClick={() => run("svg", () => exportSvg(activeBlocks, palette))}
+            onClick={() => run("svg", () => exportSvg(activeBlocks, palette, activePage.name))}
           >
             SVG (当前页 · 矢量)
           </button>
