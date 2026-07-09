@@ -329,16 +329,145 @@ export async function exportJpg(blocks: Block[], palette: Palette) {
   });
 }
 
-export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "print" | "standard") {
+// ── Editable (vector) PDF export ───────────────────────────────────────────
+// A3 page in mm and the poster→page transforms.
+const A3_W_MM = 297;
+const A3_H_MM = 420;
+const MM_X = A3_W_MM / POSTER_W;
+const MM_Y = A3_H_MM / POSTER_H;
+const PT_PER_MM = 2.834645669;
+
+// Canonical jsPDF-compatible CJK TrueType font (黑体). Fetched once, cached.
+const CJK_FONT_URL = "https://cdn.jsdelivr.net/gh/StellarCN/scp_zh/fonts/SimHei.ttf";
+let cjkFontB64Promise: Promise<string> | null = null;
+
+function arrayBufferToBase64(buf: ArrayBuffer): string {
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk) as unknown as number[]);
+  }
+  return btoa(binary);
+}
+
+async function loadCjkFontBase64(): Promise<string> {
+  if (!cjkFontB64Promise) {
+    cjkFontB64Promise = fetch(CJK_FONT_URL)
+      .then((r) => {
+        if (!r.ok) throw new Error(`font ${r.status}`);
+        return r.arrayBuffer();
+      })
+      .then(arrayBufferToBase64)
+      .catch((e) => {
+        cjkFontB64Promise = null; // allow retry next export
+        throw e;
+      });
+  }
+  return cjkFontB64Promise;
+}
+
+// Fallback: the old rasterised export (one flattened image per page).
+async function exportPdfRaster(
+  pages: PosterPage[],
+  palette: Palette,
+  mode: "print" | "standard",
+) {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
   for (let i = 0; i < pages.length; i++) {
     const canvas = await renderPosterToCanvas(pages[i].blocks, palette, mode === "print" ? 3 : 2);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
     if (i > 0) pdf.addPage("a3", "portrait");
-    pdf.addImage(dataUrl, "JPEG", 0, 0, 297, 420);
+    pdf.addImage(dataUrl, "JPEG", 0, 0, A3_W_MM, A3_H_MM);
   }
   pdf.save(mode === "print" ? "banrihua-print.pdf" : "banrihua.pdf");
+}
+
+export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "print" | "standard") {
+  try {
+    const { jsPDF } = await import("jspdf");
+    const fontB64 = await loadCjkFontBase64();
+
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
+    pdf.addFileToVFS("SimHei.ttf", fontB64);
+    pdf.addFont("SimHei.ttf", "SimHei", "normal");
+
+    for (let pi = 0; pi < pages.length; pi++) {
+      if (pi > 0) pdf.addPage("a3", "portrait");
+      const page = pages[pi];
+
+      // Background (solid; gradients approximated by their first colour).
+      const bg = page.background ?? palette.background;
+      if (bg && bg !== "transparent" && bg !== "rgba(0,0,0,0)") {
+        const c = parseRgba(firstColor(bg));
+        if (c) {
+          pdf.setFillColor(c.r, c.g, c.b);
+          pdf.rect(0, 0, A3_W_MM, A3_H_MM, "F");
+        }
+      }
+
+      for (const b of page.blocks) {
+        if (b.type === "image") {
+          const ib = b as ImageBlock;
+          if (!ib.src) continue;
+          try {
+            const dataUrl = await imageToDataUrl(ib.src); // rasterises SVG maps too
+            pdf.addImage(
+              dataUrl,
+              "JPEG",
+              ib.x * MM_X,
+              ib.y * MM_Y,
+              ib.w * MM_X,
+              ib.h * MM_Y,
+              undefined,
+              "FAST",
+            );
+          } catch {
+            /* skip unreadable image */
+          }
+          continue;
+        }
+
+        const t = b as TextBlock;
+        if (!t.text) continue;
+        const c = parseRgba(t.color) ?? { r: 34, g: 34, b: 34, a: 1 };
+        const fontPt = t.fontSize * MM_Y * PT_PER_MM;
+        pdf.setFont("SimHei", "normal");
+        pdf.setFontSize(fontPt);
+        pdf.setTextColor(c.r, c.g, c.b);
+        pdf.setLineHeightFactor(t.lineHeight ?? 1.4);
+
+        const maxWidthMm = t.w * MM_X;
+        const raw = t.textTransform === "uppercase" ? t.text.toUpperCase() : t.text;
+        const lines = pdf.splitTextToSize(raw, maxWidthMm);
+
+        const align = (t.align ?? "left") as "left" | "center" | "right";
+        const anchorX =
+          align === "center" ? (t.x + t.w / 2) * MM_X : align === "right" ? (t.x + t.w) * MM_X : t.x * MM_X;
+
+        // Faux-bold for heavy weights (only the regular face is embedded).
+        const bold = (t.fontWeight ?? 400) >= 600;
+        if (bold) {
+          pdf.setDrawColor(c.r, c.g, c.b);
+          pdf.setLineWidth(fontPt * 0.012);
+        }
+        pdf.text(lines, anchorX, t.y * MM_Y, {
+          align,
+          baseline: "top",
+          lineHeightFactor: t.lineHeight ?? 1.4,
+          ...(bold ? { renderingMode: "fillThenStroke" } : {}),
+        });
+        if (bold) pdf.setLineWidth(0);
+      }
+    }
+
+    pdf.save(mode === "print" ? "banrihua-print.pdf" : "banrihua.pdf");
+  } catch (e) {
+    // Any failure (font load, parsing, etc.) → never break export; use raster.
+    console.error("vector PDF failed, falling back to raster:", e instanceof Error ? e.message : e);
+    await exportPdfRaster(pages, palette, mode);
+  }
 }
 
 export async function exportSvg(blocks: Block[], palette: Palette) {

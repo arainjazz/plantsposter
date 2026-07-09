@@ -13,6 +13,49 @@ const DB_NAME = "banrihua-editor";
 const STORE = "state";
 const RECORD = "latest";
 
+// ── SVG data-url repair ────────────────────────────────────────────────────
+// Some stored range-map SVGs contain a bare, unescaped `&` (e.g. "Xinjiang &
+// W. Ordos"). SVG loaded via <img> uses strict XML parsing, so a single bare
+// `&` makes the WHOLE map fail to render (0×0 broken image). We repair such
+// data URLs on load: escape any bare `&` → `&amp;`. `&` is ASCII (0x26) and
+// never appears inside a multibyte UTF-8 sequence, so we can operate on the
+// raw byte string from atob without a full Unicode round-trip.
+const BARE_AMP = /&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g;
+
+function fixSvgDataUrl(src: unknown): unknown {
+  if (typeof src !== "string" || !src.startsWith("data:image/svg+xml")) return src;
+  const comma = src.indexOf(",");
+  if (comma < 0) return src;
+  const meta = src.slice(0, comma);
+  const payload = src.slice(comma + 1);
+  try {
+    if (meta.includes(";base64")) {
+      const bytes = atob(payload);
+      if (!BARE_AMP.test(bytes)) return src;
+      return `${meta},${btoa(bytes.replace(BARE_AMP, "&amp;"))}`;
+    }
+    const decoded = decodeURIComponent(payload);
+    if (!BARE_AMP.test(decoded)) return src;
+    return `${meta},${encodeURIComponent(decoded.replace(BARE_AMP, "&amp;"))}`;
+  } catch {
+    return src;
+  }
+}
+
+// Repair every image block's src across a loaded state so all range maps render.
+function sanitizeState<T extends PersistedEditorState | null>(state: T): T {
+  if (!state || !Array.isArray(state.pages)) return state;
+  for (const page of state.pages) {
+    if (!page || !Array.isArray(page.blocks)) continue;
+    for (const b of page.blocks as Array<{ type?: string; src?: unknown }>) {
+      if (b && b.type === "image" && typeof b.src === "string") {
+        b.src = fixSvgDataUrl(b.src) as string;
+      }
+    }
+  }
+  return state;
+}
+
 function isState(value: unknown): value is PersistedEditorState {
   const v = value as PersistedEditorState | null;
   return (
@@ -79,9 +122,9 @@ function readLocalStorage(): PersistedEditorState | null {
 export async function loadEditorState(): Promise<PersistedEditorState | null> {
   if (typeof window === "undefined") return null;
   try {
-    return (await readIndexedDb()) ?? readLocalStorage();
+    return sanitizeState((await readIndexedDb()) ?? readLocalStorage());
   } catch {
-    return readLocalStorage();
+    return sanitizeState(readLocalStorage());
   }
 }
 
@@ -126,7 +169,7 @@ export async function loadPublishedState(): Promise<PersistedEditorState | null>
     const res = await fetch("/api/state?t=" + Date.now(), { cache: "no-store" });
     if (!res.ok) return null;
     const data = (await res.json()) as unknown;
-    return isState(data) ? (data as PersistedEditorState) : null;
+    return isState(data) ? sanitizeState(data as PersistedEditorState) : null;
   } catch {
     return null;
   }
