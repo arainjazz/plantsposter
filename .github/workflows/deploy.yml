@@ -1,64 +1,73 @@
 name: Deploy to Cloudflare
- 
+
 # Direct deploy to Cloudflare Workers on every push to main — no Lovable step.
 # Required repository secrets (Settings → Secrets and variables → Actions):
 #   CLOUDFLARE_API_TOKEN   – token with "Edit Cloudflare Workers" + "Workers R2 Storage: Edit"
 #   CLOUDFLARE_ACCOUNT_ID  – your Cloudflare account id
 # Optional (only if you want CI to (re)set the Worker's runtime secrets):
 #   GEMINI_API_KEY, LOVABLE_API_KEY, EDIT_KEY
- 
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
- 
+
 concurrency:
   group: deploy-cloudflare
   cancel-in-progress: true
- 
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
- 
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
- 
+
       - name: Install dependencies
         run: bun install
         env:
           PUPPETEER_SKIP_DOWNLOAD: "true"
- 
+
       - name: Build
         run: bun run build
         env:
           PUPPETEER_SKIP_DOWNLOAD: "true"
- 
-      - name: Ensure R2 bucket exists
-        run: npx --yes wrangler@4 r2 bucket create plantsposter-state || true
+
+      - name: Ensure KV namespace + inject binding
+        working-directory: .output/server
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
- 
-      - name: Inject R2 binding into built wrangler config
-        working-directory: .output/server
         run: |
-          node -e '
+          set -e
+          # Find the KV namespace id by title; create it if missing. KV needs no
+          # account-level activation (unlike R2), so this works out of the box.
+          LIST=$(npx --yes wrangler@4 kv namespace list 2>/dev/null || echo '[]')
+          ID=$(printf '%s' "$LIST" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);const n=j.find(x=>x.title&&x.title.indexOf("POSTER_STATE")>=0);process.stdout.write(n?n.id:"")}catch(e){process.stdout.write("")}})')
+          if [ -z "$ID" ]; then
+            OUT=$(npx --yes wrangler@4 kv namespace create "POSTER_STATE")
+            echo "$OUT"
+            ID=$(printf '%s' "$OUT" | grep -oiE '[0-9a-f]{32}' | head -n1)
+          fi
+          if [ -z "$ID" ]; then echo "Could not resolve KV namespace id" >&2; exit 1; fi
+          echo "KV namespace id: $ID"
+          KV_ID="$ID" node -e '
             const fs = require("fs");
             const p = "wrangler.json";
             const c = JSON.parse(fs.readFileSync(p, "utf8"));
-            c.r2_buckets = [{ binding: "POSTER_STATE", bucket_name: "plantsposter-state" }];
+            c.kv_namespaces = [{ binding: "POSTER_STATE", id: process.env.KV_ID }];
             fs.writeFileSync(p, JSON.stringify(c, null, 2));
-            console.log("Injected R2 binding:", JSON.stringify(c.r2_buckets));
+            console.log("Injected KV binding:", JSON.stringify(c.kv_namespaces));
           '
           # Remove the nitro-generated deploy redirect so `wrangler deploy`
           # unambiguously uses THIS .output/server/wrangler.json (otherwise
           # wrangler errors: "Found both a user configuration file ... and a
           # deploy configuration file").
           rm -f ../../.wrangler/deploy/config.json
- 
+
       - name: Push runtime secrets (optional, skipped if unset)
         working-directory: .output/server
         env:
@@ -79,7 +88,7 @@ jobs:
           put_secret GEMINI_API_KEY "$GEMINI_API_KEY"
           put_secret LOVABLE_API_KEY "$LOVABLE_API_KEY"
           put_secret EDIT_KEY "$EDIT_KEY"
- 
+
       - name: Deploy Worker
         working-directory: .output/server
         run: npx --yes wrangler@4 deploy
