@@ -3,30 +3,42 @@ import { createFileRoute } from "@tanstack/react-router";
 // Global poster state persistence.
 //
 // GET  /api/state → returns the published poster state as JSON.
-//   Source of truth: Cloudflare R2 bucket (binding POSTER_STATE), key "latest".
-//   Fallback when R2 is empty or unbound: the static seed file
+//   Source of truth: the POSTER_STATE binding (Cloudflare KV namespace), key
+//   "latest". Fallback when it is empty or unbound: the static seed file
 //   /banrihua-editor-20plants.json (bundled full state with images).
 //
-// POST /api/state → writes the given state to R2 (the "立即保存 / 全局发布" action).
-//   All visitors then see it on their next load. Requires R2 to be bound.
-//   Optional protection: if env EDIT_KEY is set, requests must send a matching
-//   `x-edit-key` header; otherwise writes are open (matching the app's prior
-//   no-auth design).
+// POST /api/state → writes the given state to the store (the "立即保存 / 全局
+//   发布" action). All visitors then see it on their next load. Requires the
+//   POSTER_STATE binding. Optional protection: if env EDIT_KEY is set, requests
+//   must send a matching `x-edit-key` header; otherwise writes are open
+//   (matching the app's prior no-auth design).
+//
+// The reader is duck-typed so it works whether POSTER_STATE is a KV namespace
+// (get() → string) or an R2 bucket (get() → object with .text()).
 
-const R2_KEY = "latest";
+const STATE_KEY = "latest";
 const SEED_ASSET = "/banrihua-editor-20plants.json";
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB safety cap
 
+type StoreLike = {
+  get: (key: string) => Promise<unknown>;
+  put: (key: string, value: string) => Promise<unknown>;
+};
+
 type CfEnv = {
-  POSTER_STATE?: R2BucketLike;
+  POSTER_STATE?: StoreLike;
   ASSETS?: { fetch: (req: Request | string) => Promise<Response> };
   EDIT_KEY?: string;
 };
 
-type R2BucketLike = {
-  get: (key: string) => Promise<{ body: ReadableStream | null; text: () => Promise<string> } | null>;
-  put: (key: string, value: string) => Promise<unknown>;
-};
+async function readState(store: StoreLike): Promise<string | null> {
+  const val = await store.get(STATE_KEY);
+  if (typeof val === "string") return val; // KV
+  if (val && typeof (val as { text?: unknown }).text === "function") {
+    return await (val as { text: () => Promise<string> }).text(); // R2
+  }
+  return null;
+}
 
 function getEnv(): CfEnv {
   // Cloudflare Workers bindings are exposed on globalThis.__env__ by the
@@ -49,16 +61,13 @@ export const Route = createFileRoute("/api/state")({
     handlers: {
       GET: async ({ request }) => {
         const env = getEnv();
-        // 1) Prefer R2 published state.
+        // 1) Prefer the published state from the KV/R2 store.
         if (env.POSTER_STATE) {
           try {
-            const obj = await env.POSTER_STATE.get(R2_KEY);
-            if (obj) {
-              const text = await obj.text();
-              return new Response(text, { headers: noStore });
-            }
+            const text = await readState(env.POSTER_STATE);
+            if (text) return new Response(text, { headers: noStore });
           } catch (e) {
-            console.error("R2 get failed:", e instanceof Error ? e.message : String(e));
+            console.error("state read failed:", e instanceof Error ? e.message : String(e));
           }
         }
         // 2) Fallback: static seed asset (full state with images).
@@ -79,7 +88,7 @@ export const Route = createFileRoute("/api/state")({
         const env = getEnv();
         if (!env.POSTER_STATE) {
           return Response.json(
-            { error: "全局存储(R2)未配置，无法发布。请先在 Cloudflare 绑定 POSTER_STATE 存储桶。" },
+            { error: "全局存储(KV)未配置，无法发布。请先绑定 POSTER_STATE 命名空间。" },
             { status: 501 },
           );
         }
@@ -103,7 +112,7 @@ export const Route = createFileRoute("/api/state")({
           return Response.json({ error: "不是有效的编辑器状态。" }, { status: 400 });
         }
         try {
-          await env.POSTER_STATE.put(R2_KEY, body);
+          await env.POSTER_STATE.put(STATE_KEY, body);
         } catch (e) {
           return Response.json(
             { error: `写入失败：${e instanceof Error ? e.message : String(e)}` },
