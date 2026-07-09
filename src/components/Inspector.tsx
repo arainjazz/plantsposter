@@ -14,7 +14,7 @@ type Props = {
   onChangeImage: (src: string | null) => void;
   onChangeBackground: (color: string) => void;
   onApplyBackgroundToPages: (pageIds: string[], color: string) => void;
-  onAlignToPage: (dir: AlignDir) => void;
+  onAlignToPage: (dir: AlignDir, mode: "page" | "selection") => void;
   onDistribute: (axis: DistributeAxis) => void;
 };
 
@@ -31,6 +31,23 @@ export function Inspector({
   onAlignToPage,
   onDistribute,
 }: Props) {
+  const [alignMode, setAlignMode] = useState<"page" | "selection">("page");
+  const modeBtn = (m: "page" | "selection", label: string) => (
+    <button
+      onClick={() => setAlignMode(m)}
+      disabled={m === "selection" && selectionCount < 2}
+      style={{
+        ...alignBtn,
+        flex: 1,
+        background: alignMode === m ? "#2a2622" : "white",
+        color: alignMode === m ? "white" : "#333",
+        opacity: m === "selection" && selectionCount < 2 ? 0.4 : 1,
+      }}
+      title={m === "page" ? "相对整个页面对齐" : "相对选中元素的整体外框对齐"}
+    >
+      {label}
+    </button>
+  );
   const AlignPanel = (
     <div
       style={{
@@ -43,25 +60,29 @@ export function Inspector({
       }}
     >
       <div style={{ fontSize: 11, color: "#666", fontWeight: 600 }}>
-        对齐到页面 · {selectionCount} 个元素
+        对齐 · {selectionCount} 个元素
+      </div>
+      <div style={{ display: "flex", gap: 4 }}>
+        {modeBtn("page", "对齐到页面")}
+        {modeBtn("selection", "对齐到选区")}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
-        <button style={alignBtn} onClick={() => onAlignToPage("left")} title="左对齐">
+        <button style={alignBtn} onClick={() => onAlignToPage("left", alignMode)} title="左对齐">
           ⇤
         </button>
-        <button style={alignBtn} onClick={() => onAlignToPage("hcenter")} title="水平居中">
+        <button style={alignBtn} onClick={() => onAlignToPage("hcenter", alignMode)} title="水平居中">
           ⇔
         </button>
-        <button style={alignBtn} onClick={() => onAlignToPage("right")} title="右对齐">
+        <button style={alignBtn} onClick={() => onAlignToPage("right", alignMode)} title="右对齐">
           ⇥
         </button>
-        <button style={alignBtn} onClick={() => onAlignToPage("top")} title="顶对齐">
+        <button style={alignBtn} onClick={() => onAlignToPage("top", alignMode)} title="顶对齐">
           ⤒
         </button>
-        <button style={alignBtn} onClick={() => onAlignToPage("vcenter")} title="垂直居中">
+        <button style={alignBtn} onClick={() => onAlignToPage("vcenter", alignMode)} title="垂直居中">
           ⇕
         </button>
-        <button style={alignBtn} onClick={() => onAlignToPage("bottom")} title="底对齐">
+        <button style={alignBtn} onClick={() => onAlignToPage("bottom", alignMode)} title="底对齐">
           ⤓
         </button>
       </div>
@@ -84,7 +105,7 @@ export function Inspector({
         </button>
       </div>
       <div style={{ fontSize: 10, color: "#888" }}>
-        提示：单选时相对整页对齐；多选时相对整体外框对齐。
+        提示：可切换「对齐到页面」或「对齐到选区外框」；等距分布需选中 ≥3 个元素。
       </div>
     </div>
   );

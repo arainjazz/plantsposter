@@ -337,9 +337,14 @@ const MM_X = A3_W_MM / POSTER_W;
 const MM_Y = A3_H_MM / POSTER_H;
 const PT_PER_MM = 2.834645669;
 
-// Canonical jsPDF-compatible CJK TrueType font (黑体). Fetched once, cached.
-const CJK_FONT_URL = "https://cdn.jsdelivr.net/gh/StellarCN/scp_zh/fonts/SimHei.ttf";
-let cjkFontB64Promise: Promise<string> | null = null;
+// Real fonts used by the poster (matching the on-screen Google webfonts), as
+// jsPDF-compatible TrueType. jsPDF subsets these in the output so files stay
+// small; we cache the ~23 MB of source fonts in IndexedDB so they download
+// only once, ever.
+const FONT_SOURCES: Record<string, string> = {
+  NotoSans: "https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/google-fonts/NotoSansSC%5Bwght%5D.ttf",
+  ZCOOL: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/zcoolxiaowei/ZCOOLXiaoWei-Regular.ttf",
+};
 
 function arrayBufferToBase64(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf);
@@ -351,20 +356,140 @@ function arrayBufferToBase64(buf: ArrayBuffer): string {
   return btoa(binary);
 }
 
-async function loadCjkFontBase64(): Promise<string> {
-  if (!cjkFontB64Promise) {
-    cjkFontB64Promise = fetch(CJK_FONT_URL)
-      .then((r) => {
-        if (!r.ok) throw new Error(`font ${r.status}`);
-        return r.arrayBuffer();
-      })
-      .then(arrayBufferToBase64)
-      .catch((e) => {
-        cjkFontB64Promise = null; // allow retry next export
-        throw e;
-      });
+// ── font cache (IndexedDB) ──
+const FONT_DB = "banrihua-fonts";
+const FONT_STORE = "ttf";
+function fontDb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(FONT_DB, 1);
+    req.onupgradeneeded = () => {
+      if (!req.result.objectStoreNames.contains(FONT_STORE)) req.result.createObjectStore(FONT_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function fontCacheGet(key: string): Promise<string | null> {
+  try {
+    const db = await fontDb();
+    return await new Promise((resolve) => {
+      const r = db.transaction(FONT_STORE, "readonly").objectStore(FONT_STORE).get(key);
+      r.onsuccess = () => resolve(typeof r.result === "string" ? r.result : null);
+      r.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
   }
-  return cjkFontB64Promise;
+}
+async function fontCachePut(key: string, val: string): Promise<void> {
+  try {
+    const db = await fontDb();
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction(FONT_STORE, "readwrite");
+      tx.objectStore(FONT_STORE).put(val, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
+const fontMem = new Map<string, Promise<string>>();
+async function loadFontB64(name: string): Promise<string> {
+  let p = fontMem.get(name);
+  if (!p) {
+    p = (async () => {
+      const cached = await fontCacheGet(name);
+      if (cached) return cached;
+      const res = await fetch(FONT_SOURCES[name]);
+      if (!res.ok) throw new Error(`font ${name} ${res.status}`);
+      const b64 = arrayBufferToBase64(await res.arrayBuffer());
+      void fontCachePut(name, b64);
+      return b64;
+    })().catch((e) => {
+      fontMem.delete(name);
+      throw e;
+    });
+    fontMem.set(name, p);
+  }
+  return p;
+}
+
+const CJK_RE = /[㐀-鿿豈-﫿]/;
+
+// Measure the exact visual line breaks the browser produces for a text block,
+// so the PDF layout matches the screen (which uses a DOM div with pre-wrap).
+function measureVisualLines(t: TextBlock): string[] {
+  if (typeof document === "undefined") return t.text.split("\n");
+  const div = document.createElement("div");
+  Object.assign(div.style, {
+    position: "absolute",
+    left: "-99999px",
+    top: "0",
+    visibility: "hidden",
+    width: `${t.w}px`,
+    fontFamily: FONT_FAMILY[t.fontFamily ?? "sans"],
+    fontSize: `${t.fontSize}px`,
+    fontWeight: String(t.fontWeight ?? 400),
+    fontStyle: t.fontStyle ?? "normal",
+    lineHeight: String(t.lineHeight ?? 1.4),
+    letterSpacing: t.letterSpacing ? `${t.letterSpacing}px` : "normal",
+    textTransform: t.textTransform ?? "none",
+    whiteSpace: "pre-wrap",
+    wordBreak: "normal",
+  } as CSSStyleDeclaration);
+  const raw = t.textTransform === "uppercase" ? t.text : t.text; // CSS handles transform for measuring
+  div.textContent = raw;
+  document.body.appendChild(div);
+  const node = div.firstChild as Text | null;
+  const lines: string[] = [];
+  if (node) {
+    const range = document.createRange();
+    const chars = Array.from(t.text);
+    let cur = "";
+    let prevTop: number | null = null;
+    let offset = 0;
+    for (const ch of chars) {
+      if (ch === "\n") {
+        lines.push(cur);
+        cur = "";
+        prevTop = null;
+        offset += ch.length;
+        continue;
+      }
+      try {
+        range.setStart(node, offset);
+        range.setEnd(node, offset + ch.length);
+        const top = range.getBoundingClientRect().top;
+        if (prevTop !== null && top - prevTop > 1) {
+          lines.push(cur);
+          cur = "";
+        }
+        prevTop = top;
+      } catch {
+        /* ignore */
+      }
+      cur += ch;
+      offset += ch.length;
+    }
+    lines.push(cur);
+  }
+  document.body.removeChild(div);
+  return lines.length ? lines : [t.text];
+}
+
+// Render an image src to a PNG data URL, preserving transparency (so
+// transparent range maps composite over the page background instead of turning
+// black, as JPEG would).
+async function imageToPngDataUrl(src: string): Promise<string> {
+  const img = await loadImage(src);
+  const c = document.createElement("canvas");
+  c.width = img.naturalWidth || 1;
+  c.height = img.naturalHeight || 1;
+  const ctx = c.getContext("2d")!;
+  ctx.drawImage(img, 0, 0);
+  return c.toDataURL("image/png");
 }
 
 // Fallback: the old rasterised export (one flattened image per page).
@@ -384,14 +509,27 @@ async function exportPdfRaster(
   pdf.save(mode === "print" ? "banrihua-print.pdf" : "banrihua.pdf");
 }
 
+// Which embedded/built-in PDF font to use for a text block so it matches the
+// on-screen webfont: sans→Noto Sans SC, display→ZCOOL XiaoWei, serif→Noto Sans
+// SC when it contains CJK (no CJK serif TTF is jsPDF-embeddable) or the built-in
+// Times serif for Latin-only labels (scientific names).
+function pdfFontFor(t: TextBlock): string {
+  const fam = t.fontFamily ?? "sans";
+  if (fam === "display") return "ZCOOL";
+  if (fam === "serif") return CJK_RE.test(t.text) ? "NotoSans" : "times";
+  return "NotoSans";
+}
+
 export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "print" | "standard") {
   try {
     const { jsPDF } = await import("jspdf");
-    const fontB64 = await loadCjkFontBase64();
+    const [notoSans, zcool] = await Promise.all([loadFontB64("NotoSans"), loadFontB64("ZCOOL")]);
 
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
-    pdf.addFileToVFS("SimHei.ttf", fontB64);
-    pdf.addFont("SimHei.ttf", "SimHei", "normal");
+    pdf.addFileToVFS("NotoSansSC.ttf", notoSans);
+    pdf.addFont("NotoSansSC.ttf", "NotoSans", "normal");
+    pdf.addFileToVFS("ZCOOL.ttf", zcool);
+    pdf.addFont("ZCOOL.ttf", "ZCOOL", "normal");
 
     for (let pi = 0; pi < pages.length; pi++) {
       if (pi > 0) pdf.addPage("a3", "portrait");
@@ -412,17 +550,9 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
           const ib = b as ImageBlock;
           if (!ib.src) continue;
           try {
-            const dataUrl = await imageToDataUrl(ib.src); // rasterises SVG maps too
-            pdf.addImage(
-              dataUrl,
-              "JPEG",
-              ib.x * MM_X,
-              ib.y * MM_Y,
-              ib.w * MM_X,
-              ib.h * MM_Y,
-              undefined,
-              "FAST",
-            );
+            // PNG keeps transparency so maps don't get a black background.
+            const dataUrl = await imageToPngDataUrl(ib.src);
+            pdf.addImage(dataUrl, "PNG", ib.x * MM_X, ib.y * MM_Y, ib.w * MM_X, ib.h * MM_Y, undefined, "FAST");
           } catch {
             /* skip unreadable image */
           }
@@ -432,33 +562,35 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
         const t = b as TextBlock;
         if (!t.text) continue;
         const c = parseRgba(t.color) ?? { r: 34, g: 34, b: 34, a: 1 };
-        const fontPt = t.fontSize * MM_Y * PT_PER_MM;
-        pdf.setFont("SimHei", "normal");
+        const fontPt = t.fontSize * MM_Y * PT_PER_MM; // exact on-screen size
+        pdf.setFont(pdfFontFor(t), "normal");
         pdf.setFontSize(fontPt);
         pdf.setTextColor(c.r, c.g, c.b);
-        pdf.setLineHeightFactor(t.lineHeight ?? 1.4);
+        pdf.setCharSpace(t.letterSpacing ? t.letterSpacing * MM_X : 0);
 
-        const maxWidthMm = t.w * MM_X;
-        const raw = t.textTransform === "uppercase" ? t.text.toUpperCase() : t.text;
-        const lines = pdf.splitTextToSize(raw, maxWidthMm);
-
+        // Exact on-screen line breaks (browser pre-wrap) and line spacing.
+        const lines = measureVisualLines(t);
         const align = (t.align ?? "left") as "left" | "center" | "right";
-        const anchorX =
-          align === "center" ? (t.x + t.w / 2) * MM_X : align === "right" ? (t.x + t.w) * MM_X : t.x * MM_X;
+        const anchorXpx = align === "center" ? t.x + t.w / 2 : align === "right" ? t.x + t.w : t.x;
+        const lineHeightPx = t.fontSize * (t.lineHeight ?? 1.4);
+        const leadPx = (lineHeightPx - t.fontSize) / 2; // CSS half-leading
 
-        // Faux-bold for heavy weights (only the regular face is embedded).
         const bold = (t.fontWeight ?? 400) >= 600;
         if (bold) {
           pdf.setDrawColor(c.r, c.g, c.b);
           pdf.setLineWidth(fontPt * 0.012);
         }
-        pdf.text(lines, anchorX, t.y * MM_Y, {
-          align,
-          baseline: "top",
-          lineHeightFactor: t.lineHeight ?? 1.4,
-          ...(bold ? { renderingMode: "fillThenStroke" } : {}),
+        lines.forEach((line, i) => {
+          const text = t.textTransform === "uppercase" ? line.toUpperCase() : line;
+          const yTopPx = t.y + i * lineHeightPx + leadPx;
+          pdf.text(text, anchorXpx * MM_X, yTopPx * MM_Y, {
+            align,
+            baseline: "top",
+            ...(bold ? { renderingMode: "fillThenStroke" } : {}),
+          });
         });
         if (bold) pdf.setLineWidth(0);
+        pdf.setCharSpace(0);
       }
     }
 

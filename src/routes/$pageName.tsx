@@ -294,24 +294,35 @@ function Editor() {
     setSelectedIds(new Set(ids));
   }
 
-  function alignToPage(dir: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") {
+  // Estimate a block's rendered height (images know their height; text is
+  // fontSize × lineHeight × line count — far better than the old fixed 40).
+  function blockBoxH(b: Block): number {
+    if (b.type === "image") return b.h;
+    const t = b as TextBlock;
+    const lines = Math.max(1, (t.text ?? "").split("\n").length);
+    return (t.fontSize ?? 24) * (t.lineHeight ?? 1.4) * lines;
+  }
+
+  function alignToPage(
+    dir: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom",
+    mode: "page" | "selection" = "page",
+  ) {
     if (selectedIds.size === 0) return;
     const sel = blocks.filter((b) => selectedIds.has(b.id));
-    const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
     let refX1 = 0,
       refX2 = POSTER_W,
       refY1 = 0,
       refY2 = POSTER_H;
-    if (sel.length >= 2) {
+    if (mode === "selection" && sel.length >= 2) {
       refX1 = Math.min(...sel.map((b) => b.x));
       refX2 = Math.max(...sel.map((b) => b.x + b.w));
       refY1 = Math.min(...sel.map((b) => b.y));
-      refY2 = Math.max(...sel.map((b) => b.y + boxH(b)));
+      refY2 = Math.max(...sel.map((b) => b.y + blockBoxH(b)));
     }
     updateActiveBlocks((bs) =>
       bs.map((b) => {
         if (!selectedIds.has(b.id)) return b;
-        const bh = boxH(b);
+        const bh = blockBoxH(b);
         let { x, y } = b;
         if (dir === "left") x = refX1;
         else if (dir === "right") x = refX2 - b.w;
@@ -327,7 +338,7 @@ function Editor() {
   function distribute(axis: "h" | "v") {
     if (selectedIds.size < 3) return;
     const sel = blocks.filter((b) => selectedIds.has(b.id));
-    const boxH = (b: Block) => (b.type === "image" ? b.h : 40);
+    const boxH = (b: Block) => blockBoxH(b);
     const sorted = [...sel].sort((a, b) => (axis === "h" ? a.x - b.x : a.y - b.y));
     const first = sorted[0],
       last = sorted[sorted.length - 1];
@@ -666,28 +677,32 @@ function Editor() {
 
   // ── clipboard: copy/paste blocks (⌘/Ctrl + C/V) + undo (⌘/Ctrl+Z) ─────
   const clipboardRef = useRef<Block[]>([]);
-  const historyRef = useRef<Array<{ pages: PosterPage[]; activeId: string; palette: Palette }>>([]);
+  type Snap = { pages: PosterPage[]; activeId: string; palette: Palette };
+  const historyRef = useRef<Snap[]>([]);
   const skipHistoryRef = useRef(false);
-  const prevSnapRef = useRef<{ pages: PosterPage[]; activeId: string; palette: Palette } | null>(
-    null,
-  );
+  // `committedRef` holds the last checkpoint; changes within a burst (a whole
+  // drag, or a run of keystrokes) are coalesced into ONE undo step by only
+  // checkpointing after ~450ms of no further changes.
+  const committedRef = useRef<Snap>({ pages, activeId, palette });
+  const commitTimerRef = useRef<number | null>(null);
 
-  // Track history: push previous snapshot before applying a new one.
   useEffect(() => {
     if (!hydrated) {
-      prevSnapRef.current = { pages, activeId, palette };
+      committedRef.current = { pages, activeId, palette };
       return;
     }
     if (skipHistoryRef.current) {
       skipHistoryRef.current = false;
-      prevSnapRef.current = { pages, activeId, palette };
+      committedRef.current = { pages, activeId, palette };
       return;
     }
-    if (prevSnapRef.current) {
-      historyRef.current.push(prevSnapRef.current);
+    if (commitTimerRef.current) window.clearTimeout(commitTimerRef.current);
+    commitTimerRef.current = window.setTimeout(() => {
+      historyRef.current.push(committedRef.current);
       if (historyRef.current.length > 100) historyRef.current.shift();
-    }
-    prevSnapRef.current = { pages, activeId, palette };
+      committedRef.current = { pages, activeId, palette };
+      commitTimerRef.current = null;
+    }, 450);
   }, [hydrated, pages, activeId, palette]);
 
   useEffect(() => {
@@ -698,13 +713,24 @@ function Editor() {
       const meta = e.metaKey || e.ctrlKey;
       if (meta && e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
-        const snap = historyRef.current.pop();
-        if (snap) {
+        const restore = (snap: Snap) => {
           skipHistoryRef.current = true;
           setPages(snap.pages);
           setActiveId(snap.activeId);
           setPalette(snap.palette);
           setSelectedIds(new Set());
+        };
+        // Pending (un-checkpointed) burst → undo the whole burst to the last checkpoint.
+        if (commitTimerRef.current) {
+          window.clearTimeout(commitTimerRef.current);
+          commitTimerRef.current = null;
+          restore(committedRef.current);
+          return;
+        }
+        const snap = historyRef.current.pop();
+        if (snap) {
+          restore(snap);
+          committedRef.current = snap;
         }
         return;
       }
