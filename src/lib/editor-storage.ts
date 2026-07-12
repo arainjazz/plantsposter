@@ -42,11 +42,16 @@ function fixSvgDataUrl(src: unknown): unknown {
   }
 }
 
-// Repair every image block's src across a loaded state so all range maps render.
+// Repair every image block's src across a loaded state so all range maps render,
+// and freeze the URL of every already-named page: an established page must NOT
+// rename itself (and change its URL) just because its text was edited. New pages
+// created in-session keep auto-naming until their first save.
 function sanitizeState<T extends PersistedEditorState | null>(state: T): T {
   if (!state || !Array.isArray(state.pages)) return state;
-  for (const page of state.pages) {
-    if (!page || !Array.isArray(page.blocks)) continue;
+  for (const page of state.pages as Array<{ name?: string; autoName?: boolean; blocks?: unknown }>) {
+    if (!page) continue;
+    if (page.name && page.name.trim()) page.autoName = false;
+    if (!Array.isArray(page.blocks)) continue;
     for (const b of page.blocks as Array<{ type?: string; src?: unknown }>) {
       if (b && b.type === "image" && typeof b.src === "string") {
         b.src = fixSvgDataUrl(b.src) as string;

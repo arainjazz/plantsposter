@@ -6,6 +6,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 type Props = {
   blocks: Block[];
+  pageName?: string;
   selectedImageId: string | null;
   onApplyOperations: (ops: Operation[]) => void;
 };
@@ -49,7 +50,7 @@ function saveCustom(list: ModelEntry[]) {
   localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
 }
 
-export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
+export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }: Props) {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
@@ -138,6 +139,7 @@ export function AiChat({ blocks, selectedImageId, onApplyOperations }: Props) {
         body: JSON.stringify({
           message: text || "(仅参考附图)",
           model,
+          pageName,
           custom: currentCustom(model),
           history: messages,
           image: sentImage ? { mimeType: sentImage.mimeType, data: sentImage.data } : null,

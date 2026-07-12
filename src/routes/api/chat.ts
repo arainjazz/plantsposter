@@ -69,9 +69,21 @@ const OPERATIONS_SCHEMA = {
   required: ["message", "operations"],
 };
 
-const SYSTEM = `You are an editing assistant for a plant poster editor built like Canva.
-The user speaks Chinese and English. The poster is a bilingual A3 portrait
-about "半日花 Helianthemum songaricum".
+const SYSTEM = `You are an editing assistant for a multi-page, bilingual (Chinese + English)
+A3 plant field-guide editor built like Canva.
+
+⚠ CRITICAL — THIS IS A MULTI-SPECIES GUIDE. Every page is about a DIFFERENT plant,
+and you always edit exactly ONE page at a time. The "Block catalog" given in each
+request is the CURRENT page's real content. FIRST determine which species THIS page
+is about from that catalog (the largest title block + the Latin binomial + the
+provided page name). Then keep every edit on-topic for THAT species only.
+- NEVER assume the page is about 半日花 / Helianthemum songaricum. Do NOT insert
+  半日花 names, text, examples, coordinates, or 鄂尔多斯/Ordos references unless the
+  current page's catalog is genuinely about that species.
+- NEVER change a page's main title / species to a different plant, and never rewrite
+  a page to be about a species other than the one already shown in its catalog.
+- If the catalog is about e.g. 梭梭 (Haloxylon ammodendron), all content, distribution
+  points and examples you output must be about 梭梭 — not 半日花.
 
 You output JSON with:
 - message: short reply in the user's language explaining what you changed (or asking for clarification).
@@ -136,22 +148,59 @@ CONTENT SKILL — "全球分布"栏 (GLOBAL RANGE) 与配图 SVG 规范
   set_range_map 字段:
     - id       : 目标图片块 id (通常是 img-map)
     - points   : [{ lat, lon, kind: "native"|"introduced", label }]  真实点，勿臆造
-    - title    : 例如 "Helianthemum songaricum · Global Distribution"
+    - title    : "<当前页物种的拉丁名> · Global Distribution"（用本页实际物种，切勿写成半日花）
     - subtitle : 例如 "Wikimedia CC0 base · GBIF/POWO records"
     - source   : caption 一句话，写清数据源/查询/日期/许可证
 
-  每个投影点必须在 message 中以文本凭证方式列出:
-      "Xinjiang - Turpan: (lat 42.9, lon 89.2) -> (x 688.95, y 191.56)"
-  证据不足时不要臆造点；宁少勿假。`;
+  每个投影点必须在 message 中以文本凭证方式列出（示例格式，坐标须为本页物种的真实记录）:
+      "<地点>: (lat 42.9, lon 89.2) -> (x 688.95, y 191.56)"
+  证据不足时不要臆造点；宁少勿假。若提供了联网检索结果(RESEARCH)，务必据其校正坐标。`;
 
 type ChatBody = {
   message: string;
   model: string;
+  pageName?: string;
   blocks: Array<{ id: string; text?: string; role?: string }>;
   history: Array<{ role: "user" | "assistant"; content: string }>;
   image?: { mimeType: string; data: string } | null;
   custom?: { baseURL: string; apiKey: string } | null;
 };
+
+// Best-effort web-search grounding: for research / distribution / verification
+// requests, ask Gemini (with the googleSearch tool) to pull authoritative
+// distribution data first, then feed that text into the structured edit call.
+// Gemini can't combine googleSearch with responseSchema, so this is a separate
+// pre-step; any failure is swallowed and the normal flow proceeds ungrounded.
+const RESEARCH_RE =
+  /(分布|distribut|范围|range|核查|校正|verify|检查|check|准确|正确|accurate|correct|联网|search|搜索|GBIF|POWO|iNaturalist|occurrence|坐标|coordinate)/i;
+
+async function webSearchResearch(
+  key: string,
+  species: string,
+  userMessage: string,
+): Promise<string | null> {
+  try {
+    const prompt = `Research the authoritative GLOBAL native distribution of the plant species "${species}" using GBIF, Kew POWO / Plants of the World Online, and iNaturalist. Return a concise bullet list of representative real occurrence points as "Region/place: lat, lon (native|introduced)", plus the data sources (with taxon key / URL and access notes) and any range caveats. Focus on decimal lat/lon. User request: ${userMessage}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        tools: [{ googleSearch: {} }],
+        generationConfig: { temperature: 0.2 },
+      }),
+    });
+    if (!res.ok) return null;
+    const j = (await res.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
+    const text = j.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+    return text.trim() ? text.trim().slice(0, 4000) : null;
+  } catch {
+    return null;
+  }
+}
 
 export const Route = createFileRoute("/api/chat")({
   server: {
@@ -178,11 +227,21 @@ export const Route = createFileRoute("/api/chat")({
           .map((h) => `${h.role.toUpperCase()}: ${h.content}`)
           .join("\n");
 
-        const userParts: Array<Record<string, unknown>> = [
-          {
-            text: `Block catalog:\n${catalog}\n\nConversation so far:\n${historyText}\n\nUser: ${body.message}`,
-          },
-        ];
+        const species = (body.pageName || "").trim();
+        // Web-search grounding for research/distribution requests (Gemini path only).
+        let research: string | null = null;
+        if (key && !custom && RESEARCH_RE.test(body.message)) {
+          research = await webSearchResearch(key, species || catalog.slice(0, 200), body.message);
+        }
+        const contextText =
+          `Current page name / species: ${species || "(infer from the catalog below)"}\n\n` +
+          `Block catalog (THIS page's real content — base every edit on it):\n${catalog}\n\n` +
+          (research
+            ? `RESEARCH (authoritative web search results — use these to CORRECT distribution points and facts for THIS species):\n${research}\n\n`
+            : "") +
+          `Conversation so far:\n${historyText}\n\nUser: ${body.message}`;
+
+        const userParts: Array<Record<string, unknown>> = [{ text: contextText }];
         if (body.image?.data) {
           userParts.push({
             inlineData: {
@@ -203,13 +262,13 @@ export const Route = createFileRoute("/api/chat")({
                 role: "user",
                 content: body.image?.data
                   ? [
-                      { type: "text", text: body.message },
+                      { type: "text", text: contextText },
                       {
                         type: "image_url",
                         image_url: { url: `data:${body.image.mimeType};base64,${body.image.data}` },
                       },
                     ]
-                  : `Block catalog:\n${catalog}\n\nUser: ${body.message}`,
+                  : contextText,
               },
             ];
             const upstream = await fetch(`${custom.baseURL.replace(/\/$/, "")}/chat/completions`, {

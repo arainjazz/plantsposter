@@ -823,6 +823,7 @@ function Editor() {
       <aside style={{ borderRight: "1px solid #e5e5e5", background: "white", overflow: "hidden" }}>
         <AiChat
           blocks={blocks}
+          pageName={activePage?.name}
           selectedImageId={soloSelected?.type === "image" ? soloSelected.id : null}
           onApplyOperations={apply}
         />
