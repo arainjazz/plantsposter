@@ -26,6 +26,7 @@ type Props = {
   onMoveMany: (dx: number, dy: number) => void;
   onResize: (id: string, patch: { x: number; y: number; w: number; h?: number }) => void;
   onResizeMany?: (patches: ResizePatch[]) => void;
+  onDestructiveCrop?: (original: ImageBlock, next: { x: number; y: number; w: number; h: number }) => void;
   onChangeText: (id: string, text: string) => void;
   onImageContextMenu: (id: string, clientX: number, clientY: number) => void;
   displayWidth: number;
@@ -51,6 +52,8 @@ type ResizeState = {
   origH: number;
   isText: boolean;
   isImage: boolean;
+  originalImage?: ImageBlock;
+  lastPatch?: { x: number; y: number; w: number; h: number };
 };
 type GroupResizeState = {
   kind: "group-resize";
@@ -82,6 +85,7 @@ export function PosterCanvas({
   onMoveMany,
   onResize,
   onResizeMany,
+  onDestructiveCrop,
   onChangeText,
   onImageContextMenu,
   displayWidth,
@@ -130,6 +134,7 @@ export function PosterCanvas({
       origH: h,
       isText: b.type === "text",
       isImage: b.type === "image",
+      originalImage: b.type === "image" ? { ...b } : undefined,
     };
   }
 
@@ -202,9 +207,9 @@ export function PosterCanvas({
       let { origX: x, origY: y, origW: w, origH: h } = d;
       const isCorner = d.handle.length === 2;
 
-      // Image corners are always an aspect-locked scale operation. The four
-      // edge handles intentionally change the visible frame only: with the
-      // image rendered as object-fit: cover this is a non-destructive crop.
+      // Image corners are always an aspect-locked scale operation. Edge
+      // handles only move inward and permanently discard the hidden pixels on
+      // pointer-up; a discarded edge cannot be revealed again by accident.
       if (d.isImage && isCorner) {
         const ratio = d.origW / d.origH;
         const widthByX = d.handle.includes("w") ? -dx : dx;
@@ -214,6 +219,17 @@ export function PosterCanvas({
         h = w / ratio;
         if (d.handle.includes("w")) x = d.origX + (d.origW - w);
         if (d.handle.includes("n")) y = d.origY + (d.origH - h);
+      } else if (d.isImage) {
+        if (d.handle.includes("e")) w = Math.max(20, d.origW + Math.min(0, dx));
+        if (d.handle.includes("s")) h = Math.max(20, d.origH + Math.min(0, dy));
+        if (d.handle.includes("w")) {
+          w = Math.max(20, d.origW - Math.max(0, dx));
+          x = d.origX + (d.origW - w);
+        }
+        if (d.handle.includes("n")) {
+          h = Math.max(20, d.origH - Math.max(0, dy));
+          y = d.origY + (d.origH - h);
+        }
       } else {
         if (d.handle.includes("e")) w = Math.max(20, d.origW + dx);
         if (d.handle.includes("s")) h = Math.max(20, d.origH + dy);
@@ -226,12 +242,14 @@ export function PosterCanvas({
           y = d.origY + (d.origH - h);
         }
       }
-      onResize(d.id, {
+      const patch = {
         x: Math.round(x),
         y: Math.round(y),
         w: Math.round(w),
         h: d.isText ? undefined : Math.round(h),
-      });
+      };
+      d.lastPatch = d.isText || patch.h === undefined ? undefined : { ...patch, h: patch.h };
+      onResize(d.id, patch);
       return;
     }
     if (d.kind === "group-resize") {
@@ -287,6 +305,20 @@ export function PosterCanvas({
 
   function endDrag(e: React.PointerEvent) {
     const d = dragRef.current;
+    if (
+      e.type === "pointerup" &&
+      d?.kind === "resize" &&
+      d.isImage &&
+      d.handle.length === 1 &&
+      d.originalImage &&
+      d.lastPatch &&
+      (d.lastPatch.x !== d.origX ||
+        d.lastPatch.y !== d.origY ||
+        d.lastPatch.w !== d.origW ||
+        d.lastPatch.h !== d.origH)
+    ) {
+      onDestructiveCrop?.(d.originalImage, d.lastPatch);
+    }
     if (d?.kind === "marquee") {
       const x1 = Math.min(d.startX, d.curX);
       const x2 = Math.max(d.startX, d.curX);

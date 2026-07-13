@@ -30,148 +30,165 @@ const rangeCountries = {
 const spatialBounds = {
   "Nostoc flagelliforme": { minLat: 30, maxLat: 55, minLon: 73, maxLon: 125 },
 };
+// GBIF's accepted N. flagelliforme concept currently has no usable China
+// coordinates; its returned points are foreign misidentifications. Use only
+// clearly-labelled provincial reference markers from published Chinese range
+// accounts, rather than presenting invented GBIF occurrences.
+const manualRangeMaps = {
+  "Nostoc flagelliforme": {
+    source: "中国区域分布资料（内蒙古、宁夏、甘肃、新疆、青海、陕西）的省域代表位置",
+    points: [
+      [111.7, 41.5], // Inner Mongolia: Siziwang Banner study area
+      [106.3, 37.6], // Ningxia dry steppe
+      [103.1, 38.6], // Gansu dry steppe
+      [98.4, 37.4], // Qinghai dry steppe
+      [86.0, 42.8], // Xinjiang dry steppe
+      [109.8, 38.4], // northern Shaanxi
+    ],
+  },
+};
 
 const copy = {
   "Helianthemum songaricum": {
     range: "中亚至中国北方的间断荒漠记录 · Disjunct records from Central Asia to northern China",
     noteSub: "隔离种群不能视作同一保护单元 · Isolated Populations Need Separate Care",
     note: "伊犁与西鄂尔多斯种群相距遥远；分布点只表示已记录地点，不能填补两地之间的空白。\nThe Ili and western Ordos populations are widely separated; occurrence dots do not imply continuous habitat between them.",
-    humSub: "“songaricum”记录准噶尔地名 · A Name Rooted in Dzungaria",
-    hum: "种加词 songaricum 源自 Songaria（准噶尔旧称），把这一物种的命名史与中亚荒漠地理联系起来。\nThe epithet songaricum derives from Songaria, an older name for Dzungaria, linking the species name to Central Asian geography.",
+    humSub: "1841 年的学名把准噶尔写进植物志 · Dzungaria in an 1841 Name",
+    hum: "Kew 记录该学名发表于 1841 年；种加词 songaricum 源自 Songaria（准噶尔旧称），把采集、命名与中亚荒漠地理连在一起。\nPublished in 1841, its epithet records Songaria, an older name for Dzungaria, linking botanical naming with Central Asian geography.",
   },
   "Tetraena mongolica": {
     range: "中国西鄂尔多斯狭域特有 · Narrow endemic of western Ordos, China",
     noteSub: "狭域分布的国家重点保护植物 · A Protected Narrow Endemic",
     note: "四合木天然分布很窄，孤立种群易受采矿、道路和生境破碎化影响；保护重点是原生群落，而非只保存单株。\nIts tiny, fragmented range makes habitat loss a greater risk than the loss of any single plant; intact native communities are the conservation priority.",
-    humSub: "四瓣果实写进了中文名 · Four Valves, One Memorable Name",
-    hum: "成熟蒴果通常裂成四瓣，“四合木”把可观察的果实特征直接写进名称，也便于野外识别。\nThe Chinese name refers to the capsule splitting into four valves, turning a diagnostic fruit character into a memorable field name.",
+    humSub: "把果实特征写进地方植物名 · A Field Character Becomes a Name",
+    hum: "“四合木”以成熟蒴果常裂成四瓣得名。把识别特征写入名称，是荒漠植物被地方观察、记忆和传授的一种方式。\nIts Chinese name recalls a capsule that usually opens into four valves—field observation turned into local botanical memory.",
   },
   "Ammopiptanthus mongolicus": {
     range: "蒙古南部与中国北方荒漠 · Deserts of southern Mongolia and northern China",
     noteSub: "严寒荒漠中的常绿阔叶灌木 · Evergreen in a Freezing Desert",
     note: "它在冬季严寒、长期干旱的荒漠仍保持革质叶，是温带荒漠少见的常绿阔叶灌木；这比泛称“活化石”更具识别和研究价值。\nIts leathery leaves persist through cold, arid winters—an unusual evergreen strategy among temperate-desert broad-leaved shrubs.",
-    humSub: "沙中越冬的绿色标志 · A Winter-Green Desert Landmark",
-    hum: "“沙冬青”准确概括了它在沙砾荒漠中越冬常绿的特征；迁地繁育应服务于野生种群恢复，不能替代原生生境。\nIts Chinese name literally evokes a winter-green shrub of sandy deserts; ex-situ propagation should support, not replace, wild habitat conservation.",
+    humSub: "“沙冬青”是冬季识别的地方名字 · A Winter Name for a Desert Shrub",
+    hum: "在多数荒漠灌木落叶的季节，沙冬青仍保留革质绿叶；这个直白的中文名把长期野外观察转化成了易传的识别线索。\nWhen many desert shrubs are leafless, its leathery leaves remain green; the Chinese name preserves that practical winter field cue.",
   },
   "Potaninia mongolica": {
     range: "蒙古高原与中国北方戈壁 · Gobi records across Mongolia and northern China",
     noteSub: "单型属与国家重点保护价值 · A Monotypic, Protected Lineage",
     note: "绵刺是绵刺属现存唯一物种；保护它同时保存一条独立的蔷薇科演化支系。地图中的少量记录反映采集不足，不代表其余区域没有种群。\nAs the only species of Potaninia, it represents an entire rosaceous lineage; sparse records also reflect limited collecting effort.",
-    humSub: "棉毛宿萼造就“绵刺”之名 · Cottony Calyx, Thorny Form",
-    hum: "果实被密生棉毛的宿存萼包裹，配合刺状枝条，形成“绵刺”这一直接来自形态的名称。\nA fruit wrapped in a cottony persistent calyx, set among spine-like branches, gives the plant its descriptive Chinese name.",
+    humSub: "“绵刺”以手感和形态进入地方词汇 · Cottony and Thorny, in One Name",
+    hum: "果实外的棉毛宿萼与刺状枝条共同构成“绵刺”之名。它不是抽象标签，而是野外接触时可见、可触的形态描述。\nCottony persistent calyces and spine-like branches make “Mian-ci” a tactile, descriptive field name rather than an abstract label.",
   },
   "Leptodermis ordosica": {
     latin: "Leptodermis ordosica H.C.Fu & E.W.Ma",
     range: "中国鄂尔多斯高原狭域特有 · Narrow endemic of the Ordos Plateau, China",
     noteSub: "狭域特有种的利用边界 · Use Propagated Material Only",
     note: "野外种群分布狭窄；园林引种、种子交换或科研取样应使用可追溯的人工繁殖材料，避免采挖野生母株。\nIts wild range is narrow. Cultivation, seed exchange and research sampling should use traceable propagated material, never excavated wild parent plants.",
-    humSub: "ordosica 把产地写入学名 · Ordos Written into the Name",
-    hum: "种加词 ordosica 直接指向鄂尔多斯；它首先是一种地域特有植物，而不是可随意移植的普通“野丁香”。\nThe epithet ordosica records its Ordos identity: this is a regional endemic, not a generic wild ornamental available for unrestricted collecting.",
+    humSub: "ordosica 是一条写进拉丁名的产地记录 · Ordos Recorded in Latin",
+    hum: "种加词 ordosica 直接指向鄂尔多斯。对地方植物志而言，学名不只用于分类，也留下了发现地与区域自然史的线索。\nThe epithet ordosica points directly to Ordos: a Latin name can also preserve a clue to place and local natural history.",
   },
   "Artemisia ordosica": {
     range: "中国北方沙地，核心在鄂尔多斯周边 · Northern Chinese sandy lands, centred on Ordos",
     noteSub: "耐沙埋不等于适合所有荒漠 · Sand-Burial Tolerance Has Limits",
     note: "鄂尔多斯蒿能在活动沙地萌蘖并耐受一定沙埋，但固沙配置仍需匹配当地种源、沙丘稳定度和水分条件，不能跨区套用。\nIt resprouts and tolerates some burial, but restoration must still match local provenance, dune mobility and water availability.",
-    humSub: "从流沙先锋到恢复工程材料 · From Pioneer to Restoration Plant",
-    hum: "它长期用于中国北方沙地植被恢复；工程价值来自乡土种源和群落配置，而不是“单一种下去就能治沙”。\nIt is widely used in northern China’s sandy-land restoration, where local seed sources and mixed communities matter more than single-species planting.",
+    humSub: "治沙工程里的“鄂尔多斯蒿” · A Shrub in Sand-Recovery Practice",
+    hum: "鄂尔多斯蒿是毛乌素等沙地恢复研究中的常见对象；固沙后，土壤、结皮和群落会继续改变，工程不是“种下就结束”。\nA familiar subject of Mu Us restoration studies, it shows that soil, crusts and communities keep changing after dunes are stabilized.",
   },
   "Artemisia sphaerocephala": {
     range: "蒙古与中国北方沙地 · Sandy regions of Mongolia and northern China",
     noteSub: "种子黏液是关键适沙结构 · Seed Mucilage Anchors Life in Sand",
     note: "种子遇水形成黏液层，可黏附沙粒并调节吸水；这是有实证的适沙特征，比笼统的“基因家族扩张”更适合公众理解。\nWhen wetted, the seed coat forms mucilage that binds sand and regulates hydration—a directly observed adaptation to mobile dunes.",
-    humSub: "白沙蒿籽胶的材料价值 · A Natural Hydrocolloid",
-    hum: "白沙蒿籽胶是一类天然多糖水胶体，已被研究用于食品结构和材料应用；这项利用应与野生种群保护分开评价。\nIts seed gum is a natural polysaccharide hydrocolloid studied for food and material uses; utilization should be assessed separately from wild conservation.",
+    humSub: "沙地种子也进入了食品材料研究 · Seed Gum as a Food Material",
+    hum: "白沙蒿种子胶是天然多糖水胶体；研究已将其用于面制品质构、食品配料与包装材料。原料利用应优先采用规范来源。\nIts seed gum is a natural hydrocolloid studied for noodles, food ingredients and packaging; sourcing should be traceable and responsible.",
   },
   "Juniperus sabina": {
     range: "欧洲至中亚和东亚山地广布 · Widespread in mountains from Europe to East Asia",
     noteSub: "精油可致中毒，禁止自行内服 · Toxic Oil—Do Not Self-Medicate",
     note: "枝叶精油含多种有毒萜类，尤其富含 sabinyl acetate 的材料可造成严重刺激和器官损伤；不能把风险简单归因于 sabinene，也不应自行内服。\nIts foliage oil contains a toxic terpene mixture, often rich in sabinyl acetate; toxicity cannot be attributed to sabinene alone, and ingestion is unsafe.",
-    humSub: "园林地被，而不是家庭药材 · Groundcover, Not Home Medicine",
-    hum: "匍匐株形、常绿和耐寒使其成为岩石园及坡地绿化植物；园艺价值不等于药用安全。\nIts creeping evergreen habit suits rock gardens and slope planting, but ornamental value must never be confused with medicinal safety.",
+    humSub: "维吾尔医药文献中的历史记录 · A Record in Uyghur Medical History",
+    hum: "文献记载其果实在新疆维吾尔医药中被称作“新疆圆柏实”，宋代《注医典》已有相关记录；历史使用不等于可自行服用。\nLiterature records its fruit in Uyghur medicine as Xinjiang yuanbai shi, with a Song-era text cited; historical use is not a safety endorsement.",
   },
   "Salix gordejevii": {
     range: "蒙古、俄罗斯东南部与中国北方沙地 · Mongolia, SE Russia and northern Chinese sands",
     noteSub: "河柳与沙柳不能只凭叶形判断 · Identify Willows with Flowers and Fruit",
     note: "黄柳与近缘柳属植物叶形变异和重叠明显；可靠鉴定应同时查看花序、苞片、子房毛被与生境，不能只看一张叶片照片。\nLeaf shape overlaps among related willows; reliable identification also needs catkins, bracts, ovary hairs and habitat.",
-    humSub: "活枝扦插服务沙地恢复 · Living Cuttings for Sandy-Land Repair",
-    hum: "柳属枝条易生根，黄柳可用乡土插条参与沙地恢复；使用当地种源可降低误引种和遗传混杂风险。\nWillow cuttings root readily and can support sandy-land restoration; local provenance reduces misidentification and genetic mixing.",
+    humSub: "黄柳是科尔沁恢复工程的常用灌木 · A Horqin Restoration Shrub",
+    hum: "黄柳被用于科尔沁沙地的沙丘复绿；研究也提示，迎风坡根系暴露后的水分胁迫会造成衰亡，工程需要持续管护。\nUsed in Horqin dune revegetation, it also shows why restoration needs follow-up: exposed roots on windward slopes can trigger water stress and dieback.",
   },
   "Caragana korshinskii": {
     range: "蒙古高原至中国北部和西北部 · Mongolian Plateau to northern and NW China",
     noteSub: "固氮灌木也受水分上限约束 · Nitrogen Fixation Does Not Create Water",
     note: "根瘤共生可增加氮输入，但在极干旱地过密栽植仍会加剧土壤水分消耗；恢复密度必须服从长期水量平衡。\nRoot nodules add nitrogen, but dense planting in very dry sites can still deplete soil water; restoration density must respect long-term water balance.",
-    humSub: "柠条利用要兼顾灌丛更新 · Fodder Use with Regeneration",
-    hum: "柠条常用于防护林和饲草，但平茬、放牧与采种强度应给灌丛留出更新周期。\nIt is used in shelterbelts and as forage, but cutting, grazing and seed harvest must allow enough time for shrub regeneration.",
+    humSub: "防护带、饲草与氮循环的同一株灌木 · Shelterbelt and Forage Together",
+    hum: "柠条在北方干旱半干旱区兼具防护带、固氮恢复和补充饲草用途；水分不足仍是栽植成活与经营强度的硬约束。\nIn dry northern China it serves as shelterbelt, nitrogen-fixing restoration shrub and supplementary forage, all constrained by water availability.",
   },
   "Reaumuria soongorica": {
     range: "中亚至中国西北和北部荒漠 · Deserts from Central Asia to northern and NW China",
     noteSub: "盐腺排盐，而非笼统“耐盐” · Salt Glands Make Tolerance Visible",
     note: "叶表盐腺能排出吸收的盐分，盐晶可在叶面出现；这是红砂适应盐渍荒漠的直接结构证据。\nLeaf salt glands excrete absorbed salts, sometimes leaving visible crystals—a structural basis for survival in saline deserts.",
-    humSub: "不要把药理筛选写成临床功效 · Screening Is Not Medical Proof",
-    hum: "红砂提取物见于实验研究，但体外活性不等于安全有效的民间药方；涉及健康用途应以临床证据和安全评估为准。\nExtracts appear in laboratory studies, but in-vitro activity is not proof of a safe or effective remedy; health uses require clinical evidence and safety assessment.",
+    humSub: "荒漠植被调查中的建群灌木 · A Reference Shrub for Desert Monitoring",
+    hum: "红砂常被作为戈壁—荒漠群落的建群或优势灌木记录。它在样地调查中的价值，是帮助人们比较放牧、干旱与恢复后的群落变化。\nOften recorded as a dominant desert shrub, it helps vegetation surveys compare how grazing, drought and restoration reshape a community.",
   },
   "Nitraria tangutorum": {
     range: "中国西北与北中部盐碱荒漠 · Saline deserts of NW and north-central China",
     noteSub: "白刺属鉴定需结合果核与分子证据 · Nitraria Needs Careful Identification",
     note: "白刺属种间形态重叠明显，单靠果色或灌丛外形容易误判；分布图仅采用匹配到唐古特白刺的记录。\nNitraria species overlap in appearance; fruit-stone characters and, where needed, molecular data are safer than fruit colour alone.",
-    humSub: "盐地野果的地方利用 · A Local Fruit of Saline Lands",
-    hum: "成熟果实在部分产区被食用或加工，但野外采收应保留供鸟兽取食和天然更新的果实。\nRipe fruits are eaten or processed in parts of its range, but wild harvest should leave enough fruit for wildlife and natural regeneration.",
+    humSub: "盐碱地里的“沙漠樱桃” · A Saline-Land Wild Fruit",
+    hum: "唐古特白刺成熟果可鲜食、制果酒和提取天然色素；地方利用说明盐碱荒漠并非“无产出”，但采收须保留自然更新的果实。\nIts ripe fruit is eaten, fermented and used for natural pigments—a local product of saline desert, provided harvest leaves fruit for regeneration.",
   },
   "Haloxylon ammodendron": {
     range: "中亚至中国西北荒漠 · Deserts of Central Asia and northwestern China",
     noteSub: "绿色嫩枝承担主要光合作用 · Green Shoots Replace Broad Leaves",
     note: "梭梭叶片退化成微小鳞片，主要光合作用由当年绿色嫩枝完成，从而降低蒸腾面积。它是肉苁蓉的重要寄主，但不应写成所有肉苁蓉的“唯一寄主”。\nTiny scale leaves reduce water loss while green current-year shoots photosynthesize; it is a major Cistanche host, not a universal sole host.",
-    humSub: "固沙林与肉苁蓉产业相互绑定 · Shelterbelts and Cistanche Cultivation",
-    hum: "人工梭梭林可同时承担防护和肉苁蓉接种载体，但水量、林龄和采收强度决定这一模式能否持续。\nPlanted saxaul can support both shelterbelts and Cistanche inoculation, provided water balance, stand age and harvest intensity remain sustainable.",
+    humSub: "梭梭林与肉苁蓉栽培的共生经济 · Saxaul and Cistanche Cultivation",
+    hum: "肉苁蓉主要寄生梭梭根系，人工梭梭林因此连接防护林建设与药材栽培；寄生率受寄主种源和管理条件影响，并非必然成功。\nBecause Cistanche mainly parasitizes saxaul roots, planted stands link shelterbelts with cultivation—but success depends on host provenance and management.",
   },
   "Pugionium cornutum": {
     range: "蒙古与中国北方沙地 · Sandy lands of Mongolia and northern China",
     noteSub: "角状果实是可靠识别点 · Horned Fruits Confirm Identity",
     note: "成熟果实具有成对角状翅，是沙芥属重要识别特征；仅凭嫩叶无法排除其他十字花科植物。\nThe paired horn-like wings of mature fruits are diagnostic; young leaves alone cannot safely distinguish it from other brassicas.",
-    humSub: "沙地野菜必须可持续采收 · A Desert Vegetable, Harvested Carefully",
-    hum: "部分地区食用嫩茎叶；采收应避开受污染地块，并保留足够植株完成开花结籽。\nYoung shoots are eaten in parts of its range; harvest should avoid contaminated sites and leave enough plants to flower and seed.",
+    humSub: "“沙芥”是被长期食用的荒漠野菜 · A Long-Used Desert Vegetable",
+    hum: "沙芥既是固沙先锋植物，也被当地长期作为鲜食和腌制蔬菜；营养研究强调其膳食纤维、蛋白质和维生素，但不应以采挖替代栽培。\nA sand-fixing pioneer and long-used vegetable, it has been studied for fibre, protein and vitamins; cultivation is preferable to destructive wild harvest.",
   },
   "Tugarinovia mongolica": {
     range: "蒙古南部与中国内蒙古荒漠 · Deserts of southern Mongolia and Inner Mongolia, China",
     noteSub: "单型属，误采代价很高 · A Monotypic Genus with Little Margin for Loss",
     note: "革苞菊属仅含这一物种，局部种群损失会削弱整个属的遗传与形态多样性；稀少记录不能被解读为可采集。\nTugarinovia contains only this species, so loss of local populations erodes diversity across the whole genus; rarity is not permission to collect.",
-    humSub: "革质总苞写进了中文名 · Leathery Bracts in the Name",
-    hum: "“革苞菊”指向其坚韧、革质的总苞片，这是比泛称“荒漠模式植物”更具体的观察线索。\nThe Chinese name points to its tough, leathery involucral bracts—a concrete field character rather than a vague claim of scientific importance.",
+    humSub: "1928 年发表的地方单型属 · A Local Monotypic Genus, Published in 1928",
+    hum: "革苞菊属在 1928 年发表，现仅含这一物种及两个被接受的变种。它把一小片荒漠的地方自然史带入了全球植物分类体系。\nPublished in 1928, the genus has one species with two accepted varieties—local desert history carried into global plant classification.",
   },
   "Allium mongolicum": {
     range: "蒙古高原及中国北方干旱区 · Mongolian Plateau and arid northern China",
     noteSub: "可食用不等于可凭叶片采集 · Edible, but Identification Comes First",
     note: "无花、无鳞茎特征时，线形叶不足以可靠鉴定蒙古韭；野采还需避开道路、矿区和受污染土壤。\nLinear leaves alone are insufficient for identification without flowers and bulbs; collecting sites must also be free of road, mining and soil contamination.",
-    humSub: "荒漠草原上的地方蔬菜 · A Regional Steppe Vegetable",
-    hum: "蒙古韭的嫩叶和花序在部分地区作为风味蔬菜；可持续利用应以栽培或轮采替代连根挖取。\nLeaves and umbels are used as a regional vegetable; cultivation or rotational harvest is safer than uprooting wild plants.",
+    humSub: "沙葱进入游牧饮食与调味传统 · A Steppe Allium in Local Foodways",
+    hum: "蒙古韭又称沙葱；内蒙古民族植物学记录了野生葱属用于食物、饲草、药用和文化。嫩叶可作凉拌、腌制或配肉调味。\nKnown as sha cong, it belongs to wild Allium traditions of food, forage and culture; tender leaves are used fresh, pickled or with meat.",
   },
   "Cistanche deserticola": {
     range: "中国西北与蒙古荒漠中的寄生记录 · Parasitic records in NW China and Mongolian deserts",
     noteSub: "保护寄生植物必须同时保护寄主 · Protect the Host to Protect the Parasite",
     note: "肉苁蓉没有叶绿素，依靠吸器连接梭梭等寄主根系；只移栽花序或单独保存种子不能形成独立种群。\nLacking chlorophyll, it connects to host roots through a haustorium; conserving flowers or seeds alone cannot sustain a population without hosts.",
-    humSub: "药材需求推动人工接种栽培 · Cultivation Answers Medicinal Demand",
-    hum: "它是受管制的传统药材；在人工梭梭林中接种可降低野采压力，但产品来源仍需合法、可追溯。\nIt is a regulated traditional medicinal material; inoculation in planted saxaul can reduce wild harvest when production is legal and traceable.",
+    humSub: "从野生药材到寄主协同栽培 · From Wild Collection to Host-Based Cultivation",
+    hum: "肉苁蓉人工接种研究围绕种子萌发、吸器形成与梭梭幼根连接展开；可持续生产的单位不是一株药材，而是完整健康的寄主系统。\nCultivation follows seed germination, haustorium formation and attachment to young saxaul roots; the production unit is a healthy host system, not a lone stem.",
   },
   "Xanthoceras sorbifolium": {
     range: "原产中国北方，栽培记录更广 · Native to northern China, cultivated more widely",
     noteSub: "油用价值不等于全株可食 · Oil Crop Does Not Mean Every Part Is Food",
     note: "文冠果种仁可作为油料原料；果壳、种皮和压榨副产物含皂苷等成分，不宜作为常规食物或自行入药。\nIts kernels can be used as an oil raw material, while shells, seed coats and press residues contain saponins and are not ordinary food or self-medication.",
-    humSub: "从庭院花木到北方木本油料 · Ornamental Tree and Woody Oil Crop",
-    hum: "白花与变色花心使它成为观赏树，种子又支持木本油料开发；两种用途都依赖经过选择的栽培材料。\nShowy flowers support ornamental planting while seeds support woody-oil development; both uses depend on selected cultivated material.",
+    humSub: "从花木到木本油料与生物柴油原料 · Ornamental Tree, Oil Crop, Biofuel",
+    hum: "文冠果种仁油富含不饱和脂肪酸，可用于食用油研究，也被开发为生物柴油原料；不同产地种源的含油量和脂肪酸组成会变化。\nKernel oil is rich in unsaturated fatty acids and studied for food and biodiesel; oil yield and composition vary among provenances.",
   },
   "Prunus mongolica": {
     range: "蒙古南部与中国北方荒漠山地 · Desert mountains of southern Mongolia and northern China",
     noteSub: "它不是栽培扁桃的野生替代品 · Not a Wild Substitute for Almond",
     note: "蒙古扁桃果实小、果肉薄并密被毛，不能因中文名含“扁桃”就当作商品杏仁采食；可靠鉴定需结合枝刺、叶和核果。\nIts small, hairy drupes are not commercial almonds; identification should combine spines, leaves and fruit characters.",
-    humSub: "珍贵的是野生基因库，而非果量 · Value Lies in Wild Diversity",
-    hum: "作为耐旱蔷薇科野生种，它的价值在于原生种群的遗传多样性；迁地保存应记录采种地点和母株。\nAs a drought-adapted wild rosaceous species, its value lies in genetic diversity; ex-situ collections should retain provenance and maternal records.",
+    humSub: "荒漠扁桃是耐旱育种的野生基因库 · A Wild Resource for Drought Research",
+    hum: "蒙古扁桃在戈壁极端干旱中表现出耐旱性；其基因组与转录组研究正为蔷薇属耐旱、脂肪酸等性状提供候选资源。\nIts Gobi drought tolerance makes it a genomic resource for Prunus research on water stress and fatty-acid traits, not a substitute for commercial almonds.",
   },
   "Nostoc flagelliforme": {
     range: "主要见于中国北方与西北干旱草原 · Mainly arid steppes of northern and NW China",
     noteSub: "它是蓝细菌，采集会剥伤地表 · A Cyanobacterium—Harvest Damages Soil",
     note: "发菜不是维管植物，而是陆生蓝细菌群体。传统搂采会破坏生物土壤结皮并加剧风蚀，中国已禁止采集、收购、加工和销售野生发菜。\nIt is a terrestrial cyanobacterial colony, not a vascular plant; raking damages biological soil crusts, and China prohibits wild collection and trade.",
-    humSub: "“发财”谐音背后的消费转向 · From Lucky Homophone to No-Harvest Policy",
-    hum: "“发菜”因谐音“发财”进入节庆饮食；今天更有价值的文化选择，是用合法替代食材保留寓意而不破坏荒漠。\nIts lucky homophone once drove festive demand; legal substitutes can preserve the symbolism without damaging desert soil crusts.",
+    humSub: "从“发财”谐音到禁止采集的公共选择 · From Lucky Homophone to Protection",
+    hum: "“发菜”曾因谐音“发财”进入节庆饮食。国务院 2000 年通知明确禁止采集，并取缔野生发菜收购、加工、销售和出口。\nIts lucky homophone once drove festive demand; a 2000 State Council notice banned wild harvest and its trade, processing and export.",
   },
 };
 
@@ -226,26 +243,39 @@ async function gbifMap(scientific, basePaths) {
   );
   if (!match.usageKey || match.confidence < 90) throw new Error(`Low-confidence GBIF match: ${scientific}`);
 
-  const query = new URLSearchParams({
+  const baseQuery = new URLSearchParams({
     taxon_key: String(match.usageKey),
     has_coordinate: "true",
     has_geospatial_issue: "false",
     occurrence_status: "PRESENT",
   });
-  for (const country of rangeCountries[scientific] ?? []) query.append("country", country);
-  const countJson = await fetchJson(`https://api.gbif.org/v1/occurrence/search?${query}&limit=0`);
-  const count = countJson.count ?? 0;
-  const pageSize = 25;
-  const maxOffset = Math.max(0, Math.min(count - pageSize, 99_900));
-  const offsets = [...new Set([0, 0.5, 1].map((p) => Math.floor((maxOffset * p) / pageSize) * pageSize))];
-  const pages = [];
-  for (const offset of offsets) {
-    pages.push(
-      await fetchJson(
-        `https://api.gbif.org/v1/occurrence/search?${query}&limit=${pageSize}&offset=${offset}`,
-      ),
-    );
-  }
+  // Query every known native-range country independently. Appending several
+  // `country` parameters can be interpreted as a restrictive intersection by
+  // APIs/proxies; that was why a widespread taxon such as Juniperus sabina
+  // could acquire European dots while losing China altogether.
+  const countries = rangeCountries[scientific]?.length ? rangeCountries[scientific] : [null];
+  const pageSize = 80;
+  const countryPages = await Promise.all(
+    countries.map(async (country) => {
+      const query = new URLSearchParams(baseQuery);
+      if (country) query.set("country", country);
+      const first = await fetchJson(`https://api.gbif.org/v1/occurrence/search?${query}&limit=${pageSize}&offset=0`);
+      const count = Number(first.count ?? 0);
+      if (count <= pageSize) return { count, pages: [first] };
+      const middle = Math.floor(Math.max(0, count - pageSize) / (pageSize * 2)) * pageSize;
+      const offsets = [...new Set([0, middle])];
+      const pages = await Promise.all(
+        offsets.map((offset) =>
+          offset === 0
+            ? first
+            : fetchJson(`https://api.gbif.org/v1/occurrence/search?${query}&limit=${pageSize}&offset=${offset}`),
+        ),
+      );
+      return { count, pages };
+    }),
+  );
+  const count = countryPages.reduce((total, row) => total + row.count, 0);
+  const pages = countryPages.flatMap((row) => row.pages);
 
   const cells = new Map();
   const bounds = spatialBounds[scientific];
@@ -257,9 +287,12 @@ async function gbifMap(scientific, basePaths) {
     const key = `${Math.floor(lat / 3)},${Math.floor(lon / 3)}`;
     if (!cells.has(key)) cells.set(key, row);
   }
-  const records = [...cells.values()].slice(0, 100);
+  const manual = manualRangeMaps[scientific];
+  const records = manual
+    ? manual.points.map(([decimalLongitude, decimalLatitude]) => ({ decimalLongitude, decimalLatitude }))
+    : [...cells.values()].slice(0, 100);
   const noVerifiedPoints = !records.length;
-  if (noVerifiedPoints && scientific !== "Nostoc flagelliforme") {
+  if (noVerifiedPoints) {
     throw new Error(`No usable GBIF coordinates: ${scientific}`);
   }
 
@@ -278,9 +311,9 @@ async function gbifMap(scientific, basePaths) {
       `${circles.introduced.join("")}${circles.unknown.join("")}${circles.native.join("")}`,
       basePaths,
     ),
-    key: match.usageKey,
+    ...(manual ? { source: manual.source } : { key: match.usageKey }),
     accepted,
-    count,
+    count: manual ? records.length : count,
     plotted: records.length,
   };
 }
@@ -307,6 +340,9 @@ const MAP_CAPTION =
   "青绿色点：参考分布范围内筛选的 GBIF 坐标；橙色点：GBIF 标注的引入记录。点位不等于连续边界；来源与日期可直接编辑。";
 
 function mapCaption(map) {
+  if (map?.source) {
+    return `青绿色点：文献列举省域的代表位置（不是采集坐标）。数据：${map.source}，核查 ${ACCESSED}；点位不等于连续边界。`;
+  }
   const provenance = map?.key
     ? `数据：GBIF taxonKey ${map.key}，参考分布国家筛选 ${map.count} 条记录，核查 ${ACCESSED}。`
     : "数据：GBIF 坐标记录，核查日期可直接编辑。";
@@ -390,6 +426,8 @@ if (maps.size === 0) {
     });
   }
 }
+const forceTaxa = new Set((process.env.FORCE_TAXA ?? "").split(",").map((name) => name.trim()).filter(Boolean));
+for (const scientific of forceTaxa) maps.delete(scientific);
 for (const [scientific, map] of maps) {
   const svg = Buffer.from(map.dataUrl.split(",")[1], "base64").toString("utf8");
   maps.set(scientific, {
@@ -468,6 +506,6 @@ for (const page of ssrState.pages) {
 await fs.writeFile(SSR_OUTPUT, `${JSON.stringify(ssrState, null, 2)}\n`);
 await fs.writeFile(
   "content-audit-2026-07-13.json",
-  `${JSON.stringify({ accessed: ACCESSED, mapMethod: "GBIF occurrence/search; known native-range country filter; PRESENT; coordinate=true; geospatial_issue=false; stratified pages; 3-degree grid deduplication", pages: audit.map(({ dataUrl, ...row }) => row) }, null, 2)}\n`,
+  `${JSON.stringify({ accessed: ACCESSED, mapMethod: "GBIF occurrence/search; each known native-range country queried independently; PRESENT; coordinate=true; geospatial_issue=false; first and middle pages; 3-degree grid deduplication", pages: audit.map(({ dataUrl, ...row }) => row) }, null, 2)}\n`,
 );
 console.log(`Updated ${state.pages.length} pages / ${maps.size} taxa.`);

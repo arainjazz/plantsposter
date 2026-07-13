@@ -1,6 +1,6 @@
 {
   "accessed": "2026-07-13",
-  "mapMethod": "GBIF occurrence/search; known native-range country filter; PRESENT; coordinate=true; geospatial_issue=false; stratified pages; 3-degree grid deduplication",
+  "mapMethod": "GBIF occurrence/search; each known native-range country queried independently; PRESENT; coordinate=true; geospatial_issue=false; first and middle pages; 3-degree grid deduplication",
   "pages": [
     {
       "page": "封面·半日花",
@@ -8,7 +8,7 @@
       "key": 7878193,
       "accepted": "Helianthemum songaricum Schrenk",
       "count": 177,
-      "plotted": 10
+      "plotted": 11
     },
     {
       "page": "四合木",
@@ -24,7 +24,7 @@
       "key": 2943136,
       "accepted": "Ammopiptanthus mongolicus (Maxim. ex Kom.) S.H.Cheng",
       "count": 26,
-      "plotted": 8
+      "plotted": 9
     },
     {
       "page": "绵刺",
@@ -32,7 +32,7 @@
       "key": 5371208,
       "accepted": "Potaninia mongolica Maxim.",
       "count": 70,
-      "plotted": 5
+      "plotted": 10
     },
     {
       "page": "鄂尔多斯野丁香",
@@ -48,7 +48,7 @@
       "key": 3121069,
       "accepted": "Artemisia ordosica Krasch.",
       "count": 123,
-      "plotted": 18
+      "plotted": 16
     },
     {
       "page": "白沙蒿",
@@ -64,7 +64,7 @@
       "key": 7963890,
       "accepted": "Juniperus sabina L.",
       "count": 14783,
-      "plotted": 26
+      "plotted": 100
     },
     {
       "page": "叉子圆柏·实拍照片版",
@@ -72,7 +72,7 @@
       "key": 7963890,
       "accepted": "Juniperus sabina L.",
       "count": 14783,
-      "plotted": 26
+      "plotted": 100
     },
     {
       "page": "叉子圆柏·科学插图版",
@@ -80,7 +80,7 @@
       "key": 7963890,
       "accepted": "Juniperus sabina L.",
       "count": 14783,
-      "plotted": 26
+      "plotted": 100
     },
     {
       "page": "黄柳",
@@ -88,7 +88,7 @@
       "key": 5583207,
       "accepted": "Salix gordejevii Y.L.Chang & A.K.Skvortsov",
       "count": 181,
-      "plotted": 13
+      "plotted": 20
     },
     {
       "page": "柠条锦鸡儿",
@@ -96,7 +96,7 @@
       "key": 2943277,
       "accepted": "Caragana korshinskii Kom.",
       "count": 529,
-      "plotted": 16
+      "plotted": 18
     },
     {
       "page": "红砂",
@@ -104,7 +104,7 @@
       "key": 5929908,
       "accepted": "Reaumuria soongorica (Pall.) Maxim.",
       "count": 39,
-      "plotted": 13
+      "plotted": 16
     },
     {
       "page": "唐古特白刺",
@@ -112,7 +112,7 @@
       "key": 3986821,
       "accepted": "Nitraria tangutorum Bobrov",
       "count": 182,
-      "plotted": 22
+      "plotted": 19
     },
     {
       "page": "梭梭",
@@ -120,7 +120,7 @@
       "key": 3759078,
       "accepted": "Haloxylon ammodendron (C.A.Mey.) Bunge ex Fenzl",
       "count": 995,
-      "plotted": 27
+      "plotted": 56
     },
     {
       "page": "沙芥",
@@ -144,7 +144,7 @@
       "key": 2857345,
       "accepted": "Allium mongolicum Regel",
       "count": 495,
-      "plotted": 24
+      "plotted": 41
     },
     {
       "page": "肉苁蓉",
@@ -173,10 +173,10 @@
     {
       "page": "发菜",
       "scientific": "Nostoc flagelliforme",
-      "key": 12085956,
+      "source": "中国区域分布资料（内蒙古、宁夏、甘肃、新疆、青海、陕西）的省域代表位置",
       "accepted": "Nostoc flagelliforme A",
-      "count": 37,
-      "plotted": 0
+      "count": 6,
+      "plotted": 6
     }
   ]
 }

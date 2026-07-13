@@ -1,4 +1,5 @@
 type RefImage = { mimeType: string; data: string };
+type ImageFrame = { x: number; y: number; w: number; h: number };
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -108,5 +109,51 @@ export async function cleanupImageBackground(ref: RefImage): Promise<string> {
     }
   }
   ctx.putImageData(image, 0, 0);
+  return canvas.toDataURL("image/png");
+}
+
+/**
+ * Permanently removes the pixels outside a resized image frame.  The editor
+ * normally displays photos with `object-fit: cover`, so the source rectangle
+ * must be calculated from that same cover transform rather than from the
+ * element's nominal aspect ratio.
+ */
+export async function destructiveCropImage(
+  ref: RefImage,
+  original: ImageFrame,
+  next: ImageFrame,
+): Promise<string> {
+  const src = `data:${ref.mimeType || "image/png"};base64,${ref.data}`;
+  const image = await loadImage(src);
+  const sourceW = image.naturalWidth || image.width;
+  const sourceH = image.naturalHeight || image.height;
+  if (!sourceW || !sourceH || !original.w || !original.h || !next.w || !next.h) {
+    throw new Error("图片尺寸无效，无法裁切");
+  }
+
+  const isSvg = /svg/i.test(ref.mimeType);
+  // SVG maps are displayed with object-fit: fill; photographs use cover.
+  const scaleX = isSvg ? sourceW / original.w : Math.max(original.w / sourceW, original.h / sourceH);
+  const scaleY = isSvg ? sourceH / original.h : scaleX;
+  const drawnW = sourceW * scaleX;
+  const drawnH = sourceH * scaleY;
+  const offsetX = isSvg ? 0 : (drawnW - original.w) / 2;
+  const offsetY = isSvg ? 0 : (drawnH - original.h) / 2;
+
+  const wantedX = (offsetX + (next.x - original.x)) / scaleX;
+  const wantedY = (offsetY + (next.y - original.y)) / scaleY;
+  const wantedW = next.w / scaleX;
+  const wantedH = next.h / scaleY;
+  const sx = Math.max(0, Math.min(sourceW - 1, wantedX));
+  const sy = Math.max(0, Math.min(sourceH - 1, wantedY));
+  const sw = Math.max(1, Math.min(sourceW - sx, wantedW));
+  const sh = Math.max(1, Math.min(sourceH - sy, wantedH));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(sw));
+  canvas.height = Math.max(1, Math.round(sh));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("浏览器无法建立裁切画布");
+  ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/png");
 }
