@@ -24,7 +24,8 @@ export type Operation =
       accent?: string;
       muted?: string;
     }
-  | { type: "set_image"; id: string; src: string }
+  | { type: "set_image"; id: string; src: string; label?: string }
+  | { type: "update_image_label"; id: string; label: string }
   | {
       type: "set_range_map";
       id: string;
@@ -120,7 +121,15 @@ export function applyOperations(
       }
       case "set_image": {
         nextBlocks = nextBlocks.map((b) =>
-          b.id === op.id && b.type === "image" ? { ...b, src: op.src } : b,
+          b.id === op.id && b.type === "image"
+            ? { ...b, src: op.src, ...(op.label ? { label: op.label } : {}) }
+            : b,
+        );
+        break;
+      }
+      case "update_image_label": {
+        nextBlocks = nextBlocks.map((b) =>
+          b.id === op.id && b.type === "image" ? { ...b, label: op.label } : b,
         );
         break;
       }

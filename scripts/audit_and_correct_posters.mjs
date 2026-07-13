@@ -63,8 +63,8 @@ const copy = {
   "Leptodermis ordosica": {
     latin: "Leptodermis ordosica H.C.Fu & E.W.Ma",
     range: "中国鄂尔多斯高原狭域特有 · Narrow endemic of the Ordos Plateau, China",
-    noteSub: "先确认学名，再谈推广利用 · Identity Before Horticultural Use",
-    note: "本页原命名人组合有误，已按权威分类记录改为 H.C.Fu & E.W.Ma。狭域特有植物的园林利用必须使用可追溯繁殖材料，避免采挖野生株。\nThe author citation has been corrected to H.C.Fu & E.W.Ma; any horticultural use should rely on traceable propagation, not wild collection.",
+    noteSub: "狭域特有种的利用边界 · Use Propagated Material Only",
+    note: "野外种群分布狭窄；园林引种、种子交换或科研取样应使用可追溯的人工繁殖材料，避免采挖野生母株。\nIts wild range is narrow. Cultivation, seed exchange and research sampling should use traceable propagated material, never excavated wild parent plants.",
     humSub: "ordosica 把产地写入学名 · Ordos Written into the Name",
     hum: "种加词 ordosica 直接指向鄂尔多斯；它首先是一种地域特有植物，而不是可随意移植的普通“野丁香”。\nThe epithet ordosica records its Ordos identity: this is a regional endemic, not a generic wild ornamental available for unrestricted collecting.",
   },
@@ -108,7 +108,7 @@ const copy = {
     noteSub: "盐腺排盐，而非笼统“耐盐” · Salt Glands Make Tolerance Visible",
     note: "叶表盐腺能排出吸收的盐分，盐晶可在叶面出现；这是红砂适应盐渍荒漠的直接结构证据。\nLeaf salt glands excrete absorbed salts, sometimes leaving visible crystals—a structural basis for survival in saline deserts.",
     humSub: "不要把药理筛选写成临床功效 · Screening Is Not Medical Proof",
-    hum: "红砂提取物见于实验研究，但体外活性不等于安全有效的民间药方；本页不再宣称未经临床验证的治疗用途。\nExtracts appear in laboratory studies, but in-vitro activity is not proof of a safe or effective remedy; unverified medical claims are omitted.",
+    hum: "红砂提取物见于实验研究，但体外活性不等于安全有效的民间药方；涉及健康用途应以临床证据和安全评估为准。\nExtracts appear in laboratory studies, but in-vitro activity is not proof of a safe or effective remedy; health uses require clinical evidence and safety assessment.",
   },
   "Nitraria tangutorum": {
     range: "中国西北与北中部盐碱荒漠 · Saline deserts of NW and north-central China",
@@ -155,7 +155,7 @@ const copy = {
   "Xanthoceras sorbifolium": {
     range: "原产中国北方，栽培记录更广 · Native to northern China, cultivated more widely",
     noteSub: "油用价值不等于全株可食 · Oil Crop Does Not Mean Every Part Is Food",
-    note: "文冠果种仁含油并可加工利用，但果壳、种皮和压榨副产物富含皂苷等成分，不能把“油料树”误写成全株可直接食用或入药。\nIts kernels yield useful oil, but shells, seed coats and press residues contain abundant saponins; an oil crop is not an all-purpose edible or remedy.",
+    note: "文冠果种仁可作为油料原料；果壳、种皮和压榨副产物含皂苷等成分，不宜作为常规食物或自行入药。\nIts kernels can be used as an oil raw material, while shells, seed coats and press residues contain saponins and are not ordinary food or self-medication.",
     humSub: "从庭院花木到北方木本油料 · Ornamental Tree and Woody Oil Crop",
     hum: "白花与变色花心使它成为观赏树，种子又支持木本油料开发；两种用途都依赖经过选择的栽培材料。\nShowy flowers support ornamental planting while seeds support woody-oil development; both uses depend on selected cultivated material.",
   },
@@ -186,10 +186,26 @@ function scientificName(page) {
   return raw.match(/^[A-Z][a-z-]+\s+[a-z-]+/)?.[0] ?? null;
 }
 
-function escapeXml(value) {
-  return value.replace(/[<>&"']/g, (c) =>
-    c === "<" ? "&lt;" : c === ">" ? "&gt;" : c === "&" ? "&amp;" : c === '"' ? "&quot;" : "&apos;",
-  );
+function mapDataUrl(pointMarkup, basePaths) {
+  // The SVG intentionally contains map geometry only. Source, status and
+  // legend stay in sec-range-caption, a normal editable text block below it.
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 640" width="950" height="640">
+<g fill="#e8dcc4" stroke="#8a7a5a" stroke-width="0.35">${basePaths}</g>
+<g stroke="#b9a87e" stroke-width="0.55" stroke-dasharray="2 3" opacity="0.35"><line x1="0" y1="339.35" x2="950" y2="339.35"/><line x1="0" y1="258.61" x2="950" y2="258.61"/><line x1="0" y1="420.09" x2="950" y2="420.09"/></g>
+<g>${pointMarkup}</g>
+</svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`;
+}
+
+function cachedPointMarkup(svg) {
+  const match =
+    svg.match(/<g>([\s\S]*?)<\/g>\s*<g transform="translate\(0,640\)">/) ??
+    svg.match(/<g>([\s\S]*?)<\/g>\s*<\/svg>/);
+  if (!match) throw new Error("Unable to recover cached map points");
+  // Teal means a quality-filtered GBIF occurrence whose establishment status
+  // is unrecorded; grey is deliberately not used as a visual dead end.
+  return match[1].replaceAll('fill="#64748b"', 'fill="#147d8b"');
 }
 
 async function gbifMap(scientific, basePaths) {
@@ -253,22 +269,15 @@ async function gbifMap(scientific, basePaths) {
     const y = -3.4451 * row.decimalLatitude + 339.3522;
     const means = String(row.establishmentMeans ?? "").toLowerCase();
     const kind = means.includes("introduced") ? "introduced" : means.includes("native") ? "native" : "unknown";
-    const fill = kind === "native" ? "#3a7d2e" : kind === "introduced" ? "#d97706" : "#64748b";
+    const fill = kind === "native" ? "#3a7d2e" : kind === "introduced" ? "#d97706" : "#147d8b";
     circles[kind].push(`<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="4.2" fill="${fill}" stroke="#fff" stroke-width="0.7" opacity="0.92"/>`);
   }
   const accepted = match.scientificName ?? scientific;
-  const source = noVerifiedPoints
-    ? `GBIF taxonKey ${match.usageKey}; no usable coordinates in the reference extent; no points plotted; accessed ${ACCESSED}`
-    : `GBIF taxonKey ${match.usageKey}; ${count} records in known native-range countries; coordinate/status filters; accessed ${ACCESSED}`;
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 780" width="950" height="780">
-<style>.ttl{font:700 22px Arial,sans-serif;fill:#2a2622}.sub{font:400 12px Arial,sans-serif;fill:#6b6357}.cap{font:400 11px Arial,sans-serif;fill:#4a443c}.lg{font:500 13px Arial,sans-serif;fill:#2a2622}</style>
-<g fill="#e8dcc4" stroke="#8a7a5a" stroke-width="0.35">${basePaths}</g>
-<g stroke="#b9a87e" stroke-width="0.55" stroke-dasharray="2 3" opacity="0.35"><line x1="0" y1="339.35" x2="950" y2="339.35"/><line x1="0" y1="258.61" x2="950" y2="258.61"/><line x1="0" y1="420.09" x2="950" y2="420.09"/></g>
-<g>${circles.introduced.join("")}${circles.unknown.join("")}${circles.native.join("")}</g>
-<g transform="translate(0,640)"><text class="ttl" x="24" y="26">${escapeXml(accepted)} · Global Distribution</text><text class="sub" x="24" y="46">${noVerifiedPoints ? "No verified GBIF coordinates available for this reference extent" : "Verified GBIF occurrences within reference native-range countries"}</text><g transform="translate(24,70)"><circle cx="8" cy="8" r="6" fill="#3a7d2e"/><text class="lg" x="24" y="12">Native · 原生</text><circle cx="180" cy="8" r="6" fill="#d97706"/><text class="lg" x="196" y="12">Introduced · 引入</text><circle cx="390" cy="8" r="6" fill="#64748b"/><text class="lg" x="406" y="12">Unknown · 属性未定</text></g><text class="cap" x="24" y="118">${escapeXml(source)}</text><text class="cap" x="24" y="136">${noVerifiedPoints ? "This avoids displaying unsourced hand-placed distribution points." : "Real coordinates; 3° grid deduplication reduces collection-hotspot bias."}</text></g></svg>`;
   return {
-    dataUrl: `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`,
+    dataUrl: mapDataUrl(
+      `${circles.introduced.join("")}${circles.unknown.join("")}${circles.native.join("")}`,
+      basePaths,
+    ),
     key: match.usageKey,
     accepted,
     count,
@@ -286,6 +295,73 @@ const basePaths = (baseSvg.match(/<path\b[\s\S]*?(?:\/>|<\/path>)/gi) ?? [])
   )
   .join("\n");
 
+let priorAudit = { pages: [] };
+try {
+  priorAudit = JSON.parse(await fs.readFile("content-audit-2026-07-13.json", "utf8"));
+} catch {
+  // A first-time audit has no historical metadata to preserve.
+}
+const priorMapMetadata = new Map((priorAudit.pages ?? []).map((row) => [row.scientific, row]));
+
+const MAP_CAPTION =
+  "青绿色点：参考分布范围内筛选的 GBIF 坐标；橙色点：GBIF 标注的引入记录。点位不等于连续边界；来源与日期可直接编辑。";
+
+function mapCaption(map) {
+  const provenance = map?.key
+    ? `数据：GBIF taxonKey ${map.key}，参考分布国家筛选 ${map.count} 条记录，核查 ${ACCESSED}。`
+    : "数据：GBIF 坐标记录，核查日期可直接编辑。";
+  return `青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。${provenance} 点位不等于连续边界。`;
+}
+
+function pageCommonName(page) {
+  const title = findText(page, "title")?.text ?? page.name;
+  return title.replace(/\s+/g, "").replace(/^封面·/, "") || page.name;
+}
+
+function setSpeciesImageLabels(page, scientific) {
+  const common = pageCommonName(page);
+  const slot = (id) => {
+    if (id.includes("img-map")) return "全球分布记录图";
+    if (id.includes("img-main")) return "主图：植株、叶、花或果实";
+    if (id.includes("season-img-1")) return "春季物候";
+    if (id.includes("season-img-2")) return "夏季物候";
+    if (id.includes("season-img-3")) return "秋季物候";
+    if (id.includes("season-img-4")) return "冬季物候";
+    if (id.includes("trait-img")) return "识别特征图";
+    if (id.includes("sim-img")) return "相似种对照图";
+    if (id.includes("img-habitat")) return "典型生境";
+    if (id.includes("img-humanities")) return "生活、生产或地方知识相关图";
+    return "物种相关配图";
+  };
+  for (const block of page.blocks) {
+    if (block.type === "image") block.label = `${common}（${scientific}）${slot(block.id)}`;
+  }
+}
+
+function ensureRangeCaption(page) {
+  const existing = findText(page, "sec-range-caption");
+  if (existing) return existing;
+  const mapBlock = page.blocks.find((block) => block.type === "image" && block.id.includes("img-map"));
+  if (!mapBlock) throw new Error(`Missing map block on ${page.name}`);
+  const suffix = mapBlock.id.slice("img-map".length);
+  const caption = {
+    id: `sec-range-caption${suffix}`,
+    type: "text",
+    x: mapBlock.x,
+    y: mapBlock.y + mapBlock.h + 10,
+    w: mapBlock.w,
+    text: MAP_CAPTION,
+    fontSize: 10,
+    color: "#7a6f5f",
+    fontWeight: 400,
+    fontFamily: "sans",
+    lineHeight: 1.4,
+  };
+  const mapIndex = page.blocks.indexOf(mapBlock);
+  page.blocks.splice(mapIndex + 1, 0, caption);
+  return caption;
+}
+
 let cachedMaps = {};
 try {
   cachedMaps = JSON.parse(await fs.readFile(CACHE, "utf8"));
@@ -293,15 +369,32 @@ try {
   // The first pass starts with an empty cache.
 }
 const maps = new Map(Object.entries(cachedMaps));
+// Older runs wrote completed SVGs directly into the state file but did not
+// retain the optional cache. Reuse those verified coordinates rather than
+// forcing another 20-taxon GBIF fetch merely to change map presentation.
+if (maps.size === 0) {
+  for (const page of state.pages) {
+    const scientific = scientificName(page);
+    const mapBlock = page.blocks.find((block) => block.type === "image" && block.id.includes("img-map"));
+    if (!scientific || !mapBlock?.src) continue;
+    const svg = Buffer.from(mapBlock.src.split(",")[1], "base64").toString("utf8");
+    const prior = priorMapMetadata.get(scientific);
+    const key = prior?.key ?? svg.match(/GBIF taxonKey\s+(\d+)/i)?.[1] ?? null;
+    const count = prior?.count ?? Number(svg.match(/taxonKey\s+\d+;\s+(\d+)\s+records/i)?.[1] ?? 0);
+    maps.set(scientific, {
+      dataUrl: mapBlock.src,
+      key,
+      accepted: prior?.accepted ?? scientific,
+      count,
+      plotted: prior?.plotted ?? 0,
+    });
+  }
+}
 for (const [scientific, map] of maps) {
   const svg = Buffer.from(map.dataUrl.split(",")[1], "base64").toString("utf8");
-  const repaired = svg.replace(
-    /(<g fill="#e8dcc4" stroke="#8a7a5a" stroke-width="0\.35">)[\s\S]*?(<\/g>)/,
-    `$1${basePaths}$2`,
-  );
   maps.set(scientific, {
     ...map,
-    dataUrl: `data:image/svg+xml;base64,${Buffer.from(repaired, "utf8").toString("base64")}`,
+    dataUrl: mapDataUrl(cachedPointMarkup(svg), basePaths),
   });
 }
 const uniqueTaxa = [...new Set(state.pages.map(scientificName))];
@@ -325,8 +418,18 @@ for (const page of state.pages) {
   const scientific = scientificName(page);
   if (!scientific || !copy[scientific]) throw new Error(`Missing reviewed copy for ${page.name}: ${scientific}`);
   const reviewed = copy[scientific];
+  // These location captions were templated and repeated. The habitat paragraph
+  // and its editable ecological fields remain; only the redundant pseudo-photo
+  // caption is removed.
+  page.blocks = page.blocks.filter(
+    (block) => !(block.type === "text" && (block.id === "sec-habitat-cap" || block.id.startsWith("sec-habitat-cap-"))),
+  );
+  ensureRangeCaption(page);
+  const rangeMap = maps.get(scientific);
+  if (!rangeMap) throw new Error(`Missing map data for ${page.name}`);
   const replacements = {
     "sec-range-sub": reviewed.range,
+    "sec-range-caption": mapCaption(rangeMap),
     "sec-note-sub": reviewed.noteSub,
     "sec-note-body": reviewed.note,
     "sec-hum-sub": reviewed.humSub,
@@ -341,10 +444,14 @@ for (const page of state.pages) {
   for (const block of page.blocks) {
     if (block.type === "text") block.text = block.text.replaceAll("\\n", "\n");
   }
+  const caption = findText(page, "sec-range-caption");
+  caption.fontSize = 10;
+  caption.lineHeight = 1.4;
+  setSpeciesImageLabels(page, scientific);
   const mapBlock = page.blocks.find((b) => b.type === "image" && b.id.includes("img-map"));
   if (!mapBlock) throw new Error(`Missing map image on ${page.name}`);
-  mapBlock.src = maps.get(scientific).dataUrl;
-  audit.push({ page: page.name, scientific, ...maps.get(scientific) });
+  mapBlock.src = rangeMap.dataUrl;
+  audit.push({ page: page.name, scientific, ...rangeMap });
 }
 
 const json = `${JSON.stringify(state, null, 2)}\n`;

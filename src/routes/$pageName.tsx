@@ -263,6 +263,12 @@ function Editor() {
     if (!soloSelected || soloSelected.type !== "image") return;
     setImageAt(soloSelected.id, src);
   }
+  function setImageLabel(label: string) {
+    if (!soloSelected || soloSelected.type !== "image") return;
+    updateActiveBlocks((bs) =>
+      bs.map((b) => (b.id === soloSelected.id && b.type === "image" ? { ...b, label } : b)),
+    );
+  }
   function moveMany(dx: number, dy: number) {
     if (selectedIds.size === 0) return;
     updateActiveBlocks((bs) =>
@@ -885,6 +891,7 @@ function Editor() {
           selectionCount={selectedIds.size}
           onChange={patchSelected}
           onChangeImage={setImage}
+          onChangeImageLabel={setImageLabel}
           onChangeBackground={(c) => {
             setPages(prev => prev.map(p => p.id === activeId ? { ...p, background: c } : p));
             void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), activeId, palette });

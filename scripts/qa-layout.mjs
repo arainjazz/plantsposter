@@ -3,7 +3,7 @@ import puppeteer from "puppeteer";
 
 const state = JSON.parse(await fs.readFile("public/banrihua-editor-20plants.json", "utf8"));
 const baseUrl = process.env.QA_BASE_URL ?? "http://127.0.0.1:8081";
-const cachePath = ".layout-audit-cache.json";
+const cachePath = process.env.QA_CACHE_PATH ?? ".layout-audit-cache.json";
 let cached = [];
 try {
   cached = JSON.parse(await fs.readFile(cachePath, "utf8"));
@@ -67,6 +67,6 @@ if (checked.size < state.pages.length) {
   process.exit(0);
 }
 const result = state.pages.map((posterPage) => checked.get(posterPage.name));
-await fs.writeFile("layout-audit-2026-07-13.json", `${JSON.stringify(result, null, 2)}\n`);
+await fs.writeFile(process.env.QA_OUTPUT_PATH ?? "layout-audit-2026-07-13.json", `${JSON.stringify(result, null, 2)}\n`);
 const issues = result.flatMap((r) => r.collisions.map((c) => ({ page: r.page, ...c })));
 console.log(JSON.stringify({ pages: result.length, collisions: issues.length, outOfCanvas: result.flatMap((r) => r.outOfCanvas).length, issues }, null, 2));

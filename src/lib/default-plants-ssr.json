@@ -171,7 +171,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "半日花（Helianthemum songaricum）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season",
@@ -219,7 +219,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "半日花（Helianthemum songaricum）春季物候"
         },
         {
           "id": "season-img-2",
@@ -229,7 +229,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "半日花（Helianthemum songaricum）夏季物候"
         },
         {
           "id": "season-img-3",
@@ -239,7 +239,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "半日花（Helianthemum songaricum）秋季物候"
         },
         {
           "id": "season-img-4",
@@ -249,7 +249,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "半日花（Helianthemum songaricum）冬季物候"
         },
         {
           "id": "season-1-cn",
@@ -392,7 +392,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "半日花（Helianthemum songaricum）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 7878193，参考分布国家筛选 177 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field",
@@ -427,7 +440,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "半日花（Helianthemum songaricum）识别特征图"
         },
         {
           "id": "trait-1-title",
@@ -462,7 +475,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "半日花（Helianthemum songaricum）识别特征图"
         },
         {
           "id": "trait-2-title",
@@ -497,7 +510,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "半日花（Helianthemum songaricum）识别特征图"
         },
         {
           "id": "trait-3-title",
@@ -532,7 +545,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "半日花（Helianthemum songaricum）识别特征图"
         },
         {
           "id": "trait-4-title",
@@ -657,7 +670,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "半日花（Helianthemum songaricum）相似种对照图"
         },
         {
           "id": "sim-1-title",
@@ -692,7 +705,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "半日花（Helianthemum songaricum）相似种对照图"
         },
         {
           "id": "sim-2-title",
@@ -752,7 +765,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "半日花（Helianthemum songaricum）典型生境"
         },
         {
           "id": "sec-habitat-body",
@@ -766,19 +779,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos  ·  砾坡 gravel slope  ·  荒漠草原 steppe-desert",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l",
@@ -908,7 +908,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "半日花（Helianthemum songaricum）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum",
@@ -1135,7 +1135,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "四合木（Tetraena mongolica）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-c9ac9",
@@ -1183,7 +1183,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "四合木（Tetraena mongolica）春季物候"
         },
         {
           "id": "season-img-2-c9ac9",
@@ -1193,7 +1193,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "四合木（Tetraena mongolica）夏季物候"
         },
         {
           "id": "season-img-3-c9ac9",
@@ -1203,7 +1203,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "四合木（Tetraena mongolica）秋季物候"
         },
         {
           "id": "season-img-4-c9ac9",
@@ -1213,7 +1213,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "四合木（Tetraena mongolica）冬季物候"
         },
         {
           "id": "season-1-cn-c9ac9",
@@ -1356,7 +1356,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "四合木（Tetraena mongolica）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-c9ac9",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3987052，参考分布国家筛选 5 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-c9ac9",
@@ -1391,7 +1404,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "四合木（Tetraena mongolica）识别特征图"
         },
         {
           "id": "trait-1-title-c9ac9",
@@ -1426,7 +1439,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "四合木（Tetraena mongolica）识别特征图"
         },
         {
           "id": "trait-2-title-c9ac9",
@@ -1461,7 +1474,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "四合木（Tetraena mongolica）识别特征图"
         },
         {
           "id": "trait-3-title-c9ac9",
@@ -1496,7 +1509,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "四合木（Tetraena mongolica）识别特征图"
         },
         {
           "id": "trait-4-title-c9ac9",
@@ -1621,7 +1634,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "四合木（Tetraena mongolica）相似种对照图"
         },
         {
           "id": "sim-1-title-c9ac9",
@@ -1656,7 +1669,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "四合木（Tetraena mongolica）相似种对照图"
         },
         {
           "id": "sim-2-title-c9ac9",
@@ -1716,7 +1729,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "四合木（Tetraena mongolica）典型生境"
         },
         {
           "id": "sec-habitat-body-c9ac9",
@@ -1730,19 +1743,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-c9ac9",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 砾坡 gravel slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-c9ac9",
@@ -1872,7 +1872,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "四合木（Tetraena mongolica）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-c9ac9",
@@ -2099,7 +2099,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cqgfn",
@@ -2147,7 +2147,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）春季物候"
         },
         {
           "id": "season-img-2-cqgfn",
@@ -2157,7 +2157,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）夏季物候"
         },
         {
           "id": "season-img-3-cqgfn",
@@ -2167,7 +2167,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）秋季物候"
         },
         {
           "id": "season-img-4-cqgfn",
@@ -2177,7 +2177,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）冬季物候"
         },
         {
           "id": "season-1-cn-cqgfn",
@@ -2320,7 +2320,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cqgfn",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 2943136，参考分布国家筛选 26 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cqgfn",
@@ -2355,7 +2368,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）识别特征图"
         },
         {
           "id": "trait-1-title-cqgfn",
@@ -2390,7 +2403,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）识别特征图"
         },
         {
           "id": "trait-2-title-cqgfn",
@@ -2425,7 +2438,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）识别特征图"
         },
         {
           "id": "trait-3-title-cqgfn",
@@ -2460,7 +2473,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）识别特征图"
         },
         {
           "id": "trait-4-title-cqgfn",
@@ -2585,7 +2598,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）相似种对照图"
         },
         {
           "id": "sim-1-title-cqgfn",
@@ -2620,7 +2633,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）相似种对照图"
         },
         {
           "id": "sim-2-title-cqgfn",
@@ -2680,7 +2693,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）典型生境"
         },
         {
           "id": "sec-habitat-body-cqgfn",
@@ -2694,19 +2707,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cqgfn",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 砾石戈壁 gravel Gobi",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cqgfn",
@@ -2836,7 +2836,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cqgfn",
@@ -3063,7 +3063,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "绵刺（Potaninia mongolica）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cklvf",
@@ -3111,7 +3111,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "绵刺（Potaninia mongolica）春季物候"
         },
         {
           "id": "season-img-2-cklvf",
@@ -3121,7 +3121,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "绵刺（Potaninia mongolica）夏季物候"
         },
         {
           "id": "season-img-3-cklvf",
@@ -3131,7 +3131,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "绵刺（Potaninia mongolica）秋季物候"
         },
         {
           "id": "season-img-4-cklvf",
@@ -3141,7 +3141,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "绵刺（Potaninia mongolica）冬季物候"
         },
         {
           "id": "season-1-cn-cklvf",
@@ -3284,7 +3284,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "绵刺（Potaninia mongolica）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cklvf",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 5371208，参考分布国家筛选 70 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cklvf",
@@ -3319,7 +3332,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "绵刺（Potaninia mongolica）识别特征图"
         },
         {
           "id": "trait-1-title-cklvf",
@@ -3354,7 +3367,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "绵刺（Potaninia mongolica）识别特征图"
         },
         {
           "id": "trait-2-title-cklvf",
@@ -3389,7 +3402,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "绵刺（Potaninia mongolica）识别特征图"
         },
         {
           "id": "trait-3-title-cklvf",
@@ -3424,7 +3437,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "绵刺（Potaninia mongolica）识别特征图"
         },
         {
           "id": "trait-4-title-cklvf",
@@ -3549,7 +3562,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "绵刺（Potaninia mongolica）相似种对照图"
         },
         {
           "id": "sim-1-title-cklvf",
@@ -3584,7 +3597,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "绵刺（Potaninia mongolica）相似种对照图"
         },
         {
           "id": "sim-2-title-cklvf",
@@ -3644,7 +3657,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "绵刺（Potaninia mongolica）典型生境"
         },
         {
           "id": "sec-habitat-body-cklvf",
@@ -3658,19 +3671,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cklvf",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 砾坡 gravel slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cklvf",
@@ -3800,7 +3800,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "绵刺（Potaninia mongolica）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cklvf",
@@ -4027,7 +4027,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-ca7tj",
@@ -4075,7 +4075,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）春季物候"
         },
         {
           "id": "season-img-2-ca7tj",
@@ -4085,7 +4085,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）夏季物候"
         },
         {
           "id": "season-img-3-ca7tj",
@@ -4095,7 +4095,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）秋季物候"
         },
         {
           "id": "season-img-4-ca7tj",
@@ -4105,7 +4105,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）冬季物候"
         },
         {
           "id": "season-1-cn-ca7tj",
@@ -4248,7 +4248,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-ca7tj",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 2893478，参考分布国家筛选 23 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-ca7tj",
@@ -4283,7 +4296,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）识别特征图"
         },
         {
           "id": "trait-1-title-ca7tj",
@@ -4318,7 +4331,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）识别特征图"
         },
         {
           "id": "trait-2-title-ca7tj",
@@ -4353,7 +4366,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）识别特征图"
         },
         {
           "id": "trait-3-title-ca7tj",
@@ -4388,7 +4401,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）识别特征图"
         },
         {
           "id": "trait-4-title-ca7tj",
@@ -4461,7 +4474,7 @@
           "x": 60,
           "y": 1230,
           "w": 620,
-          "text": "先确认学名，再谈推广利用 · Identity Before Horticultural Use",
+          "text": "狭域特有种的利用边界 · Use Propagated Material Only",
           "fontSize": 13,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -4473,7 +4486,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "本页原命名人组合有误，已按权威分类记录改为 H.C.Fu & E.W.Ma。狭域特有植物的园林利用必须使用可追溯繁殖材料，避免采挖野生株。\nThe author citation has been corrected to H.C.Fu & E.W.Ma; any horticultural use should rely on traceable propagation, not wild collection.",
+          "text": "野外种群分布狭窄；园林引种、种子交换或科研取样应使用可追溯的人工繁殖材料，避免采挖野生母株。\nIts wild range is narrow. Cultivation, seed exchange and research sampling should use traceable propagated material, never excavated wild parent plants.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -4513,7 +4526,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）相似种对照图"
         },
         {
           "id": "sim-1-title-ca7tj",
@@ -4548,7 +4561,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）相似种对照图"
         },
         {
           "id": "sim-2-title-ca7tj",
@@ -4608,7 +4621,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）典型生境"
         },
         {
           "id": "sec-habitat-body-ca7tj",
@@ -4622,19 +4635,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-ca7tj",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 沙地 sandy land",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-ca7tj",
@@ -4764,7 +4764,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-ca7tj",
@@ -4991,7 +4991,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-co5wu",
@@ -5039,7 +5039,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）春季物候"
         },
         {
           "id": "season-img-2-co5wu",
@@ -5049,7 +5049,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）夏季物候"
         },
         {
           "id": "season-img-3-co5wu",
@@ -5059,7 +5059,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）秋季物候"
         },
         {
           "id": "season-img-4-co5wu",
@@ -5069,7 +5069,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）冬季物候"
         },
         {
           "id": "season-1-cn-co5wu",
@@ -5212,7 +5212,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-co5wu",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3121069，参考分布国家筛选 123 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-co5wu",
@@ -5247,7 +5260,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）识别特征图"
         },
         {
           "id": "trait-1-title-co5wu",
@@ -5282,7 +5295,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）识别特征图"
         },
         {
           "id": "trait-2-title-co5wu",
@@ -5317,7 +5330,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）识别特征图"
         },
         {
           "id": "trait-3-title-co5wu",
@@ -5352,7 +5365,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）识别特征图"
         },
         {
           "id": "trait-4-title-co5wu",
@@ -5477,7 +5490,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）相似种对照图"
         },
         {
           "id": "sim-1-title-co5wu",
@@ -5512,7 +5525,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）相似种对照图"
         },
         {
           "id": "sim-2-title-co5wu",
@@ -5572,7 +5585,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）典型生境"
         },
         {
           "id": "sec-habitat-body-co5wu",
@@ -5586,19 +5599,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-co5wu",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 流动沙丘 shifting dune",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-co5wu",
@@ -5728,7 +5728,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-co5wu",
@@ -5955,7 +5955,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "白沙蒿（Artemisia sphaerocephala）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cwnb6",
@@ -6003,7 +6003,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "白沙蒿（Artemisia sphaerocephala）春季物候"
         },
         {
           "id": "season-img-2-cwnb6",
@@ -6013,7 +6013,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "白沙蒿（Artemisia sphaerocephala）夏季物候"
         },
         {
           "id": "season-img-3-cwnb6",
@@ -6023,7 +6023,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "白沙蒿（Artemisia sphaerocephala）秋季物候"
         },
         {
           "id": "season-img-4-cwnb6",
@@ -6033,7 +6033,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "白沙蒿（Artemisia sphaerocephala）冬季物候"
         },
         {
           "id": "season-1-cn-cwnb6",
@@ -6176,7 +6176,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "白沙蒿（Artemisia sphaerocephala）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cwnb6",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3121431，参考分布国家筛选 163 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cwnb6",
@@ -6211,7 +6224,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "白沙蒿（Artemisia sphaerocephala）识别特征图"
         },
         {
           "id": "trait-1-title-cwnb6",
@@ -6246,7 +6259,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "白沙蒿（Artemisia sphaerocephala）识别特征图"
         },
         {
           "id": "trait-2-title-cwnb6",
@@ -6281,7 +6294,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "白沙蒿（Artemisia sphaerocephala）识别特征图"
         },
         {
           "id": "trait-3-title-cwnb6",
@@ -6316,7 +6329,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "白沙蒿（Artemisia sphaerocephala）识别特征图"
         },
         {
           "id": "trait-4-title-cwnb6",
@@ -6441,7 +6454,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "白沙蒿（Artemisia sphaerocephala）相似种对照图"
         },
         {
           "id": "sim-1-title-cwnb6",
@@ -6476,7 +6489,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "白沙蒿（Artemisia sphaerocephala）相似种对照图"
         },
         {
           "id": "sim-2-title-cwnb6",
@@ -6536,7 +6549,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "白沙蒿（Artemisia sphaerocephala）典型生境"
         },
         {
           "id": "sec-habitat-body-cwnb6",
@@ -6550,19 +6563,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cwnb6",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂尔多斯 Ordos · 流动沙丘 shifting dunes",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cwnb6",
@@ -6692,7 +6692,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "白沙蒿（Artemisia sphaerocephala）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cwnb6",
@@ -6919,7 +6919,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "叉子圆柏（Juniperus sabina）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cvenr",
@@ -6967,7 +6967,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "叉子圆柏（Juniperus sabina）春季物候"
         },
         {
           "id": "season-img-2-cvenr",
@@ -6977,7 +6977,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "叉子圆柏（Juniperus sabina）夏季物候"
         },
         {
           "id": "season-img-3-cvenr",
@@ -6987,7 +6987,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "叉子圆柏（Juniperus sabina）秋季物候"
         },
         {
           "id": "season-img-4-cvenr",
@@ -6997,7 +6997,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "叉子圆柏（Juniperus sabina）冬季物候"
         },
         {
           "id": "season-1-cn-cvenr",
@@ -7140,7 +7140,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "叉子圆柏（Juniperus sabina）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cvenr",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 7963890，参考分布国家筛选 14783 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cvenr",
@@ -7175,7 +7188,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-1-title-cvenr",
@@ -7210,7 +7223,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-2-title-cvenr",
@@ -7245,7 +7258,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-3-title-cvenr",
@@ -7280,7 +7293,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-4-title-cvenr",
@@ -7405,7 +7418,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
         },
         {
           "id": "sim-1-title-cvenr",
@@ -7440,7 +7453,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
         },
         {
           "id": "sim-2-title-cvenr",
@@ -7500,7 +7513,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "叉子圆柏（Juniperus sabina）典型生境"
         },
         {
           "id": "sec-habitat-body-cvenr",
@@ -7514,19 +7527,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cvenr",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 山地岩石坡 mountain rocky slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cvenr",
@@ -7656,7 +7656,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "叉子圆柏（Juniperus sabina）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cvenr",
@@ -7883,7 +7883,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "全株匍匐形态 · 法国阿尔卑斯山",
+          "label": "叉子圆柏（Juniperus sabina）主图：植株、叶、花或果实",
           "text": ""
         },
         {
@@ -7932,7 +7932,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "枝叶与球果特写 · 西班牙内华达山"
+          "label": "叉子圆柏（Juniperus sabina）春季物候"
         },
         {
           "id": "season-img-2-photo",
@@ -7942,7 +7942,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "叉子圆柏（Juniperus sabina）夏季物候"
         },
         {
           "id": "season-img-3-photo",
@@ -7952,7 +7952,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "球果近照 · 瑞士瓦莱州"
+          "label": "叉子圆柏（Juniperus sabina）秋季物候"
         },
         {
           "id": "season-img-4-photo",
@@ -7962,7 +7962,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "叉子圆柏（Juniperus sabina）冬季物候"
         },
         {
           "id": "season-1-cn-photo",
@@ -8105,7 +8105,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "叉子圆柏（Juniperus sabina）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-photo",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 7963890，参考分布国家筛选 14783 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-photo",
@@ -8140,7 +8153,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-1-title-photo",
@@ -8175,7 +8188,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-2-title-photo",
@@ -8210,7 +8223,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-3-title-photo",
@@ -8245,7 +8258,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-4-title-photo",
@@ -8370,7 +8383,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
         },
         {
           "id": "sim-1-title-photo",
@@ -8405,7 +8418,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
         },
         {
           "id": "sim-2-title-photo",
@@ -8465,7 +8478,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "生境全貌 · 西班牙内华达山 2100m"
+          "label": "叉子圆柏（Juniperus sabina）典型生境"
         },
         {
           "id": "sec-habitat-body-photo",
@@ -8479,19 +8492,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-photo",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 山地岩石坡 mountain rocky slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-photo",
@@ -8621,7 +8621,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "叉子圆柏（Juniperus sabina）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-photo",
@@ -8848,7 +8848,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·AI科学插图（Imagen 4）"
+          "label": "叉子圆柏（Juniperus sabina）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-illus",
@@ -8896,7 +8896,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "叉子圆柏（Juniperus sabina）春季物候"
         },
         {
           "id": "season-img-2-illus",
@@ -8906,7 +8906,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "叉子圆柏（Juniperus sabina）夏季物候"
         },
         {
           "id": "season-img-3-illus",
@@ -8916,7 +8916,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "叉子圆柏（Juniperus sabina）秋季物候"
         },
         {
           "id": "season-img-4-illus",
@@ -8926,7 +8926,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "叉子圆柏（Juniperus sabina）冬季物候"
         },
         {
           "id": "season-1-cn-illus",
@@ -9069,7 +9069,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "叉子圆柏（Juniperus sabina）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-illus",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 7963890，参考分布国家筛选 14783 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-illus",
@@ -9104,7 +9117,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-1-title-illus",
@@ -9139,7 +9152,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-2-title-illus",
@@ -9174,7 +9187,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-3-title-illus",
@@ -9209,7 +9222,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "叉子圆柏（Juniperus sabina）识别特征图"
         },
         {
           "id": "trait-4-title-illus",
@@ -9334,7 +9347,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
         },
         {
           "id": "sim-1-title-illus",
@@ -9369,7 +9382,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
         },
         {
           "id": "sim-2-title-illus",
@@ -9429,7 +9442,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "叉子圆柏（Juniperus sabina）典型生境"
         },
         {
           "id": "sec-habitat-body-illus",
@@ -9443,19 +9456,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-illus",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 山地岩石坡 mountain rocky slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-illus",
@@ -9585,7 +9585,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "叉子圆柏（Juniperus sabina）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-illus",
@@ -9812,7 +9812,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "黄柳（Salix gordejevii）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cf3xm",
@@ -9860,7 +9860,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "黄柳（Salix gordejevii）春季物候"
         },
         {
           "id": "season-img-2-cf3xm",
@@ -9870,7 +9870,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "黄柳（Salix gordejevii）夏季物候"
         },
         {
           "id": "season-img-3-cf3xm",
@@ -9880,7 +9880,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "黄柳（Salix gordejevii）秋季物候"
         },
         {
           "id": "season-img-4-cf3xm",
@@ -9890,7 +9890,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "黄柳（Salix gordejevii）冬季物候"
         },
         {
           "id": "season-1-cn-cf3xm",
@@ -10033,7 +10033,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "黄柳（Salix gordejevii）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cf3xm",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 5583207，参考分布国家筛选 181 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cf3xm",
@@ -10068,7 +10081,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
           "id": "trait-1-title-cf3xm",
@@ -10103,7 +10116,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
           "id": "trait-2-title-cf3xm",
@@ -10138,7 +10151,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
           "id": "trait-3-title-cf3xm",
@@ -10173,7 +10186,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
           "id": "trait-4-title-cf3xm",
@@ -10298,7 +10311,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "黄柳（Salix gordejevii）相似种对照图"
         },
         {
           "id": "sim-1-title-cf3xm",
@@ -10333,7 +10346,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "黄柳（Salix gordejevii）相似种对照图"
         },
         {
           "id": "sim-2-title-cf3xm",
@@ -10393,7 +10406,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "黄柳（Salix gordejevii）典型生境"
         },
         {
           "id": "sec-habitat-body-cf3xm",
@@ -10407,19 +10420,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cf3xm",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 流动沙丘 shifting dune",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cf3xm",
@@ -10549,7 +10549,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "黄柳（Salix gordejevii）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cf3xm",
@@ -10776,7 +10776,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "柠条锦鸡儿（Caragana korshinskii）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-c1cw1",
@@ -10824,7 +10824,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "柠条锦鸡儿（Caragana korshinskii）春季物候"
         },
         {
           "id": "season-img-2-c1cw1",
@@ -10834,7 +10834,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "柠条锦鸡儿（Caragana korshinskii）夏季物候"
         },
         {
           "id": "season-img-3-c1cw1",
@@ -10844,7 +10844,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "柠条锦鸡儿（Caragana korshinskii）秋季物候"
         },
         {
           "id": "season-img-4-c1cw1",
@@ -10854,7 +10854,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "柠条锦鸡儿（Caragana korshinskii）冬季物候"
         },
         {
           "id": "season-1-cn-c1cw1",
@@ -10997,7 +10997,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "柠条锦鸡儿（Caragana korshinskii）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-c1cw1",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 2943277，参考分布国家筛选 529 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-c1cw1",
@@ -11032,7 +11045,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "柠条锦鸡儿（Caragana korshinskii）识别特征图"
         },
         {
           "id": "trait-1-title-c1cw1",
@@ -11067,7 +11080,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "柠条锦鸡儿（Caragana korshinskii）识别特征图"
         },
         {
           "id": "trait-2-title-c1cw1",
@@ -11102,7 +11115,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "柠条锦鸡儿（Caragana korshinskii）识别特征图"
         },
         {
           "id": "trait-3-title-c1cw1",
@@ -11137,7 +11150,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "柠条锦鸡儿（Caragana korshinskii）识别特征图"
         },
         {
           "id": "trait-4-title-c1cw1",
@@ -11262,7 +11275,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "柠条锦鸡儿（Caragana korshinskii）相似种对照图"
         },
         {
           "id": "sim-1-title-c1cw1",
@@ -11297,7 +11310,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "柠条锦鸡儿（Caragana korshinskii）相似种对照图"
         },
         {
           "id": "sim-2-title-c1cw1",
@@ -11357,7 +11370,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "柠条锦鸡儿（Caragana korshinskii）典型生境"
         },
         {
           "id": "sec-habitat-body-c1cw1",
@@ -11371,19 +11384,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-c1cw1",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 沙地 sandland",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-c1cw1",
@@ -11513,7 +11513,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "柠条锦鸡儿（Caragana korshinskii）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-c1cw1",
@@ -11740,7 +11740,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "红砂（Reaumuria soongorica）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cz2cr",
@@ -11788,7 +11788,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "红砂（Reaumuria soongorica）春季物候"
         },
         {
           "id": "season-img-2-cz2cr",
@@ -11798,7 +11798,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "红砂（Reaumuria soongorica）夏季物候"
         },
         {
           "id": "season-img-3-cz2cr",
@@ -11808,7 +11808,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "红砂（Reaumuria soongorica）秋季物候"
         },
         {
           "id": "season-img-4-cz2cr",
@@ -11818,7 +11818,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "红砂（Reaumuria soongorica）冬季物候"
         },
         {
           "id": "season-1-cn-cz2cr",
@@ -11961,7 +11961,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "红砂（Reaumuria soongorica）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cz2cr",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 5929908，参考分布国家筛选 39 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cz2cr",
@@ -11996,7 +12009,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "红砂（Reaumuria soongorica）识别特征图"
         },
         {
           "id": "trait-1-title-cz2cr",
@@ -12031,7 +12044,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "红砂（Reaumuria soongorica）识别特征图"
         },
         {
           "id": "trait-2-title-cz2cr",
@@ -12066,7 +12079,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "红砂（Reaumuria soongorica）识别特征图"
         },
         {
           "id": "trait-3-title-cz2cr",
@@ -12101,7 +12114,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "红砂（Reaumuria soongorica）识别特征图"
         },
         {
           "id": "trait-4-title-cz2cr",
@@ -12226,7 +12239,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "红砂（Reaumuria soongorica）相似种对照图"
         },
         {
           "id": "sim-1-title-cz2cr",
@@ -12261,7 +12274,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "红砂（Reaumuria soongorica）相似种对照图"
         },
         {
           "id": "sim-2-title-cz2cr",
@@ -12321,7 +12334,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "红砂（Reaumuria soongorica）典型生境"
         },
         {
           "id": "sec-habitat-body-cz2cr",
@@ -12335,19 +12348,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cz2cr",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 盐碱荒漠 saline desert",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cz2cr",
@@ -12477,7 +12477,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "红砂（Reaumuria soongorica）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cz2cr",
@@ -12510,7 +12510,7 @@
           "x": 380,
           "y": 1675,
           "w": 500,
-          "text": "红砂提取物见于实验研究，但体外活性不等于安全有效的民间药方；本页不再宣称未经临床验证的治疗用途。\nExtracts appear in laboratory studies, but in-vitro activity is not proof of a safe or effective remedy; unverified medical claims are omitted.",
+          "text": "红砂提取物见于实验研究，但体外活性不等于安全有效的民间药方；涉及健康用途应以临床证据和安全评估为准。\nExtracts appear in laboratory studies, but in-vitro activity is not proof of a safe or effective remedy; health uses require clinical evidence and safety assessment.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -12704,7 +12704,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "唐古特白刺（Nitraria tangutorum）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-c1sa9",
@@ -12752,7 +12752,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "唐古特白刺（Nitraria tangutorum）春季物候"
         },
         {
           "id": "season-img-2-c1sa9",
@@ -12762,7 +12762,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "唐古特白刺（Nitraria tangutorum）夏季物候"
         },
         {
           "id": "season-img-3-c1sa9",
@@ -12772,7 +12772,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "唐古特白刺（Nitraria tangutorum）秋季物候"
         },
         {
           "id": "season-img-4-c1sa9",
@@ -12782,7 +12782,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "唐古特白刺（Nitraria tangutorum）冬季物候"
         },
         {
           "id": "season-1-cn-c1sa9",
@@ -12925,7 +12925,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "唐古特白刺（Nitraria tangutorum）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-c1sa9",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3986821，参考分布国家筛选 182 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-c1sa9",
@@ -12960,7 +12973,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "唐古特白刺（Nitraria tangutorum）识别特征图"
         },
         {
           "id": "trait-1-title-c1sa9",
@@ -12995,7 +13008,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "唐古特白刺（Nitraria tangutorum）识别特征图"
         },
         {
           "id": "trait-2-title-c1sa9",
@@ -13030,7 +13043,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "唐古特白刺（Nitraria tangutorum）识别特征图"
         },
         {
           "id": "trait-3-title-c1sa9",
@@ -13065,7 +13078,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "唐古特白刺（Nitraria tangutorum）识别特征图"
         },
         {
           "id": "trait-4-title-c1sa9",
@@ -13190,7 +13203,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "唐古特白刺（Nitraria tangutorum）相似种对照图"
         },
         {
           "id": "sim-1-title-c1sa9",
@@ -13225,7 +13238,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "唐古特白刺（Nitraria tangutorum）相似种对照图"
         },
         {
           "id": "sim-2-title-c1sa9",
@@ -13285,7 +13298,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "唐古特白刺（Nitraria tangutorum）典型生境"
         },
         {
           "id": "sec-habitat-body-c1sa9",
@@ -13299,19 +13312,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-c1sa9",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 盐碱地 saline land",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-c1sa9",
@@ -13441,7 +13441,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "唐古特白刺（Nitraria tangutorum）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-c1sa9",
@@ -13668,7 +13668,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "梭梭（Haloxylon ammodendron）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-c57zv",
@@ -13716,7 +13716,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "梭梭（Haloxylon ammodendron）春季物候"
         },
         {
           "id": "season-img-2-c57zv",
@@ -13726,7 +13726,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "梭梭（Haloxylon ammodendron）夏季物候"
         },
         {
           "id": "season-img-3-c57zv",
@@ -13736,7 +13736,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "梭梭（Haloxylon ammodendron）秋季物候"
         },
         {
           "id": "season-img-4-c57zv",
@@ -13746,7 +13746,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "梭梭（Haloxylon ammodendron）冬季物候"
         },
         {
           "id": "season-1-cn-c57zv",
@@ -13889,7 +13889,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "梭梭（Haloxylon ammodendron）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-c57zv",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3759078，参考分布国家筛选 995 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-c57zv",
@@ -13924,7 +13937,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "梭梭（Haloxylon ammodendron）识别特征图"
         },
         {
           "id": "trait-1-title-c57zv",
@@ -13959,7 +13972,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "梭梭（Haloxylon ammodendron）识别特征图"
         },
         {
           "id": "trait-2-title-c57zv",
@@ -13994,7 +14007,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "梭梭（Haloxylon ammodendron）识别特征图"
         },
         {
           "id": "trait-3-title-c57zv",
@@ -14029,7 +14042,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "梭梭（Haloxylon ammodendron）识别特征图"
         },
         {
           "id": "trait-4-title-c57zv",
@@ -14154,7 +14167,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "梭梭（Haloxylon ammodendron）相似种对照图"
         },
         {
           "id": "sim-1-title-c57zv",
@@ -14189,7 +14202,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "梭梭（Haloxylon ammodendron）相似种对照图"
         },
         {
           "id": "sim-2-title-c57zv",
@@ -14249,7 +14262,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "梭梭（Haloxylon ammodendron）典型生境"
         },
         {
           "id": "sec-habitat-body-c57zv",
@@ -14263,19 +14276,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-c57zv",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 沙地 sandy land",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-c57zv",
@@ -14405,7 +14405,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "梭梭（Haloxylon ammodendron）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-c57zv",
@@ -14632,7 +14632,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "沙芥（Pugionium cornutum）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cp7xi",
@@ -14680,7 +14680,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "沙芥（Pugionium cornutum）春季物候"
         },
         {
           "id": "season-img-2-cp7xi",
@@ -14690,7 +14690,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "沙芥（Pugionium cornutum）夏季物候"
         },
         {
           "id": "season-img-3-cp7xi",
@@ -14700,7 +14700,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "沙芥（Pugionium cornutum）秋季物候"
         },
         {
           "id": "season-img-4-cp7xi",
@@ -14710,7 +14710,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "沙芥（Pugionium cornutum）冬季物候"
         },
         {
           "id": "season-1-cn-cp7xi",
@@ -14853,7 +14853,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "沙芥（Pugionium cornutum）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cp7xi",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3042082，参考分布国家筛选 56 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cp7xi",
@@ -14888,7 +14901,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "沙芥（Pugionium cornutum）识别特征图"
         },
         {
           "id": "trait-1-title-cp7xi",
@@ -14923,7 +14936,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "沙芥（Pugionium cornutum）识别特征图"
         },
         {
           "id": "trait-2-title-cp7xi",
@@ -14958,7 +14971,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "沙芥（Pugionium cornutum）识别特征图"
         },
         {
           "id": "trait-3-title-cp7xi",
@@ -14993,7 +15006,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "沙芥（Pugionium cornutum）识别特征图"
         },
         {
           "id": "trait-4-title-cp7xi",
@@ -15118,7 +15131,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "沙芥（Pugionium cornutum）相似种对照图"
         },
         {
           "id": "sim-1-title-cp7xi",
@@ -15153,7 +15166,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "沙芥（Pugionium cornutum）相似种对照图"
         },
         {
           "id": "sim-2-title-cp7xi",
@@ -15213,7 +15226,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "沙芥（Pugionium cornutum）典型生境"
         },
         {
           "id": "sec-habitat-body-cp7xi",
@@ -15227,19 +15240,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cp7xi",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 沙地 sandy land",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cp7xi",
@@ -15369,7 +15369,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "沙芥（Pugionium cornutum）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cp7xi",
@@ -15596,7 +15596,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "革苞菊（Tugarinovia mongolica）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cle2s",
@@ -15644,7 +15644,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "革苞菊（Tugarinovia mongolica）春季物候"
         },
         {
           "id": "season-img-2-cle2s",
@@ -15654,7 +15654,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "革苞菊（Tugarinovia mongolica）夏季物候"
         },
         {
           "id": "season-img-3-cle2s",
@@ -15664,7 +15664,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "革苞菊（Tugarinovia mongolica）秋季物候"
         },
         {
           "id": "season-img-4-cle2s",
@@ -15674,7 +15674,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "革苞菊（Tugarinovia mongolica）冬季物候"
         },
         {
           "id": "season-1-cn-cle2s",
@@ -15817,7 +15817,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "革苞菊（Tugarinovia mongolica）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cle2s",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3100296，参考分布国家筛选 21 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cle2s",
@@ -15852,7 +15865,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "革苞菊（Tugarinovia mongolica）识别特征图"
         },
         {
           "id": "trait-1-title-cle2s",
@@ -15887,7 +15900,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "革苞菊（Tugarinovia mongolica）识别特征图"
         },
         {
           "id": "trait-2-title-cle2s",
@@ -15922,7 +15935,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "革苞菊（Tugarinovia mongolica）识别特征图"
         },
         {
           "id": "trait-3-title-cle2s",
@@ -15957,7 +15970,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "革苞菊（Tugarinovia mongolica）识别特征图"
         },
         {
           "id": "trait-4-title-cle2s",
@@ -16082,7 +16095,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "革苞菊（Tugarinovia mongolica）相似种对照图"
         },
         {
           "id": "sim-1-title-cle2s",
@@ -16117,7 +16130,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "革苞菊（Tugarinovia mongolica）相似种对照图"
         },
         {
           "id": "sim-2-title-cle2s",
@@ -16177,7 +16190,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "革苞菊（Tugarinovia mongolica）典型生境"
         },
         {
           "id": "sec-habitat-body-cle2s",
@@ -16191,19 +16204,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cle2s",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 砾石坡 gravel slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cle2s",
@@ -16333,7 +16333,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "革苞菊（Tugarinovia mongolica）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cle2s",
@@ -16560,7 +16560,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "蒙古韭（Allium mongolicum）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-ch9iy",
@@ -16608,7 +16608,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "蒙古韭（Allium mongolicum）春季物候"
         },
         {
           "id": "season-img-2-ch9iy",
@@ -16618,7 +16618,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "蒙古韭（Allium mongolicum）夏季物候"
         },
         {
           "id": "season-img-3-ch9iy",
@@ -16628,7 +16628,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "蒙古韭（Allium mongolicum）秋季物候"
         },
         {
           "id": "season-img-4-ch9iy",
@@ -16638,7 +16638,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "蒙古韭（Allium mongolicum）冬季物候"
         },
         {
           "id": "season-1-cn-ch9iy",
@@ -16781,7 +16781,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "蒙古韭（Allium mongolicum）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-ch9iy",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 2857345，参考分布国家筛选 495 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-ch9iy",
@@ -16816,7 +16829,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "蒙古韭（Allium mongolicum）识别特征图"
         },
         {
           "id": "trait-1-title-ch9iy",
@@ -16851,7 +16864,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "蒙古韭（Allium mongolicum）识别特征图"
         },
         {
           "id": "trait-2-title-ch9iy",
@@ -16886,7 +16899,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "蒙古韭（Allium mongolicum）识别特征图"
         },
         {
           "id": "trait-3-title-ch9iy",
@@ -16921,7 +16934,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "蒙古韭（Allium mongolicum）识别特征图"
         },
         {
           "id": "trait-4-title-ch9iy",
@@ -17046,7 +17059,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "蒙古韭（Allium mongolicum）相似种对照图"
         },
         {
           "id": "sim-1-title-ch9iy",
@@ -17081,7 +17094,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "蒙古韭（Allium mongolicum）相似种对照图"
         },
         {
           "id": "sim-2-title-ch9iy",
@@ -17141,7 +17154,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "蒙古韭（Allium mongolicum）典型生境"
         },
         {
           "id": "sec-habitat-body-ch9iy",
@@ -17155,19 +17168,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-ch9iy",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 沙地 sandy land",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-ch9iy",
@@ -17297,7 +17297,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "蒙古韭（Allium mongolicum）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-ch9iy",
@@ -17524,7 +17524,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "肉苁蓉（Cistanche deserticola）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-ck9ru",
@@ -17572,7 +17572,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "肉苁蓉（Cistanche deserticola）春季物候"
         },
         {
           "id": "season-img-2-ck9ru",
@@ -17582,7 +17582,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "肉苁蓉（Cistanche deserticola）夏季物候"
         },
         {
           "id": "season-img-3-ck9ru",
@@ -17592,7 +17592,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "肉苁蓉（Cistanche deserticola）秋季物候"
         },
         {
           "id": "season-img-4-ck9ru",
@@ -17602,7 +17602,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "肉苁蓉（Cistanche deserticola）冬季物候"
         },
         {
           "id": "season-1-cn-ck9ru",
@@ -17745,7 +17745,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "肉苁蓉（Cistanche deserticola）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-ck9ru",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3730700，参考分布国家筛选 50 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-ck9ru",
@@ -17780,7 +17793,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "肉苁蓉（Cistanche deserticola）识别特征图"
         },
         {
           "id": "trait-1-title-ck9ru",
@@ -17815,7 +17828,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "肉苁蓉（Cistanche deserticola）识别特征图"
         },
         {
           "id": "trait-2-title-ck9ru",
@@ -17850,7 +17863,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "肉苁蓉（Cistanche deserticola）识别特征图"
         },
         {
           "id": "trait-3-title-ck9ru",
@@ -17885,7 +17898,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "肉苁蓉（Cistanche deserticola）识别特征图"
         },
         {
           "id": "trait-4-title-ck9ru",
@@ -18010,7 +18023,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "肉苁蓉（Cistanche deserticola）相似种对照图"
         },
         {
           "id": "sim-1-title-ck9ru",
@@ -18045,7 +18058,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "肉苁蓉（Cistanche deserticola）相似种对照图"
         },
         {
           "id": "sim-2-title-ck9ru",
@@ -18105,7 +18118,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "肉苁蓉（Cistanche deserticola）典型生境"
         },
         {
           "id": "sec-habitat-body-ck9ru",
@@ -18119,19 +18132,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-ck9ru",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 梭梭林 Haloxylon forest",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-ck9ru",
@@ -18261,7 +18261,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "肉苁蓉（Cistanche deserticola）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-ck9ru",
@@ -18488,7 +18488,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "文冠果（Xanthoceras sorbifolium）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-cyg0t",
@@ -18536,7 +18536,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "文冠果（Xanthoceras sorbifolium）春季物候"
         },
         {
           "id": "season-img-2-cyg0t",
@@ -18546,7 +18546,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "文冠果（Xanthoceras sorbifolium）夏季物候"
         },
         {
           "id": "season-img-3-cyg0t",
@@ -18556,7 +18556,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "文冠果（Xanthoceras sorbifolium）秋季物候"
         },
         {
           "id": "season-img-4-cyg0t",
@@ -18566,7 +18566,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "文冠果（Xanthoceras sorbifolium）冬季物候"
         },
         {
           "id": "season-1-cn-cyg0t",
@@ -18709,7 +18709,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "文冠果（Xanthoceras sorbifolium）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-cyg0t",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 9479204，参考分布国家筛选 2 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-cyg0t",
@@ -18744,7 +18757,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "文冠果（Xanthoceras sorbifolium）识别特征图"
         },
         {
           "id": "trait-1-title-cyg0t",
@@ -18779,7 +18792,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "文冠果（Xanthoceras sorbifolium）识别特征图"
         },
         {
           "id": "trait-2-title-cyg0t",
@@ -18814,7 +18827,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "文冠果（Xanthoceras sorbifolium）识别特征图"
         },
         {
           "id": "trait-3-title-cyg0t",
@@ -18849,7 +18862,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "文冠果（Xanthoceras sorbifolium）识别特征图"
         },
         {
           "id": "trait-4-title-cyg0t",
@@ -18934,7 +18947,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "文冠果种仁含油并可加工利用，但果壳、种皮和压榨副产物富含皂苷等成分，不能把“油料树”误写成全株可直接食用或入药。\nIts kernels yield useful oil, but shells, seed coats and press residues contain abundant saponins; an oil crop is not an all-purpose edible or remedy.",
+          "text": "文冠果种仁可作为油料原料；果壳、种皮和压榨副产物含皂苷等成分，不宜作为常规食物或自行入药。\nIts kernels can be used as an oil raw material, while shells, seed coats and press residues contain saponins and are not ordinary food or self-medication.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -18974,7 +18987,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "文冠果（Xanthoceras sorbifolium）相似种对照图"
         },
         {
           "id": "sim-1-title-cyg0t",
@@ -19009,7 +19022,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "文冠果（Xanthoceras sorbifolium）相似种对照图"
         },
         {
           "id": "sim-2-title-cyg0t",
@@ -19069,7 +19082,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "文冠果（Xanthoceras sorbifolium）典型生境"
         },
         {
           "id": "sec-habitat-body-cyg0t",
@@ -19083,19 +19096,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-cyg0t",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 砾坡 gravel slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-cyg0t",
@@ -19225,7 +19225,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "文冠果（Xanthoceras sorbifolium）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-cyg0t",
@@ -19452,7 +19452,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "蒙古扁桃（Prunus mongolica）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-c528h",
@@ -19500,7 +19500,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "蒙古扁桃（Prunus mongolica）春季物候"
         },
         {
           "id": "season-img-2-c528h",
@@ -19510,7 +19510,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "蒙古扁桃（Prunus mongolica）夏季物候"
         },
         {
           "id": "season-img-3-c528h",
@@ -19520,7 +19520,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "蒙古扁桃（Prunus mongolica）秋季物候"
         },
         {
           "id": "season-img-4-c528h",
@@ -19530,7 +19530,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "蒙古扁桃（Prunus mongolica）冬季物候"
         },
         {
           "id": "season-1-cn-c528h",
@@ -19673,7 +19673,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "蒙古扁桃（Prunus mongolica）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-c528h",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 3023152，参考分布国家筛选 78 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-c528h",
@@ -19708,7 +19721,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "蒙古扁桃（Prunus mongolica）识别特征图"
         },
         {
           "id": "trait-1-title-c528h",
@@ -19743,7 +19756,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "蒙古扁桃（Prunus mongolica）识别特征图"
         },
         {
           "id": "trait-2-title-c528h",
@@ -19778,7 +19791,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "蒙古扁桃（Prunus mongolica）识别特征图"
         },
         {
           "id": "trait-3-title-c528h",
@@ -19813,7 +19826,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "蒙古扁桃（Prunus mongolica）识别特征图"
         },
         {
           "id": "trait-4-title-c528h",
@@ -19938,7 +19951,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "蒙古扁桃（Prunus mongolica）相似种对照图"
         },
         {
           "id": "sim-1-title-c528h",
@@ -19973,7 +19986,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "蒙古扁桃（Prunus mongolica）相似种对照图"
         },
         {
           "id": "sim-2-title-c528h",
@@ -20033,7 +20046,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "蒙古扁桃（Prunus mongolica）典型生境"
         },
         {
           "id": "sec-habitat-body-c528h",
@@ -20047,19 +20060,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-c528h",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂尔多斯 Ordos · 荒漠砾石坡 desert gravel slope",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-c528h",
@@ -20189,7 +20189,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "蒙古扁桃（Prunus mongolica）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-c528h",
@@ -20416,7 +20416,7 @@
           "w": 620,
           "h": 640,
           "src": null,
-          "label": "主图·半日花植株插画"
+          "label": "发菜（Nostoc flagelliforme）主图：植株、叶、花或果实"
         },
         {
           "id": "sec-season-c3yua",
@@ -20464,7 +20464,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "春·new shoots"
+          "label": "发菜（Nostoc flagelliforme）春季物候"
         },
         {
           "id": "season-img-2-c3yua",
@@ -20474,7 +20474,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "夏·yellow bloom"
+          "label": "发菜（Nostoc flagelliforme）夏季物候"
         },
         {
           "id": "season-img-3-c3yua",
@@ -20484,7 +20484,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "秋·seed capsule"
+          "label": "发菜（Nostoc flagelliforme）秋季物候"
         },
         {
           "id": "season-img-4-c3yua",
@@ -20494,7 +20494,7 @@
           "w": 105,
           "h": 78,
           "src": null,
-          "label": "冬·woody cushion"
+          "label": "发菜（Nostoc flagelliforme）冬季物候"
         },
         {
           "id": "season-1-cn-c3yua",
@@ -20637,7 +20637,20 @@
           "w": 460,
           "h": 220,
           "src": null,
-          "label": "全球分布图 (GBIF + POWO)"
+          "label": "发菜（Nostoc flagelliforme）全球分布记录图"
+        },
+        {
+          "id": "sec-range-caption-c3yua",
+          "type": "text",
+          "x": 720,
+          "y": 750,
+          "w": 460,
+          "text": "青绿色点：GBIF 未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。数据：GBIF taxonKey 12085956，参考分布国家筛选 37 条记录，核查 2026-07-13。 点位不等于连续边界。",
+          "fontSize": 10,
+          "color": "#7a6f5f",
+          "fontWeight": 400,
+          "fontFamily": "sans",
+          "lineHeight": 1.4
         },
         {
           "id": "sec-field-c3yua",
@@ -20672,7 +20685,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "刺状枝端"
+          "label": "发菜（Nostoc flagelliforme）识别特征图"
         },
         {
           "id": "trait-1-title-c3yua",
@@ -20707,7 +20720,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "微小反卷叶"
+          "label": "发菜（Nostoc flagelliforme）识别特征图"
         },
         {
           "id": "trait-2-title-c3yua",
@@ -20742,7 +20755,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "白色短柔毛"
+          "label": "发菜（Nostoc flagelliforme）识别特征图"
         },
         {
           "id": "trait-3-title-c3yua",
@@ -20777,7 +20790,7 @@
           "w": 60,
           "h": 60,
           "src": null,
-          "label": "顶生黄色单花"
+          "label": "发菜（Nostoc flagelliforme）识别特征图"
         },
         {
           "id": "trait-4-title-c3yua",
@@ -20902,7 +20915,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. songaricum"
+          "label": "发菜（Nostoc flagelliforme）相似种对照图"
         },
         {
           "id": "sim-1-title-c3yua",
@@ -20937,7 +20950,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "H. ordosicum"
+          "label": "发菜（Nostoc flagelliforme）相似种对照图"
         },
         {
           "id": "sim-2-title-c3yua",
@@ -20997,7 +21010,7 @@
           "w": 460,
           "h": 165,
           "src": null,
-          "label": "典型生境·砾坡"
+          "label": "发菜（Nostoc flagelliforme）典型生境"
         },
         {
           "id": "sec-habitat-body-c3yua",
@@ -21011,19 +21024,6 @@
           "fontWeight": 400,
           "fontFamily": "sans",
           "lineHeight": 1.3
-        },
-        {
-          "id": "sec-habitat-cap-c3yua",
-          "type": "text",
-          "x": 720,
-          "y": 1365,
-          "w": 460,
-          "text": "鄂托克 Otog, Ordos · 荒漠地表 desert surface",
-          "fontSize": 11,
-          "color": "#7a6f5f",
-          "fontWeight": 500,
-          "fontFamily": "serif",
-          "fontStyle": "italic"
         },
         {
           "id": "eco-1-l-c3yua",
@@ -21153,7 +21153,7 @@
           "w": 300,
           "h": 130,
           "src": null,
-          "label": "半日花核心区"
+          "label": "发菜（Nostoc flagelliforme）生活、生产或地方知识相关图"
         },
         {
           "id": "sec-hum-c3yua",

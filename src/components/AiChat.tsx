@@ -146,6 +146,7 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
           blocks: blocks.map((b) => ({
             id: b.id,
             text: b.type === "text" ? b.text : undefined,
+            label: b.type === "image" ? b.label : undefined,
             role: b.type,
           })),
         }),

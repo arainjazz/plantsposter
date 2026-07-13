@@ -54,13 +54,10 @@ export async function composeRangeMapSVG(
   points: RangePoint[],
   opts: RangeMapOpts = {},
 ): Promise<string> {
+  // Titles, legends and sources belong in the editable text block below the
+  // image frame, never baked into the map pixels.
+  void opts;
   const base = await loadBaseMap();
-  const title = opts.title ?? "Global Distribution";
-  const subtitle =
-    opts.subtitle ?? "Wikimedia CC0 low-resolution base · Equirectangular projection";
-  const source = opts.source ?? "Base map: Wikimedia Commons (World map - low resolution.svg, CC0)";
-  const legendNative = opts.legendNative ?? "Native · 原生分布";
-  const legendIntro = opts.legendIntro ?? "Introduced · 引入记录";
 
   const nativePts: string[] = [];
   const introPts: string[] = [];
@@ -70,18 +67,14 @@ export async function composeRangeMapSVG(
     const c = `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="4.2" stroke="#fff" stroke-width="0.7" opacity="0.92"/>`;
     if (p.kind === "introduced") introPts.push(c.replace("<circle", '<circle fill="#d97706"'));
     else if (p.kind === "native") nativePts.push(c.replace("<circle", '<circle fill="#3a7d2e"'));
-    else unknownPts.push(c.replace("<circle", '<circle fill="#64748b"'));
+    // GBIF often leaves establishment means blank. It is still a useful
+    // occurrence record, but must not be disguised as a formal native range.
+    else unknownPts.push(c.replace("<circle", '<circle fill="#147d8b"'));
   }
 
-  // total canvas 950 x 780 (620 map + 160 caption strip)
+  // Map-only canvas; its editable title, legend and provenance live below it.
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 780" width="950" height="780">
-  <style>
-    .ttl { font: 700 22px "Noto Sans SC","PingFang SC",Arial,sans-serif; fill:#2a2622; }
-    .sub { font: 400 12px "Noto Sans SC","PingFang SC",Arial,sans-serif; fill:#6b6357; }
-    .cap { font: 400 12px "Noto Sans SC","PingFang SC",Arial,sans-serif; fill:#4a443c; }
-    .lg  { font: 500 13px "Noto Sans SC","PingFang SC",Arial,sans-serif; fill:#2a2622; }
-  </style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 640" width="950" height="640">
   <!-- transparent background: no rect fill on the root -->
   <g id="basemap" fill="#e8dcc4" stroke="#8a7a5a" stroke-width="0.35">
     ${base}
@@ -95,24 +88,6 @@ export async function composeRangeMapSVG(
   <g id="introduced-points">${introPts.join("")}</g>
   <g id="unknown-points">${unknownPts.join("")}</g>
   <g id="native-points">${nativePts.join("")}</g>
-
-  <!-- caption strip -->
-  <g transform="translate(0,640)">
-    <text class="ttl" x="24" y="26">${escapeXml(title)}</text>
-    <text class="sub" x="24" y="46">${escapeXml(subtitle)}</text>
-
-    <g transform="translate(24,70)">
-      <circle cx="8" cy="8" r="6" fill="#3a7d2e" stroke="#fff" stroke-width="0.8"/>
-      <text class="lg" x="24" y="12">${escapeXml(legendNative)}</text>
-      <circle cx="220" cy="8" r="6" fill="#d97706" stroke="#fff" stroke-width="0.8"/>
-      <text class="lg" x="236" y="12">${escapeXml(legendIntro)}</text>
-      <circle cx="440" cy="8" r="6" fill="#64748b" stroke="#fff" stroke-width="0.8"/>
-      <text class="lg" x="456" y="12">Status unknown · 属性未定</text>
-    </g>
-
-    <text class="cap" x="24" y="118">${escapeXml(source)}</text>
-    <text class="cap" x="24" y="136">Points projected with: x = 2.6865·lon + 449.3127 ,  y = -3.4451·lat + 339.3522</text>
-  </g>
 </svg>`;
 
   // btoa cannot handle non-latin1; encode UTF-8 safely
@@ -121,10 +96,4 @@ export async function composeRangeMapSVG(
       ? Buffer.from(svg, "utf8").toString("base64")
       : btoa(unescape(encodeURIComponent(svg)));
   return `data:image/svg+xml;base64,${b64}`;
-}
-
-function escapeXml(s: string): string {
-  return s.replace(/[<>&"']/g, (c) =>
-    c === "<" ? "&lt;" : c === ">" ? "&gt;" : c === "&" ? "&amp;" : c === '"' ? "&quot;" : "&apos;",
-  );
 }

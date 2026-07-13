@@ -20,11 +20,13 @@ const OPERATIONS_SCHEMA = {
               "replace_all",
               "recolor_scheme",
               "set_image",
+              "update_image_label",
               "set_range_map",
             ],
           },
           id: { type: "string" },
           text: { type: "string" },
+          label: { type: "string" },
           src: { type: "string" },
           title: { type: "string" },
           subtitle: { type: "string" },
@@ -96,7 +98,8 @@ Operations available (set "type" plus the fields listed):
                     fontFamily (serif|sans|display), textTransform (none|uppercase)
 - replace_all     : find, replace, caseSensitive?
 - recolor_scheme  : ink, accent, muted only (all #RRGGBB). NEVER output background.
-- set_image       : id (must be an image block id), src (a full data:image/... URL or https URL).
+- set_image       : id (must be an image block id), src (a full data:image/... URL or https URL), optional label.
+- update_image_label: id (an image block id), label. This label is the image alt description.
 - set_range_map   : id (image block id, e.g. img-map), points: [{ lat, lon, kind: "native"|"introduced", label? }],
                     optional title / subtitle / source. Use this for ANY "全球分布 / GLOBAL RANGE" map request —
                     the client automatically composes the SVG on top of the fixed Wikimedia CC0 base map
@@ -104,6 +107,10 @@ Operations available (set "type" plus the fields listed):
 
 General rules:
 - Use ONLY block ids from the provided catalog. Do not invent ids.
+- Every image block is sent with its current alt description. When the user asks to edit a whole page,
+  update each relevant image label with update_image_label so it accurately names THIS page's species
+  and the image slot (main image, phenology, diagnostic trait, habitat, etc.). Never leave a 半日花
+  or Helianthemum label on another species' page.
 - When the user gives a vague instruction, pick reasonable values yourself.
 - Colors must be #RRGGBB hex.
 - If the user attaches an image, you may use it as visual reference (e.g. to pick a matching color palette).
@@ -125,14 +132,25 @@ CONTENT SKILL — "重要提示"栏 (IMPORTANT NOTE)
       · 分类学分歧 (taxonomic disagreement)
       · 其他必要的警示或区分
   - 证据不足时不要硬凑主题；明确写出不确定性和分歧 ("尚有争议""证据有限"等)。
+  - 只写物种本身的真实提示价值，绝不写“本页已修改 / 已校正 / 原来写错 / 本次替换”等编辑过程。
+  - 不要与“植物人文”重复同一卖点：提示优先写安全、识别、保护边界或利用限制。
   - sec-note-sub 一行中英并列的副标题；sec-note-body 2-4 句中英对照正文。
+
+═══════════════════════════════════════════════════════════════════════════
+CONTENT SKILL — "植物人文"栏 (HUMANITIES)
+═══════════════════════════════════════════════════════════════════════════
+■ blocks: sec-hum / sec-hum-sub / sec-hum-body
+  - 以与该物种直接相关的生活、生产、地方知识、食用、药用、民族志、经济利用、命名史或文学记载为优先。
+  - 与重要提示选择不同角度；避免把保护口号、形态复述或泛泛“生态价值”换词重复。
+  - 医疗、食用和民族志内容要保留证据与安全边界，不把实验研究写成疗效。
 
 ═══════════════════════════════════════════════════════════════════════════
 CONTENT SKILL — "全球分布"栏 (GLOBAL RANGE) 与配图 SVG 规范
 ═══════════════════════════════════════════════════════════════════════════
 ■ 文本 blocks: sec-range / sec-range-sub / sec-range-caption
-  - 底图使用真实 GBIF/POWO 记录或另一个可追溯、有文献支持的分布数据集。
-    caption 记录：taxon key 或查询、筛选条件、记录数、下载/API URL、访问日期、局限性。
+  - 底图使用真实 GBIF/POWO 记录或另一个可追溯、有文献支持的分布数据集；SVG 内不得写标题、图例、来源或“属性未定”。
+  - 图例、taxon key/查询、筛选条件、记录数、访问日期和局限性都写入 sec-range-caption；它位于地图下方且可编辑。
+  - 无 establishmentMeans 的 GBIF 坐标称为“参考范围内记录”，以青绿色显示；不要称作灰色“属性未定”，也不要误报为原生范围。
   - 不要凭空补点，不要臆造鄂尔多斯本地记录。原生 / 引入 / 不确定记录不得混绘。
 
 ■ 配图生成 (img-map 或"全球分布"图片块) — 必须使用 set_range_map
@@ -150,7 +168,7 @@ CONTENT SKILL — "全球分布"栏 (GLOBAL RANGE) 与配图 SVG 规范
     - points   : [{ lat, lon, kind: "native"|"introduced", label }]  真实点，勿臆造
     - title    : "<当前页物种的拉丁名> · Global Distribution"（用本页实际物种，切勿写成半日花）
     - subtitle : 例如 "Wikimedia CC0 base · GBIF/POWO records"
-    - source   : caption 一句话，写清数据源/查询/日期/许可证
+    - source   : 用于地图下方可编辑说明的一句话，写清数据源/查询/日期/许可证
 
   每个投影点必须在 message 中以文本凭证方式列出（示例格式，坐标须为本页物种的真实记录）:
       "<地点>: (lat 42.9, lon 89.2) -> (x 688.95, y 191.56)"
@@ -160,7 +178,7 @@ type ChatBody = {
   message: string;
   model: string;
   pageName?: string;
-  blocks: Array<{ id: string; text?: string; role?: string }>;
+  blocks: Array<{ id: string; text?: string; label?: string; role?: string }>;
   history: Array<{ role: "user" | "assistant"; content: string }>;
   image?: { mimeType: string; data: string } | null;
   custom?: { baseURL: string; apiKey: string } | null;
@@ -198,6 +216,9 @@ async function buildGbifRangeMap(body: ChatBody) {
   const target =
     body.blocks.find((b) => b.id === "img-map") ??
     body.blocks.find((b) => b.role === "image" && /map|range|分布/i.test(b.id));
+  const captionTarget =
+    body.blocks.find((b) => b.id === "sec-range-caption") ??
+    body.blocks.find((b) => b.id.startsWith("sec-range-caption"));
   if (!scientificName || !target) return null;
 
   const matchRes = await fetch(
@@ -264,7 +285,7 @@ async function buildGbifRangeMap(body: ChatBody) {
   const accessed = new Date().toISOString().slice(0, 10);
   const acceptedName = match.scientificName ?? scientificName;
   return {
-    message: `已直接核查 GBIF 并重绘 ${acceptedName} 的分布图：采用 ${points.length} 个经坐标质量过滤、4° 网格抽样的真实记录。GBIF 的原生/引入属性缺失时以灰色“属性未定”显示，不把出现记录误报为原生分布。`,
+    message: `已直接核查 GBIF 并重绘 ${acceptedName} 的分布图：采用 ${points.length} 个经坐标质量过滤、4° 网格抽样的真实记录。没有 establishmentMeans 的记录以青绿色“参考范围内记录”显示，图例与来源已写入地图下方可编辑说明。`,
     operations: [
       {
         type: "set_range_map" as const,
@@ -274,6 +295,15 @@ async function buildGbifRangeMap(body: ChatBody) {
         subtitle: "GBIF occurrence records · Wikimedia CC0 base",
         source: `GBIF taxonKey ${match.usageKey}; ${count} matched records; stratified API sample, coordinate + geospatial-quality filters; accessed ${accessed}; https://www.gbif.org/species/${match.usageKey}`,
       },
+      ...(captionTarget
+        ? [
+            {
+              type: "update_text" as const,
+              id: captionTarget.id,
+              text: `青绿色点：GBIF 中未标注建立状态的参考范围内记录；橙色点：GBIF 标注的引入记录。点位不等于连续边界。数据：GBIF taxonKey ${match.usageKey}，${count} 条匹配记录，${accessed}（可编辑）。`,
+            },
+          ]
+        : []),
     ],
   };
 }
@@ -336,7 +366,8 @@ export const Route = createFileRoute("/api/chat")({
 
         const catalog = body.blocks
           .map(
-            (b) => `- ${b.id}${b.text ? `  :: "${b.text.slice(0, 80).replace(/\n/g, " ")}"` : ""}`,
+            (b) =>
+              `- ${b.id}${b.text ? `  :: "${b.text.slice(0, 80).replace(/\n/g, " ")}"` : ""}${b.label ? `  [image alt: "${b.label.slice(0, 120)}"]` : ""}`,
           )
           .join("\n");
 

@@ -12,6 +12,7 @@ type Props = {
   selectionCount: number;
   onChange: (patch: Partial<TextBlock>) => void;
   onChangeImage: (src: string | null) => void;
+  onChangeImageLabel: (label: string) => void;
   onChangeBackground: (color: string) => void;
   onApplyBackgroundToPages: (pageIds: string[], color: string) => void;
   onAlignToPage: (dir: AlignDir, mode: "page" | "selection") => void;
@@ -26,6 +27,7 @@ export function Inspector({
   selectionCount,
   onChange,
   onChangeImage,
+  onChangeImageLabel,
   onChangeBackground,
   onApplyBackgroundToPages,
   onAlignToPage,
@@ -142,6 +144,17 @@ export function Inspector({
     return (
       <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ fontSize: 12, color: "#888" }}>图片框：{block.label}</div>
+        <Field label="图片描述 / Alt（供读屏与 AI 整页编辑使用）">
+          <textarea
+            value={block.label}
+            onChange={(e) => onChangeImageLabel(e.target.value)}
+            rows={3}
+            style={ta}
+          />
+        </Field>
+        <div style={{ fontSize: 11, color: "#777", lineHeight: 1.55 }}>
+          四个角拖动为等比例缩放；上下左右边框拖动为非破坏性裁切。
+        </div>
         <label style={{ fontSize: 12, color: "#333" }}>
           上传替换图片
           <input
@@ -240,15 +253,33 @@ export function Inspector({
             <option value="mono">JetBrains Mono</option>
           </select>
         </Field>
-        <Field label="斜体">
-          <select
-            value={t.fontStyle ?? "normal"}
-            onChange={(e) => onChange({ fontStyle: e.target.value as "normal" | "italic" })}
-            style={inp}
-          >
-            <option value="normal">正常</option>
-            <option value="italic">斜体</option>
-          </select>
+        <Field label="字形">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
+            <button
+              onClick={() => onChange({ fontWeight: t.fontWeight >= 700 ? 400 : 700 })}
+              style={{
+                ...alignBtn,
+                fontWeight: 700,
+                background: t.fontWeight >= 700 ? "#2a2622" : "white",
+                color: t.fontWeight >= 700 ? "white" : "#333",
+              }}
+              title="粗体"
+            >
+              B 粗体
+            </button>
+            <button
+              onClick={() => onChange({ fontStyle: (t.fontStyle ?? "normal") === "italic" ? "normal" : "italic" })}
+              style={{
+                ...alignBtn,
+                fontStyle: "italic",
+                background: (t.fontStyle ?? "normal") === "italic" ? "#2a2622" : "white",
+                color: (t.fontStyle ?? "normal") === "italic" ? "white" : "#333",
+              }}
+              title="斜体"
+            >
+              I 斜体
+            </button>
+          </div>
         </Field>
       </div>
 

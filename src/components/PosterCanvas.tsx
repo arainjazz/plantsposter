@@ -50,6 +50,7 @@ type ResizeState = {
   origW: number;
   origH: number;
   isText: boolean;
+  isImage: boolean;
 };
 type GroupResizeState = {
   kind: "group-resize";
@@ -128,6 +129,7 @@ export function PosterCanvas({
       origW: b.w,
       origH: h,
       isText: b.type === "text",
+      isImage: b.type === "image",
     };
   }
 
@@ -198,20 +200,31 @@ export function PosterCanvas({
       const dx = (e.clientX - d.startX) / scale;
       const dy = (e.clientY - d.startY) / scale;
       let { origX: x, origY: y, origW: w, origH: h } = d;
-      if (d.handle.includes("e")) w = Math.max(20, d.origW + dx);
-      if (d.handle.includes("s")) h = Math.max(20, d.origH + dy);
-      if (d.handle.includes("w")) {
-        w = Math.max(20, d.origW - dx);
-        x = d.origX + (d.origW - w);
-      }
-      if (d.handle.includes("n")) {
-        h = Math.max(20, d.origH - dy);
-        y = d.origY + (d.origH - h);
-      }
-      if (!d.isText && e.shiftKey) {
+      const isCorner = d.handle.length === 2;
+
+      // Image corners are always an aspect-locked scale operation. The four
+      // edge handles intentionally change the visible frame only: with the
+      // image rendered as object-fit: cover this is a non-destructive crop.
+      if (d.isImage && isCorner) {
         const ratio = d.origW / d.origH;
-        if (Math.abs(w - d.origW) > Math.abs(h - d.origH)) h = w / ratio;
-        else w = h * ratio;
+        const widthByX = d.handle.includes("w") ? -dx : dx;
+        const widthByY = (d.handle.includes("n") ? -dy : dy) * ratio;
+        const delta = Math.abs(widthByX) >= Math.abs(widthByY) ? widthByX : widthByY;
+        w = Math.max(20, d.origW + delta);
+        h = w / ratio;
+        if (d.handle.includes("w")) x = d.origX + (d.origW - w);
+        if (d.handle.includes("n")) y = d.origY + (d.origH - h);
+      } else {
+        if (d.handle.includes("e")) w = Math.max(20, d.origW + dx);
+        if (d.handle.includes("s")) h = Math.max(20, d.origH + dy);
+        if (d.handle.includes("w")) {
+          w = Math.max(20, d.origW - dx);
+          x = d.origX + (d.origW - w);
+        }
+        if (d.handle.includes("n")) {
+          h = Math.max(20, d.origH - dy);
+          y = d.origY + (d.origH - h);
+        }
       }
       onResize(d.id, {
         x: Math.round(x),
@@ -445,15 +458,15 @@ function ResizeHandles({
   isText: boolean;
   onStart: (handle: Handle, e: React.PointerEvent) => void;
 }) {
-  const handles: Array<{ h: Handle; l: number; t: number; cursor: string; visible: boolean }> = [
-    { h: "nw", l: 0, t: 0, cursor: "nwse-resize", visible: !isText },
-    { h: "n", l: w / 2, t: 0, cursor: "ns-resize", visible: !isText },
-    { h: "ne", l: w, t: 0, cursor: "nesw-resize", visible: !isText },
-    { h: "e", l: w, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true },
-    { h: "se", l: w, t: h ?? 20, cursor: "nwse-resize", visible: !isText },
-    { h: "s", l: w / 2, t: h ?? 20, cursor: "ns-resize", visible: !isText },
-    { h: "sw", l: 0, t: h ?? 20, cursor: "nesw-resize", visible: !isText },
-    { h: "w", l: 0, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true },
+  const handles: Array<{ h: Handle; l: number; t: number; cursor: string; visible: boolean; title: string }> = [
+    { h: "nw", l: 0, t: 0, cursor: "nwse-resize", visible: !isText, title: "等比例缩放图片" },
+    { h: "n", l: w / 2, t: 0, cursor: "ns-resize", visible: !isText, title: "裁切图片上边" },
+    { h: "ne", l: w, t: 0, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
+    { h: "e", l: w, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "裁切图片右边" },
+    { h: "se", l: w, t: h ?? 20, cursor: "nwse-resize", visible: !isText, title: "等比例缩放图片" },
+    { h: "s", l: w / 2, t: h ?? 20, cursor: "ns-resize", visible: !isText, title: "裁切图片下边" },
+    { h: "sw", l: 0, t: h ?? 20, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
+    { h: "w", l: 0, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "裁切图片左边" },
   ];
   const size = 12;
   return (
@@ -463,6 +476,8 @@ function ResizeHandles({
         .map((x) => (
           <div
             key={x.h}
+            title={x.title}
+            aria-label={x.title}
             onPointerDown={(e) => {
               e.stopPropagation();
               onStart(x.h, e);
