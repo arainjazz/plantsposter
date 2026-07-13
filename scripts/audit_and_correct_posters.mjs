@@ -167,7 +167,7 @@ const copy = {
     noteSub: "保护寄生植物必须同时保护寄主 · Protect the Host to Protect the Parasite",
     note: "肉苁蓉没有叶绿素，依靠吸器连接梭梭等寄主根系；只移栽花序或单独保存种子不能形成独立种群。\nLacking chlorophyll, it connects to host roots through a haustorium; conserving flowers or seeds alone cannot sustain a population without hosts.",
     humSub: "从野生药材到寄主协同栽培 · From Wild Collection to Host-Based Cultivation",
-    hum: "肉苁蓉人工接种研究围绕种子萌发、吸器形成与梭梭幼根连接展开；可持续生产的单位不是一株药材，而是完整健康的寄主系统。\nCultivation follows seed germination, haustorium formation and attachment to young saxaul roots; the production unit is a healthy host system, not a lone stem.",
+    hum: "肉苁蓉人工接种研究围绕种子萌发、吸器形成与梭梭幼根连接展开；可持续生产的单位是完整健康的寄主系统。\nCultivation follows seed germination, haustorium formation and attachment to young saxaul roots; the production unit is a healthy host system, not a lone stem.",
   },
   "Xanthoceras sorbifolium": {
     range: "原产中国北方，栽培记录更广 · Native to northern China, cultivated more widely",
@@ -480,7 +480,11 @@ for (const page of state.pages) {
     block.text = text;
   }
   for (const block of page.blocks) {
-    if (block.type === "text") block.text = block.text.replaceAll("\\n", "\n");
+    if (block.type === "text") {
+      block.text = block.text
+        .replaceAll("\\n", "\n")
+        .replace("干燥时呈脆硬的黑色丝状，吸水后膨胀变软，呈橄榄绿色。", "干燥时呈脆硬的黑色丝状，吸水后膨胀变软，呈橄榄绿色.");
+    }
   }
   const caption = findText(page, "sec-range-caption");
   caption.fontSize = 10;

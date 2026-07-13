@@ -173,7 +173,7 @@
     {
       "page": "发菜",
       "scientific": "Nostoc flagelliforme",
-      "source": "中国区域分布资料（内蒙古、宁夏、甘肃、新疆、青海、陕西）的省域代表位置",
+      "key": null,
       "accepted": "Nostoc flagelliforme A",
       "count": 6,
       "plotted": 6
