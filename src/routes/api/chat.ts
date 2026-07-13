@@ -107,6 +107,7 @@ Operations available (set "type" plus the fields listed):
 
 General rules:
 - Use ONLY block ids from the provided catalog. Do not invent ids.
+- A request to revise, replace, correct, rewrite, or edit page content MUST return one or more operations that change the listed current-page blocks. Never say that you changed a page when operations is empty. If a request is unclear, choose the relevant current-page text blocks and make a conservative edit instead of replying conversationally only.
 - Every image block is sent with its current alt description. When the user asks to edit a whole page,
   update each relevant image label with update_image_label so it accurately names THIS page's species
   and the image slot (main image, phenology, diagnostic trait, habitat, etc.). Never leave a 半日花
@@ -344,6 +345,7 @@ export const Route = createFileRoute("/api/chat")({
         const model = body.model || "gemini-2.5-flash";
         const custom = body.custom;
         const key = process.env.GEMINI_API_KEY;
+        const lovableKey = process.env.LOVABLE_API_KEY;
         if (MAP_REQUEST_RE.test(body.message)) {
           try {
             const directMap = await buildGbifRangeMap(body);
@@ -353,11 +355,11 @@ export const Route = createFileRoute("/api/chat")({
             return Response.json({ message: `无法从 GBIF 安全重绘分布图：${msg}`, operations: [] });
           }
         }
-        if (!custom && !key) {
+        if (!custom && !key && !lovableKey) {
           return Response.json(
             {
               message:
-                "Missing GEMINI_API_KEY (未配置后端环境变量，请在左上角『配置新模型』中填入你的 API Key)",
+                "未配置 LOVABLE_API_KEY 或 GEMINI_API_KEY（请在左上角『配置新模型』中填入可用 API Key）",
               operations: [],
             },
             { status: 200 },
@@ -437,6 +439,54 @@ export const Route = createFileRoute("/api/chat")({
               return Response.json(
                 {
                   message: `自定义模型出错 (${upstream.status})：${errText.slice(0, 200)}`,
+                  operations: [],
+                },
+                { status: 200 },
+              );
+            }
+            const j = (await upstream.json()) as {
+              choices?: Array<{ message?: { content?: string } }>;
+            };
+            text = j.choices?.[0]?.message?.content ?? "";
+          } else if (lovableKey) {
+            // Prefer the project gateway for text edits too: a personal Gemini
+            // key can be quota-limited while image generation already uses it.
+            const gatewayModel = model.startsWith("google/") ? model : `google/${model}`;
+            const messages: Array<Record<string, unknown>> = [
+              { role: "system", content: SYSTEM },
+              ...body.history.map((h) => ({ role: h.role, content: h.content })),
+              {
+                role: "user",
+                content: body.image?.data
+                  ? [
+                      { type: "text", text: contextText },
+                      {
+                        type: "image_url",
+                        image_url: { url: `data:${body.image.mimeType};base64,${body.image.data}` },
+                      },
+                    ]
+                  : contextText,
+              },
+            ];
+            const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${lovableKey}`,
+                "Lovable-API-Key": lovableKey,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: gatewayModel,
+                messages,
+                response_format: { type: "json_object" },
+                temperature: 0.4,
+              }),
+            });
+            if (!upstream.ok) {
+              const errText = await upstream.text();
+              return Response.json(
+                {
+                  message: `编辑网关出错 (${upstream.status})：${errText.slice(0, 200)}`,
                   operations: [],
                 },
                 { status: 200 },

@@ -277,12 +277,12 @@ function Editor() {
       bs.map((b) => (selectedIds.has(b.id) ? { ...b, x: b.x + dx, y: b.y + dy } : b)),
     );
   }
-  function resizeBlock(id: string, patch: { x: number; y: number; w: number; h?: number }) {
+  function resizeBlock(id: string, patch: { x: number; y: number; w: number; h?: number; crop?: ImageBlock["crop"] }) {
     updateActiveBlocks((bs) =>
       bs.map((b) => {
         if (b.id !== id) return b;
         if (b.type === "image")
-          return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h };
+          return { ...b, x: patch.x, y: patch.y, w: patch.w, h: patch.h ?? b.h, ...(patch.crop ? { crop: patch.crop } : {}) };
         return { ...b, x: patch.x, y: patch.y, w: patch.w };
       }),
     );
@@ -296,11 +296,6 @@ function Editor() {
         if (b.type === "image") return { ...b, x: p.x, y: p.y, w: p.w, h: p.h ?? b.h };
         return { ...b, x: p.x, y: p.y, w: p.w };
       }),
-    );
-  }
-  function setImageCrop(id: string, crop: { x: number; y: number }) {
-    updateActiveBlocks((bs) =>
-      bs.map((b) => (b.id === id && b.type === "image" ? { ...b, crop } : b)),
     );
   }
   function selectIds(ids: string[]) {
@@ -438,28 +433,84 @@ function Editor() {
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedIds, updateActiveBlocks]);
 
-  async function apply(ops: Operation[]) {
-    // Expand any set_range_map into a set_image with a freshly composed SVG data URL.
-    const expanded: Operation[] = [];
-    for (const op of ops) {
+  async function apply(rawOps: Operation[]): Promise<{ requested: number; applied: number; skipped: number }> {
+    const targetKinds: Partial<Record<Operation["type"], Block["type"]>> = {
+      update_text: "text",
+      update_style: "text",
+      set_image: "image",
+      update_image_label: "image",
+      set_range_map: "image",
+    };
+    const resolveId = (id: string, type?: Block["type"]): string | null => {
+      const exact = blocks.find((b) => b.id === id && (!type || b.type === type));
+      if (exact) return exact.id;
+      const base = id.replace(/-[a-z0-9]{5,}$/i, "");
+      const matches = blocks.filter((b) =>
+        (!type || b.type === type) && (b.id === base || b.id.startsWith(`${base}-`)),
+      );
+      return matches.length === 1 ? matches[0].id : null;
+    };
+
+    const normalized: Operation[] = [];
+    let skipped = 0;
+    for (const raw of rawOps) {
+      if (!raw || typeof raw.type !== "string") {
+        skipped++;
+        continue;
+      }
+      const needsTarget = raw.type in targetKinds;
+      if (!needsTarget) {
+        if (raw.type === "replace_all" || raw.type === "recolor_scheme") normalized.push(raw);
+        else skipped++;
+        continue;
+      }
+      const id = "id" in raw && typeof raw.id === "string" ? resolveId(raw.id, targetKinds[raw.type]) : null;
+      if (!id) {
+        skipped++;
+        continue;
+      }
+      normalized.push({ ...raw, id } as Operation);
+    }
+
+    let nextBlocks = blocks;
+    let nextPalette = palette;
+    let applied = 0;
+    for (const op of normalized) {
+      let expanded: Operation = op;
       if (op.type === "set_range_map") {
         try {
-          const dataUrl = await composeRangeMapSVG(op.points, {
-            title: op.title,
-            subtitle: op.subtitle,
-            source: op.source,
-          });
-          expanded.push({ type: "set_image", id: op.id, src: dataUrl });
+          expanded = {
+            type: "set_image",
+            id: op.id,
+            src: await composeRangeMapSVG(op.points, {
+              title: op.title,
+              subtitle: op.subtitle,
+              source: op.source,
+            }),
+          };
         } catch (e) {
           console.error("range map compose failed", e);
+          skipped++;
+          continue;
         }
-      } else {
-        expanded.push(op);
       }
+      const result = applyOperations(nextBlocks, nextPalette, [expanded]);
+      if (
+        JSON.stringify(result.blocks) === JSON.stringify(nextBlocks) &&
+        JSON.stringify(result.palette) === JSON.stringify(nextPalette)
+      ) {
+        skipped++;
+        continue;
+      }
+      nextBlocks = result.blocks;
+      nextPalette = result.palette;
+      applied++;
     }
-    const { blocks: nb, palette: np } = applyOperations(blocks, palette, expanded);
-    updateActiveBlocks(() => nb);
-    setPalette(np);
+    if (applied) {
+      updateActiveBlocks(() => nextBlocks);
+      setPalette(nextPalette);
+    }
+    return { requested: rawOps.length, applied, skipped };
   }
 
   // ── page ops ────────────────────────────────────────────
@@ -867,7 +918,6 @@ function Editor() {
           onMoveMany={moveMany}
           onResize={resizeBlock}
           onResizeMany={resizeMany}
-          onChangeImageCrop={setImageCrop}
           onChangeText={changeText}
           onImageContextMenu={openContextMenu}
           displayWidth={displayWidth}

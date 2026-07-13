@@ -3,12 +3,13 @@ import type { Block } from "@/lib/poster-data";
 import type { Operation } from "@/lib/poster-ops";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type ApplyResult = { requested: number; applied: number; skipped: number };
 
 type Props = {
   blocks: Block[];
   pageName?: string;
   selectedImageId: string | null;
-  onApplyOperations: (ops: Operation[]) => void;
+  onApplyOperations: (ops: Operation[]) => Promise<ApplyResult>;
 };
 
 type ModelKind = "chat" | "image" | "native";
@@ -55,7 +56,7 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
     {
       role: "assistant",
       content:
-        '你好，我是页面编辑助理。\n• 说要改什么，我用 Gemini 生成编辑指令\n• 选中一个图片框，输入描述后点『生成配图』（走 Lovable AI Gateway，不再受个人配额限制）\n• 点『一键去背景』把选中的图片抠透明背景\n• 生成"全球分布图"时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG',
+        '你好，我是页面编辑助理。\n• 说要改什么，我会生成并实际写入当前页面的编辑指令\n• 每次回复都会显示“已实际写入页面”的数量；未写入时会明确提示，不会假称已修改\n• 选中一个图片框，输入描述后点『生成配图』\n• 生成“全球分布图”时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG',
     },
   ]);
   const [input, setInput] = useState("");
@@ -152,14 +153,17 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
         }),
       });
       const data = (await res.json()) as { message: string; operations: Operation[] };
-      onApplyOperations(data.operations ?? []);
+      const result = await onApplyOperations(data.operations ?? []);
+      const outcome = result.applied
+        ? `✔ 已实际写入页面：${result.applied} 处${result.skipped ? `；${result.skipped} 条未能匹配` : ""}`
+        : data.operations?.length
+          ? "⚠ 未写入页面：模型返回的操作没有匹配到当前页面内容。请重新发送，或指定要改的栏目。"
+          : "⚠ 未写入页面：模型只回复了文字，没有生成编辑操作。";
       setMessages([
         ...nextHistory,
         {
           role: "assistant",
-          content:
-            data.message +
-            (data.operations?.length ? `\n\n✔ 已应用 ${data.operations.length} 处修改` : ""),
+          content: `${data.message}\n\n${outcome}`,
         },
       ]);
     } catch (err) {
@@ -206,12 +210,14 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
       });
       const data = (await res.json()) as { dataUrl?: string; error?: string; text?: string };
       if (data.dataUrl) {
-        onApplyOperations([{ type: "set_image", id: targetId, src: data.dataUrl }]);
+        const result = await onApplyOperations([{ type: "set_image", id: targetId, src: data.dataUrl }]);
         setMessages([
           ...nextHistory,
           {
             role: "assistant",
-            content: `✔ 已生成并放入「${targetId}」${data.text ? `\n\n${data.text}` : ""}`,
+            content: result.applied
+              ? `✔ 已生成并写入「${targetId}」${data.text ? `\n\n${data.text}` : ""}`
+              : `⚠ 图像已生成，但没有写入当前页面的图片框「${targetId}」。`,
           },
         ]);
       } else {
