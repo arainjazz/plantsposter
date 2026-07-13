@@ -26,7 +26,7 @@ type Props = {
   onMoveMany: (dx: number, dy: number) => void;
   onResize: (id: string, patch: { x: number; y: number; w: number; h?: number }) => void;
   onResizeMany?: (patches: ResizePatch[]) => void;
-  onDestructiveCrop?: (original: ImageBlock, next: { x: number; y: number; w: number; h: number }) => void;
+  onChangeImageCrop: (id: string, crop: { x: number; y: number }) => void;
   onChangeText: (id: string, text: string) => void;
   onImageContextMenu: (id: string, clientX: number, clientY: number) => void;
   displayWidth: number;
@@ -52,8 +52,16 @@ type ResizeState = {
   origH: number;
   isText: boolean;
   isImage: boolean;
-  originalImage?: ImageBlock;
-  lastPatch?: { x: number; y: number; w: number; h: number };
+};
+type CropMoveState = {
+  kind: "crop-move";
+  id: string;
+  startX: number;
+  startY: number;
+  origCropX: number;
+  origCropY: number;
+  frameW: number;
+  frameH: number;
 };
 type GroupResizeState = {
   kind: "group-resize";
@@ -74,7 +82,7 @@ type MarqueeState = {
   curY: number;
   additive: boolean;
 };
-type DragState = MoveState | ResizeState | GroupResizeState | MarqueeState | null;
+type DragState = MoveState | ResizeState | CropMoveState | GroupResizeState | MarqueeState | null;
 
 export function PosterCanvas({
   blocks,
@@ -85,7 +93,7 @@ export function PosterCanvas({
   onMoveMany,
   onResize,
   onResizeMany,
-  onDestructiveCrop,
+  onChangeImageCrop,
   onChangeText,
   onImageContextMenu,
   displayWidth,
@@ -93,9 +101,18 @@ export function PosterCanvas({
   const scale = displayWidth / POSTER_W;
   const height = POSTER_H * scale;
   const dragRef = useRef<DragState>(null);
+  const pointerCaptureRef = useRef<Element | null>(null);
+  const pendingCropRef = useRef<{ id: string; x: number; y: number; expiresAt: number } | null>(null);
   const [, force] = useState(0);
+  const [cropId, setCropId] = useState<string | null>(null);
   const rerender = () => force((n) => n + 1);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  function claimPointer(e: React.PointerEvent) {
+    const element = e.currentTarget as Element;
+    element.setPointerCapture(e.pointerId);
+    pointerCaptureRef.current = element;
+  }
 
   function startBlockPointer(e: React.PointerEvent, b: Block) {
     e.stopPropagation();
@@ -108,7 +125,8 @@ export function PosterCanvas({
     } else if (!selectedIds.has(b.id)) {
       onSelectIds([b.id]);
     }
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    if (cropId && cropId !== b.id) setCropId(null);
+    claimPointer(e);
     dragRef.current = {
       kind: "move",
       startX: e.clientX,
@@ -120,7 +138,7 @@ export function PosterCanvas({
 
   function startResize(e: React.PointerEvent, b: Block, handle: Handle) {
     e.stopPropagation();
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    claimPointer(e);
     const h = b.type === "image" ? b.h : 100;
     dragRef.current = {
       kind: "resize",
@@ -134,8 +152,32 @@ export function PosterCanvas({
       origH: h,
       isText: b.type === "text",
       isImage: b.type === "image",
-      originalImage: b.type === "image" ? { ...b } : undefined,
     };
+  }
+
+  function startCropMove(e: React.PointerEvent, b: ImageBlock) {
+    e.stopPropagation();
+    claimPointer(e);
+    dragRef.current = {
+      kind: "crop-move",
+      id: b.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      origCropX: b.crop?.x ?? 0.5,
+      origCropY: b.crop?.y ?? 0.5,
+      frameW: b.w,
+      frameH: b.h,
+    };
+  }
+
+  function startImagePointer(e: React.PointerEvent, b: ImageBlock) {
+    if (cropId === b.id) startCropMove(e, b);
+    else {
+      // Selecting an image can reflow the inspector before the second native
+      // click. Remember this press so a matching second press still opens crop.
+      pendingCropRef.current = { id: b.id, x: e.clientX, y: e.clientY, expiresAt: Date.now() + 480 };
+      startBlockPointer(e, b);
+    }
   }
 
   function startGroupResize(
@@ -144,7 +186,7 @@ export function PosterCanvas({
     bbox: { x: number; y: number; w: number; h: number },
   ) {
     e.stopPropagation();
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    claimPointer(e);
     const originals = blocks
       .filter((b) => selectedIds.has(b.id))
       .map((b) => ({
@@ -170,10 +212,11 @@ export function PosterCanvas({
 
   function startMarquee(e: React.PointerEvent) {
     if (e.button !== 0) return;
+    if (cropId) setCropId(null);
     const rect = containerRef.current!.getBoundingClientRect();
     const x = (e.clientX - rect.left) / scale;
     const y = (e.clientY - rect.top) / scale;
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    claimPointer(e);
     dragRef.current = {
       kind: "marquee",
       startX: x,
@@ -201,15 +244,28 @@ export function PosterCanvas({
       }
       return;
     }
+    if (d.kind === "crop-move") {
+      const dx = (e.clientX - d.startX) / scale;
+      const dy = (e.clientY - d.startY) / scale;
+      // Dragging the picture right reveals more of its left edge, hence the
+      // inverted object-position delta.  The crop remains reversible because
+      // only normalized viewport coordinates are stored.
+      const clamp = (value: number) => Math.max(0, Math.min(1, value));
+      onChangeImageCrop(d.id, {
+        x: clamp(d.origCropX - dx / Math.max(1, d.frameW)),
+        y: clamp(d.origCropY - dy / Math.max(1, d.frameH)),
+      });
+      return;
+    }
     if (d.kind === "resize") {
       const dx = (e.clientX - d.startX) / scale;
       const dy = (e.clientY - d.startY) / scale;
       let { origX: x, origY: y, origW: w, origH: h } = d;
       const isCorner = d.handle.length === 2;
 
-      // Image corners are always an aspect-locked scale operation. Edge
-      // handles only move inward and permanently discard the hidden pixels on
-      // pointer-up; a discarded edge cannot be revealed again by accident.
+      // Image corners are always aspect-locked scaling. Edge handles resize
+      // the non-destructive crop viewport in both directions, just like a
+      // Canva crop frame: moving an edge back out reveals the original image.
       if (d.isImage && isCorner) {
         const ratio = d.origW / d.origH;
         const widthByX = d.handle.includes("w") ? -dx : dx;
@@ -220,14 +276,14 @@ export function PosterCanvas({
         if (d.handle.includes("w")) x = d.origX + (d.origW - w);
         if (d.handle.includes("n")) y = d.origY + (d.origH - h);
       } else if (d.isImage) {
-        if (d.handle.includes("e")) w = Math.max(20, d.origW + Math.min(0, dx));
-        if (d.handle.includes("s")) h = Math.max(20, d.origH + Math.min(0, dy));
+        if (d.handle.includes("e")) w = Math.max(20, d.origW + dx);
+        if (d.handle.includes("s")) h = Math.max(20, d.origH + dy);
         if (d.handle.includes("w")) {
-          w = Math.max(20, d.origW - Math.max(0, dx));
+          w = Math.max(20, d.origW - dx);
           x = d.origX + (d.origW - w);
         }
         if (d.handle.includes("n")) {
-          h = Math.max(20, d.origH - Math.max(0, dy));
+          h = Math.max(20, d.origH - dy);
           y = d.origY + (d.origH - h);
         }
       } else {
@@ -248,7 +304,6 @@ export function PosterCanvas({
         w: Math.round(w),
         h: d.isText ? undefined : Math.round(h),
       };
-      d.lastPatch = d.isText || patch.h === undefined ? undefined : { ...patch, h: patch.h };
       onResize(d.id, patch);
       return;
     }
@@ -305,20 +360,6 @@ export function PosterCanvas({
 
   function endDrag(e: React.PointerEvent) {
     const d = dragRef.current;
-    if (
-      e.type === "pointerup" &&
-      d?.kind === "resize" &&
-      d.isImage &&
-      d.handle.length === 1 &&
-      d.originalImage &&
-      d.lastPatch &&
-      (d.lastPatch.x !== d.origX ||
-        d.lastPatch.y !== d.origY ||
-        d.lastPatch.w !== d.origW ||
-        d.lastPatch.h !== d.origH)
-    ) {
-      onDestructiveCrop?.(d.originalImage, d.lastPatch);
-    }
     if (d?.kind === "marquee") {
       const x1 = Math.min(d.startX, d.curX);
       const x2 = Math.max(d.startX, d.curX);
@@ -342,16 +383,49 @@ export function PosterCanvas({
       }
     }
     try {
-      (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+      pointerCaptureRef.current?.releasePointerCapture(e.pointerId);
     } catch {
       /* noop */
     }
+    pointerCaptureRef.current = null;
     dragRef.current = null;
     rerender();
   }
 
   const marquee = dragRef.current?.kind === "marquee" ? dragRef.current : null;
   const soloSelected = selectedIds.size === 1 ? blocks.find((b) => selectedIds.has(b.id)) : null;
+
+  useEffect(() => {
+    const finishCrop = (e: KeyboardEvent) => {
+      if (cropId && (e.key === "Escape" || e.key === "Enter")) {
+        e.preventDefault();
+        setCropId(null);
+      }
+    };
+    window.addEventListener("keydown", finishCrop);
+    return () => window.removeEventListener("keydown", finishCrop);
+  }, [cropId]);
+
+  useEffect(() => {
+    const activateCropOnSecondPress = (e: PointerEvent) => {
+      const pending = pendingCropRef.current;
+      if (!pending) return;
+      if (Date.now() > pending.expiresAt) {
+        pendingCropRef.current = null;
+        return;
+      }
+      if (Math.hypot(e.clientX - pending.x, e.clientY - pending.y) > 18) return;
+      // Capture phase also covers the case where the inspector moved beneath
+      // the pointer after the first click; do not let that second press edit it.
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      pendingCropRef.current = null;
+      onSelectIds([pending.id]);
+      setCropId(pending.id);
+    };
+    window.addEventListener("pointerdown", activateCropOnSecondPress, true);
+    return () => window.removeEventListener("pointerdown", activateCropOnSecondPress, true);
+  }, [onSelectIds]);
 
   // Compute group bbox when multi-selected
   const groupBBox = useMemo(() => {
@@ -416,7 +490,8 @@ export function PosterCanvas({
                   block={b}
                   palette={palette}
                   selected={selected}
-                  onPointerDown={(e) => startBlockPointer(e, b)}
+                  cropEditing={cropId === b.id}
+                  onPointerDown={(e) => startImagePointer(e, b)}
                   onContextMenu={(e) => {
                     e.preventDefault();
                     if (!selectedIds.has(b.id)) onSelectIds([b.id]);
@@ -492,13 +567,13 @@ function ResizeHandles({
 }) {
   const handles: Array<{ h: Handle; l: number; t: number; cursor: string; visible: boolean; title: string }> = [
     { h: "nw", l: 0, t: 0, cursor: "nwse-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "n", l: w / 2, t: 0, cursor: "ns-resize", visible: !isText, title: "裁切图片上边" },
+    { h: "n", l: w / 2, t: 0, cursor: "ns-resize", visible: !isText, title: "调整可见取景上边（可恢复）" },
     { h: "ne", l: w, t: 0, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "e", l: w, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "裁切图片右边" },
+    { h: "e", l: w, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "调整可见取景右边（可恢复）" },
     { h: "se", l: w, t: h ?? 20, cursor: "nwse-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "s", l: w / 2, t: h ?? 20, cursor: "ns-resize", visible: !isText, title: "裁切图片下边" },
+    { h: "s", l: w / 2, t: h ?? 20, cursor: "ns-resize", visible: !isText, title: "调整可见取景下边（可恢复）" },
     { h: "sw", l: 0, t: h ?? 20, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "w", l: 0, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "裁切图片左边" },
+    { h: "w", l: 0, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "调整可见取景左边（可恢复）" },
   ];
   const size = 12;
   return (
@@ -617,12 +692,14 @@ function ImageEl({
   block,
   palette,
   selected,
+  cropEditing,
   onPointerDown,
   onContextMenu,
 }: {
   block: ImageBlock;
   palette: Palette;
   selected: boolean;
+  cropEditing: boolean;
   onPointerDown: (e: React.PointerEvent) => void;
   onContextMenu: (e: React.MouseEvent) => void;
 }) {
@@ -631,6 +708,7 @@ function ImageEl({
       onPointerDown={onPointerDown}
       onContextMenu={onContextMenu}
       style={{
+        position: "relative",
         width: block.w,
         height: block.h,
         border: block.src ? "none" : "2px dashed rgba(0,0,0,0.25)",
@@ -645,7 +723,7 @@ function ImageEl({
         textAlign: "center",
         padding: 6,
         boxSizing: "border-box",
-        cursor: "move",
+        cursor: cropEditing ? "grab" : "move",
         userSelect: "none",
         touchAction: "none",
         outline: selected ? "2px solid #4c8dff" : "none",
@@ -662,6 +740,7 @@ function ImageEl({
             width: "100%",
             height: "100%",
             objectFit: block.src.startsWith("data:image/svg+xml") ? "fill" : "cover",
+            objectPosition: `${(block.crop?.x ?? 0.5) * 100}% ${(block.crop?.y ?? 0.5) * 100}%`,
             pointerEvents: "none",
           }}
         />
@@ -672,6 +751,25 @@ function ImageEl({
             右键上传/搜索/去背景
           </div>
         </>
+      )}
+      {cropEditing && (
+        <div
+          style={{
+            position: "absolute",
+            left: 8,
+            bottom: 8,
+            padding: "5px 7px",
+            background: "rgba(16, 32, 48, 0.78)",
+            color: "white",
+            borderRadius: 3,
+            fontFamily: FAMILY.sans,
+            fontSize: 11,
+            fontStyle: "normal",
+            pointerEvents: "none",
+          }}
+        >
+          裁切模式：拖动图片调整取景 · Enter 完成
+        </div>
       )}
     </div>
   );

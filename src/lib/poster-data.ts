@@ -36,6 +36,9 @@ export type ImageBlock = {
   h: number;
   src: string | null;
   label: string;
+  // Non-destructive Canva-style crop position. Both values are normalized
+  // object-position coordinates (0 = start edge, 0.5 = centre, 1 = end edge).
+  crop?: { x: number; y: number };
 };
 
 export type Block = TextBlock | ImageBlock;

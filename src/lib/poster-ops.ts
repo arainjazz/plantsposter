@@ -122,7 +122,7 @@ export function applyOperations(
       case "set_image": {
         nextBlocks = nextBlocks.map((b) =>
           b.id === op.id && b.type === "image"
-            ? { ...b, src: op.src, ...(op.label ? { label: op.label } : {}) }
+            ? { ...b, src: op.src, crop: undefined, ...(op.label ? { label: op.label } : {}) }
             : b,
         );
         break;

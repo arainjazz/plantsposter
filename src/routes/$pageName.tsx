@@ -21,7 +21,7 @@ import {
 import { publishEditorState } from "@/lib/editor-storage";
 import { applyOperations, DEFAULT_PALETTE, type Operation, type Palette } from "@/lib/poster-ops";
 import { composeRangeMapSVG } from "@/lib/range-map";
-import { cleanupImageBackground, destructiveCropImage } from "@/lib/image-edit";
+import { cleanupImageBackground } from "@/lib/image-edit";
 import {
   downloadEditorStateFile,
   loadEditorState,
@@ -254,7 +254,9 @@ function Editor() {
   const setImageAt = useCallback(
     (id: string, src: string | null) => {
       updateActiveBlocks((bs) =>
-        bs.map((b) => (b.id === id && b.type === "image" ? { ...(b as ImageBlock), src } : b)),
+        bs.map((b) =>
+          b.id === id && b.type === "image" ? { ...(b as ImageBlock), src, crop: undefined } : b,
+        ),
       );
     },
     [updateActiveBlocks],
@@ -296,20 +298,10 @@ function Editor() {
       }),
     );
   }
-  async function destructiveCrop(original: ImageBlock, next: { x: number; y: number; w: number; h: number }) {
-    if (!original.src) return;
-    setBusyMsg("正在写入裁切后的图片…");
-    try {
-      const ref = await urlToBase64(original.src);
-      if (!ref) throw new Error("无法读取图片像素");
-      setImageAt(original.id, await destructiveCropImage(ref, original, next));
-    } catch (error) {
-      // The frame has already moved, but keep the original source instead of
-      // replacing it with a broken image when a remote host blocks pixel access.
-      alert(error instanceof Error ? `裁切未写入：${error.message}` : "裁切未写入");
-    } finally {
-      setBusyMsg(null);
-    }
+  function setImageCrop(id: string, crop: { x: number; y: number }) {
+    updateActiveBlocks((bs) =>
+      bs.map((b) => (b.id === id && b.type === "image" ? { ...b, crop } : b)),
+    );
   }
   function selectIds(ids: string[]) {
     setSelectedIds(new Set(ids));
@@ -875,7 +867,7 @@ function Editor() {
           onMoveMany={moveMany}
           onResize={resizeBlock}
           onResizeMany={resizeMany}
-          onDestructiveCrop={destructiveCrop}
+          onChangeImageCrop={setImageCrop}
           onChangeText={changeText}
           onImageContextMenu={openContextMenu}
           displayWidth={displayWidth}
