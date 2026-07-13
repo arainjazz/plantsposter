@@ -28,7 +28,12 @@ export type Operation =
   | {
       type: "set_range_map";
       id: string;
-      points: Array<{ lat: number; lon: number; kind?: "native" | "introduced"; label?: string }>;
+      points: Array<{
+        lat: number;
+        lon: number;
+        kind?: "native" | "introduced" | "unknown";
+        label?: string;
+      }>;
       title?: string;
       subtitle?: string;
       source?: string;

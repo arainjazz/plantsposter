@@ -36,7 +36,7 @@ const OPERATIONS_SCHEMA = {
               properties: {
                 lat: { type: "number" },
                 lon: { type: "number" },
-                kind: { type: "string", enum: ["native", "introduced"] },
+                kind: { type: "string", enum: ["native", "introduced", "unknown"] },
                 label: { type: "string" },
               },
               required: ["lat", "lon"],
@@ -174,6 +174,110 @@ type ChatBody = {
 const RESEARCH_RE =
   /(分布|distribut|范围|range|核查|校正|verify|检查|check|准确|正确|accurate|correct|联网|search|搜索|GBIF|POWO|iNaturalist|occurrence|坐标|coordinate)/i;
 
+const MAP_REQUEST_RE =
+  /(分布图|分布地图|全球分布|range\s*map|distribution\s*map|重绘.*分布|分布.*重绘)/i;
+
+type GbifOccurrence = {
+  decimalLatitude?: number;
+  decimalLongitude?: number;
+  establishmentMeans?: string;
+  country?: string;
+  stateProvince?: string;
+};
+
+function inferScientificName(body: ChatBody): string | null {
+  const haystack = [body.pageName ?? "", ...body.blocks.map((b) => b.text ?? "")].join("\n");
+  const matches = haystack.match(
+    /\b[A-Z][a-z]{2,}\s+[a-z][a-z-]{2,}(?:\s+(?:subsp\.|var\.)\s+[a-z-]+)?\b/g,
+  );
+  return matches?.[0] ?? null;
+}
+
+async function buildGbifRangeMap(body: ChatBody) {
+  const scientificName = inferScientificName(body);
+  const target =
+    body.blocks.find((b) => b.id === "img-map") ??
+    body.blocks.find((b) => b.role === "image" && /map|range|分布/i.test(b.id));
+  if (!scientificName || !target) return null;
+
+  const matchRes = await fetch(
+    `https://api.gbif.org/v1/species/match?name=${encodeURIComponent(scientificName)}`,
+  );
+  if (!matchRes.ok) throw new Error(`GBIF species match failed (${matchRes.status})`);
+  const match = (await matchRes.json()) as {
+    usageKey?: number;
+    scientificName?: string;
+    confidence?: number;
+  };
+  if (!match.usageKey || (match.confidence ?? 0) < 80) {
+    throw new Error(`GBIF could not confidently match ${scientificName}`);
+  }
+
+  const baseParams = new URLSearchParams({
+    taxon_key: String(match.usageKey),
+    has_coordinate: "true",
+    has_geospatial_issue: "false",
+  });
+  const countRes = await fetch(`https://api.gbif.org/v1/occurrence/search?${baseParams}&limit=0`);
+  if (!countRes.ok) throw new Error(`GBIF occurrence search failed (${countRes.status})`);
+  const countJson = (await countRes.json()) as { count?: number };
+  const count = countJson.count ?? 0;
+  const maxOffset = Math.max(0, Math.min(count - 100, 99_900));
+  const offsets = [
+    ...new Set([0, 0.25, 0.5, 0.75, 1].map((p) => Math.floor((maxOffset * p) / 100) * 100)),
+  ];
+  const pages = await Promise.all(
+    offsets.map(async (offset) => {
+      const res = await fetch(
+        `https://api.gbif.org/v1/occurrence/search?${baseParams}&limit=100&offset=${offset}`,
+      );
+      if (!res.ok) throw new Error(`GBIF occurrence page failed (${res.status})`);
+      return (await res.json()) as { results?: GbifOccurrence[] };
+    }),
+  );
+  const results = pages.flatMap((page) => page.results ?? []);
+
+  // One representative record per 4-degree grid cell prevents dense collection
+  // hotspots from hiding the overall range while retaining real GBIF coordinates.
+  const cells = new Map<string, GbifOccurrence>();
+  for (const row of results) {
+    if (!Number.isFinite(row.decimalLatitude) || !Number.isFinite(row.decimalLongitude)) continue;
+    const cell = `${Math.floor(row.decimalLatitude! / 4)},${Math.floor(row.decimalLongitude! / 4)}`;
+    if (!cells.has(cell)) cells.set(cell, row);
+  }
+  const sampled = [...cells.values()].slice(0, 100);
+  if (!sampled.length) throw new Error(`GBIF returned no usable coordinates for ${scientificName}`);
+  const points = sampled.map((row) => {
+    const means = (row.establishmentMeans ?? "").toLowerCase();
+    const kind = means.includes("introduced")
+      ? ("introduced" as const)
+      : means.includes("native")
+        ? ("native" as const)
+        : ("unknown" as const);
+    return {
+      lat: row.decimalLatitude!,
+      lon: row.decimalLongitude!,
+      kind,
+      label: [row.stateProvince, row.country].filter(Boolean).join(", ") || undefined,
+    };
+  });
+  const accessed = new Date().toISOString().slice(0, 10);
+  const acceptedName = match.scientificName ?? scientificName;
+  return {
+    message: `已直接核查 GBIF 并重绘 ${acceptedName} 的分布图：采用 ${points.length} 个经坐标质量过滤、4° 网格抽样的真实记录。GBIF 的原生/引入属性缺失时以灰色“属性未定”显示，不把出现记录误报为原生分布。`,
+    operations: [
+      {
+        type: "set_range_map" as const,
+        id: target.id,
+        points,
+        title: `${acceptedName} · Global Distribution`,
+        subtitle: "GBIF occurrence records · Wikimedia CC0 base",
+        source: `GBIF taxonKey ${match.usageKey}; ${count} matched records; stratified API sample, coordinate + geospatial-quality filters; accessed ${accessed}; https://www.gbif.org/species/${match.usageKey}`,
+      },
+    ],
+  };
+}
+
 async function webSearchResearch(
   key: string,
   species: string,
@@ -210,10 +314,23 @@ export const Route = createFileRoute("/api/chat")({
         const model = body.model || "gemini-2.5-flash";
         const custom = body.custom;
         const key = process.env.GEMINI_API_KEY;
+        if (MAP_REQUEST_RE.test(body.message)) {
+          try {
+            const directMap = await buildGbifRangeMap(body);
+            if (directMap) return Response.json(directMap);
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : "unknown GBIF error";
+            return Response.json({ message: `无法从 GBIF 安全重绘分布图：${msg}`, operations: [] });
+          }
+        }
         if (!custom && !key) {
           return Response.json(
-            { message: "Missing GEMINI_API_KEY (未配置后端环境变量，请在左上角『配置新模型』中填入你的 API Key)", operations: [] },
-            { status: 200 }
+            {
+              message:
+                "Missing GEMINI_API_KEY (未配置后端环境变量，请在左上角『配置新模型』中填入你的 API Key)",
+              operations: [],
+            },
+            { status: 200 },
           );
         }
 

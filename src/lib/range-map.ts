@@ -10,7 +10,7 @@
 export type RangePoint = {
   lat: number;
   lon: number;
-  kind?: "native" | "introduced";
+  kind?: "native" | "introduced" | "unknown";
   label?: string;
 };
 
@@ -64,11 +64,13 @@ export async function composeRangeMapSVG(
 
   const nativePts: string[] = [];
   const introPts: string[] = [];
+  const unknownPts: string[] = [];
   for (const p of points) {
     const { x, y } = projectLonLat(p.lat, p.lon);
     const c = `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="4.2" stroke="#fff" stroke-width="0.7" opacity="0.92"/>`;
     if (p.kind === "introduced") introPts.push(c.replace("<circle", '<circle fill="#d97706"'));
-    else nativePts.push(c.replace("<circle", '<circle fill="#3a7d2e"'));
+    else if (p.kind === "native") nativePts.push(c.replace("<circle", '<circle fill="#3a7d2e"'));
+    else unknownPts.push(c.replace("<circle", '<circle fill="#64748b"'));
   }
 
   // total canvas 950 x 780 (620 map + 160 caption strip)
@@ -91,6 +93,7 @@ export async function composeRangeMapSVG(
     <line x1="0" y1="420.09" x2="950" y2="420.09"/>
   </g>
   <g id="introduced-points">${introPts.join("")}</g>
+  <g id="unknown-points">${unknownPts.join("")}</g>
   <g id="native-points">${nativePts.join("")}</g>
 
   <!-- caption strip -->
@@ -103,6 +106,8 @@ export async function composeRangeMapSVG(
       <text class="lg" x="24" y="12">${escapeXml(legendNative)}</text>
       <circle cx="220" cy="8" r="6" fill="#d97706" stroke="#fff" stroke-width="0.8"/>
       <text class="lg" x="236" y="12">${escapeXml(legendIntro)}</text>
+      <circle cx="440" cy="8" r="6" fill="#64748b" stroke="#fff" stroke-width="0.8"/>
+      <text class="lg" x="456" y="12">Status unknown · 属性未定</text>
     </g>
 
     <text class="cap" x="24" y="118">${escapeXml(source)}</text>
