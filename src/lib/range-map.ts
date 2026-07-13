@@ -41,7 +41,7 @@ async function loadBaseMap(): Promise<string> {
     .map((path) =>
       path
         .replace(
-          /\s(?:style|fill|stroke|stroke-width|stroke-dasharray|stroke-linejoin|stroke-linecap|opacity)="[^"]*"/gi,
+          /\s(?:style|fill|stroke|stroke-width|stroke-dasharray|stroke-linejoin|stroke-linecap|opacity|(?:inkscape|sodipodi):[\w-]+)="[^"]*"/gi,
           "",
         )
         .replace(/\s+\/?>$/, (end) => (end.includes("/") ? "/>" : ">")),

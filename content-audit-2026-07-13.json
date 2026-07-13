@@ -1,0 +1,182 @@
+{
+  "accessed": "2026-07-13",
+  "mapMethod": "GBIF occurrence/search; known native-range country filter; PRESENT; coordinate=true; geospatial_issue=false; stratified pages; 3-degree grid deduplication",
+  "pages": [
+    {
+      "page": "封面·半日花",
+      "scientific": "Helianthemum songaricum",
+      "key": 7878193,
+      "accepted": "Helianthemum songaricum Schrenk",
+      "count": 177,
+      "plotted": 10
+    },
+    {
+      "page": "四合木",
+      "scientific": "Tetraena mongolica",
+      "key": 3987052,
+      "accepted": "Tetraena mongolica Maxim.",
+      "count": 5,
+      "plotted": 3
+    },
+    {
+      "page": "蒙古沙冬青",
+      "scientific": "Ammopiptanthus mongolicus",
+      "key": 2943136,
+      "accepted": "Ammopiptanthus mongolicus (Maxim. ex Kom.) S.H.Cheng",
+      "count": 26,
+      "plotted": 8
+    },
+    {
+      "page": "绵刺",
+      "scientific": "Potaninia mongolica",
+      "key": 5371208,
+      "accepted": "Potaninia mongolica Maxim.",
+      "count": 70,
+      "plotted": 5
+    },
+    {
+      "page": "鄂尔多斯野丁香",
+      "scientific": "Leptodermis ordosica",
+      "key": 2893478,
+      "accepted": "Leptodermis ordosica H.C.Fu & E.W.Ma",
+      "count": 23,
+      "plotted": 3
+    },
+    {
+      "page": "鄂尔多斯蒿",
+      "scientific": "Artemisia ordosica",
+      "key": 3121069,
+      "accepted": "Artemisia ordosica Krasch.",
+      "count": 123,
+      "plotted": 18
+    },
+    {
+      "page": "白沙蒿",
+      "scientific": "Artemisia sphaerocephala",
+      "key": 3121431,
+      "accepted": "Artemisia sphaerocephala Krasch.",
+      "count": 163,
+      "plotted": 19
+    },
+    {
+      "page": "叉子圆柏",
+      "scientific": "Juniperus sabina",
+      "key": 7963890,
+      "accepted": "Juniperus sabina L.",
+      "count": 14783,
+      "plotted": 26
+    },
+    {
+      "page": "叉子圆柏·实拍照片版",
+      "scientific": "Juniperus sabina",
+      "key": 7963890,
+      "accepted": "Juniperus sabina L.",
+      "count": 14783,
+      "plotted": 26
+    },
+    {
+      "page": "叉子圆柏·科学插图版",
+      "scientific": "Juniperus sabina",
+      "key": 7963890,
+      "accepted": "Juniperus sabina L.",
+      "count": 14783,
+      "plotted": 26
+    },
+    {
+      "page": "黄柳",
+      "scientific": "Salix gordejevii",
+      "key": 5583207,
+      "accepted": "Salix gordejevii Y.L.Chang & A.K.Skvortsov",
+      "count": 181,
+      "plotted": 13
+    },
+    {
+      "page": "柠条锦鸡儿",
+      "scientific": "Caragana korshinskii",
+      "key": 2943277,
+      "accepted": "Caragana korshinskii Kom.",
+      "count": 529,
+      "plotted": 16
+    },
+    {
+      "page": "红砂",
+      "scientific": "Reaumuria soongorica",
+      "key": 5929908,
+      "accepted": "Reaumuria soongorica (Pall.) Maxim.",
+      "count": 39,
+      "plotted": 13
+    },
+    {
+      "page": "唐古特白刺",
+      "scientific": "Nitraria tangutorum",
+      "key": 3986821,
+      "accepted": "Nitraria tangutorum Bobrov",
+      "count": 182,
+      "plotted": 22
+    },
+    {
+      "page": "梭梭",
+      "scientific": "Haloxylon ammodendron",
+      "key": 3759078,
+      "accepted": "Haloxylon ammodendron (C.A.Mey.) Bunge ex Fenzl",
+      "count": 995,
+      "plotted": 27
+    },
+    {
+      "page": "沙芥",
+      "scientific": "Pugionium cornutum",
+      "key": 3042082,
+      "accepted": "Pugionium cornutum (L.) Gaertn.",
+      "count": 56,
+      "plotted": 8
+    },
+    {
+      "page": "革苞菊",
+      "scientific": "Tugarinovia mongolica",
+      "key": 3100296,
+      "accepted": "Tugarinovia mongolica Iljin",
+      "count": 21,
+      "plotted": 5
+    },
+    {
+      "page": "蒙古韭",
+      "scientific": "Allium mongolicum",
+      "key": 2857345,
+      "accepted": "Allium mongolicum Regel",
+      "count": 495,
+      "plotted": 24
+    },
+    {
+      "page": "肉苁蓉",
+      "scientific": "Cistanche deserticola",
+      "key": 3730700,
+      "accepted": "Cistanche deserticola Ma",
+      "count": 50,
+      "plotted": 12
+    },
+    {
+      "page": "文冠果",
+      "scientific": "Xanthoceras sorbifolium",
+      "key": 9479204,
+      "accepted": "Xanthoceras sorbifolium (A.Braun) Holub",
+      "count": 2,
+      "plotted": 2
+    },
+    {
+      "page": "蒙古扁桃",
+      "scientific": "Prunus mongolica",
+      "key": 3023152,
+      "accepted": "Prunus mongolica Maxim.",
+      "count": 78,
+      "plotted": 13
+    },
+    {
+      "page": "发菜",
+      "scientific": "Nostoc flagelliforme",
+      "key": 12085956,
+      "accepted": "Nostoc flagelliforme A",
+      "count": 37,
+      "plotted": 0
+    }
+  ]
+}
