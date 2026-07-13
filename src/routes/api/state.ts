@@ -16,7 +16,11 @@ import { createFileRoute } from "@tanstack/react-router";
 // The reader is duck-typed so it works whether POSTER_STATE is a KV namespace
 // (get() → string) or an R2 bucket (get() → object with .text()).
 
-const STATE_KEY = "latest";
+// A previous published draft was stored under "latest" in Cloudflare KV and
+// takes precedence over bundled data.  This revision deliberately begins a
+// fresh publication channel so the audited, collision-checked posters ship
+// instead of that stale draft.  Subsequent editor saves stay on this key.
+const STATE_KEY = "audited-2026-07-13";
 const SEED_ASSET = "/banrihua-editor-20plants.json";
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB safety cap
 
