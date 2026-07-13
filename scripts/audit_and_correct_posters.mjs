@@ -1,7 +1,8 @@
 import fs from "node:fs/promises";
 
 const SOURCE = "public/banrihua-editor-20plants.json";
-const OUTPUTS = [SOURCE, "banrihua-editor-20plants.json", "src/lib/default-plants-ssr.json"];
+const OUTPUTS = [SOURCE, "banrihua-editor-20plants.json"];
+const SSR_OUTPUT = "src/lib/default-plants-ssr.json";
 const CACHE = ".map-audit-cache.json";
 const ACCESSED = new Date().toISOString().slice(0, 10);
 const rangeCountries = {
@@ -348,6 +349,16 @@ for (const page of state.pages) {
 
 const json = `${JSON.stringify(state, null, 2)}\n`;
 for (const output of OUTPUTS) await fs.writeFile(output, json);
+// The SSR seed must remain compact: the client immediately replaces it with
+// the published/full state, while embedding data URLs here would exceed the
+// Cloudflare Worker script-size limit.
+const ssrState = structuredClone(state);
+for (const page of ssrState.pages) {
+  for (const block of page.blocks) {
+    if (block.type === "image") block.src = null;
+  }
+}
+await fs.writeFile(SSR_OUTPUT, `${JSON.stringify(ssrState, null, 2)}\n`);
 await fs.writeFile(
   "content-audit-2026-07-13.json",
   `${JSON.stringify({ accessed: ACCESSED, mapMethod: "GBIF occurrence/search; known native-range country filter; PRESENT; coordinate=true; geospatial_issue=false; stratified pages; 3-degree grid deduplication", pages: audit.map(({ dataUrl, ...row }) => row) }, null, 2)}\n`,
