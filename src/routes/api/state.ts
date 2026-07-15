@@ -22,7 +22,7 @@ import { createFileRoute } from "@tanstack/react-router";
 // instead of that stale draft.  Subsequent editor saves stay on this key.
 // A release-specific key prevents a previous editor snapshot in the shared KV
 // namespace from overriding the audited seed that ships with this deployment.
-const STATE_KEY = "audited-2026-07-13-fa3c8be";
+const STATE_KEY = "ordosica-field-photo-2026-07-15";
 const SEED_ASSET = "/banrihua-editor-20plants.json";
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB safety cap
 
