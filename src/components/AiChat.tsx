@@ -21,13 +21,17 @@ type ModelEntry = {
 };
 
 const BUILTIN_CHAT: ModelEntry[] = [
-  { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash（默认）", kind: "chat" },
-  { id: "gemini-3.1-flash-lite", label: "Gemini 3.1 Flash Lite", kind: "chat" },
-  { id: "gemini-3-pro-preview", label: "Gemini 3 Pro", kind: "chat" },
-  { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro", kind: "chat" },
-  { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", kind: "chat" },
-  { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite", kind: "chat" },
+  { id: "gemini-3.1-flash-lite", label: "Gemini 3.1 Flash Lite（默认 · 可联网）", kind: "chat" },
+  { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash", kind: "chat" },
 ];
+
+const DEFAULT_CHAT_MODEL = BUILTIN_CHAT[0].id;
+const RETIRED_CHAT_MODELS = new Set([
+  "gemini-3-pro-preview",
+  "gemini-2.5-pro",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+]);
 
 const BUILTIN_IMAGE: ModelEntry[] = [
   { id: "gemini-2.5-flash-image", label: "Nano Banana · 2.5 Flash Image（快）", kind: "image" },
@@ -56,12 +60,12 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
     {
       role: "assistant",
       content:
-        '你好，我是页面编辑助理。\n• 说要改什么，我会生成并实际写入当前页面的编辑指令\n• 每次回复都会显示“已实际写入页面”的数量；未写入时会明确提示，不会假称已修改\n• 选中一个图片框，输入描述后点『生成配图』\n• 生成“全球分布图”时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG',
+        "你好，我是页面编辑助理。\n• 说要改什么，我会生成并实际写入当前页面的编辑指令\n• 需要最新资料、核查或搜索时，我会先用 Google Search 联网检索\n• 每次回复都会显示“已实际写入页面”的数量；未写入时会明确提示，不会假称已修改\n• 选中一个图片框，输入描述后点『生成配图』\n• 生成“全球分布图”时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG",
     },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [model, setModel] = useState<string>(BUILTIN_CHAT[0].id);
+  const [model, setModel] = useState<string>(DEFAULT_CHAT_MODEL);
   const [imgModel, setImgModel] = useState<string>(BUILTIN_IMAGE[0].id);
   const [image, setImage] = useState<{ mimeType: string; data: string; name: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -70,7 +74,12 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
 
   useEffect(() => {
     const saved = localStorage.getItem(MODEL_KEY);
-    if (saved) setModel(saved);
+    if (saved && !RETIRED_CHAT_MODELS.has(saved)) {
+      setModel(saved);
+    } else {
+      setModel(DEFAULT_CHAT_MODEL);
+      localStorage.setItem(MODEL_KEY, DEFAULT_CHAT_MODEL);
+    }
     const savedImg = localStorage.getItem(IMG_MODEL_KEY);
     if (savedImg) setImgModel(savedImg);
     setCustomModels(loadCustom());
@@ -152,7 +161,16 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
           })),
         }),
       });
-      const data = (await res.json()) as { message: string; operations: Operation[] };
+      const raw = await res.text();
+      let data: { message?: string; operations?: Operation[] };
+      try {
+        data = JSON.parse(raw) as { message?: string; operations?: Operation[] };
+      } catch {
+        throw new Error(
+          `AI 服务返回了无法解析的响应（HTTP ${res.status}）${raw ? `：${raw.slice(0, 120)}` : ""}`,
+        );
+      }
+      if (!res.ok) throw new Error(data.message || `AI 服务请求失败（HTTP ${res.status}）`);
       const result = await onApplyOperations(data.operations ?? []);
       const outcome = result.applied
         ? `✔ 已实际写入页面：${result.applied} 处${result.skipped ? `；${result.skipped} 条未能匹配` : ""}`
@@ -163,7 +181,7 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
         ...nextHistory,
         {
           role: "assistant",
-          content: `${data.message}\n\n${outcome}`,
+          content: `${data.message || "AI 没有返回说明。"}\n\n${outcome}`,
         },
       ]);
     } catch (err) {
@@ -210,7 +228,9 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
       });
       const data = (await res.json()) as { dataUrl?: string; error?: string; text?: string };
       if (data.dataUrl) {
-        const result = await onApplyOperations([{ type: "set_image", id: targetId, src: data.dataUrl }]);
+        const result = await onApplyOperations([
+          { type: "set_image", id: targetId, src: data.dataUrl },
+        ]);
         setMessages([
           ...nextHistory,
           {

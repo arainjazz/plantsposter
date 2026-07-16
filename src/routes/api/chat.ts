@@ -185,11 +185,9 @@ type ChatBody = {
   custom?: { baseURL: string; apiKey: string } | null;
 };
 
-// Best-effort web-search grounding: for research / distribution / verification
-// requests, ask Gemini (with the googleSearch tool) to pull authoritative
-// distribution data first, then feed that text into the structured edit call.
-// Gemini can't combine googleSearch with responseSchema, so this is a separate
-// pre-step; any failure is swallowed and the normal flow proceeds ungrounded.
+// Gemini 3 supports Google Search grounding and structured outputs in the same
+// request. Search when the user explicitly asks for it or when factual
+// verification/distribution work would otherwise rely on stale model memory.
 const RESEARCH_RE =
   /(分布|distribut|范围|range|核查|校正|verify|检查|check|准确|正确|accurate|correct|联网|search|搜索|GBIF|POWO|iNaturalist|occurrence|坐标|coordinate)/i;
 
@@ -309,43 +307,25 @@ async function buildGbifRangeMap(body: ChatBody) {
   };
 }
 
-async function webSearchResearch(
-  key: string,
-  species: string,
-  userMessage: string,
-): Promise<string | null> {
-  try {
-    const prompt = `Research the authoritative GLOBAL native distribution of the plant species "${species}" using GBIF, Kew POWO / Plants of the World Online, and iNaturalist. Return a concise bullet list of representative real occurrence points as "Region/place: lat, lon (native|introduced)", plus the data sources (with taxon key / URL and access notes) and any range caveats. Focus on decimal lat/lon. User request: ${userMessage}`;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        tools: [{ googleSearch: {} }],
-        generationConfig: { temperature: 0.2 },
-      }),
-    });
-    if (!res.ok) return null;
-    const j = (await res.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    };
-    const text = j.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
-    return text.trim() ? text.trim().slice(0, 4000) : null;
-  } catch {
-    return null;
-  }
-}
-
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json()) as ChatBody;
-        const model = body.model || "gemini-2.5-flash";
+        const rawBody = (await request.json()) as Partial<ChatBody>;
+        const body: ChatBody = {
+          message: typeof rawBody.message === "string" ? rawBody.message : "",
+          model: typeof rawBody.model === "string" ? rawBody.model : "gemini-3.1-flash-lite",
+          pageName: typeof rawBody.pageName === "string" ? rawBody.pageName : undefined,
+          blocks: Array.isArray(rawBody.blocks) ? rawBody.blocks : [],
+          history: Array.isArray(rawBody.history) ? rawBody.history : [],
+          image: rawBody.image ?? null,
+          custom: rawBody.custom ?? null,
+        };
+        const model = body.model || "gemini-3.1-flash-lite";
         const custom = body.custom;
         const key = process.env.GEMINI_API_KEY;
         const lovableKey = process.env.LOVABLE_API_KEY;
+        const shouldSearch = RESEARCH_RE.test(body.message);
         if (MAP_REQUEST_RE.test(body.message)) {
           try {
             const directMap = await buildGbifRangeMap(body);
@@ -378,16 +358,13 @@ export const Route = createFileRoute("/api/chat")({
           .join("\n");
 
         const species = (body.pageName || "").trim();
-        // Web-search grounding for research/distribution requests (Gemini path only).
-        let research: string | null = null;
-        if (key && !custom && RESEARCH_RE.test(body.message)) {
-          research = await webSearchResearch(key, species || catalog.slice(0, 200), body.message);
-        }
+        const today = new Date().toISOString().slice(0, 10);
         const contextText =
+          `Current date (UTC): ${today}\n` +
           `Current page name / species: ${species || "(infer from the catalog below)"}\n\n` +
           `Block catalog (THIS page's real content — base every edit on it):\n${catalog}\n\n` +
-          (research
-            ? `RESEARCH (authoritative web search results — use these to CORRECT distribution points and facts for THIS species):\n${research}\n\n`
+          (shouldSearch
+            ? "Use Google Search grounding for the user's factual request. Prefer primary/authoritative sources, do not invent facts, and include the source names in your message.\n\n"
             : "") +
           `Conversation so far:\n${historyText}\n\nUser: ${body.message}`;
 
@@ -403,6 +380,7 @@ export const Route = createFileRoute("/api/chat")({
 
         try {
           let text = "";
+          let sourceLinks: Array<{ title: string; uri: string }> = [];
           if (custom) {
             // OpenAI-compatible chat completions (user-supplied model / endpoint)
             const messages: Array<Record<string, unknown>> = [
@@ -448,7 +426,7 @@ export const Route = createFileRoute("/api/chat")({
               choices?: Array<{ message?: { content?: string } }>;
             };
             text = j.choices?.[0]?.message?.content ?? "";
-          } else if (lovableKey) {
+          } else if (lovableKey && !(key && shouldSearch)) {
             // Prefer the project gateway for text edits too: a personal Gemini
             // key can be quota-limited while image generation already uses it.
             const gatewayModel = model.startsWith("google/") ? model : `google/${model}`;
@@ -506,6 +484,7 @@ export const Route = createFileRoute("/api/chat")({
               body: JSON.stringify({
                 systemInstruction: { role: "system", parts: [{ text: SYSTEM }] },
                 contents: [{ role: "user", parts: userParts }],
+                ...(shouldSearch ? { tools: [{ googleSearch: {} }] } : {}),
                 generationConfig: {
                   responseMimeType: "application/json",
                   responseSchema: OPERATIONS_SCHEMA,
@@ -525,15 +504,33 @@ export const Route = createFileRoute("/api/chat")({
               );
             }
             const json = (await upstream.json()) as {
-              candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+              candidates?: Array<{
+                content?: { parts?: Array<{ text?: string }> };
+                groundingMetadata?: {
+                  groundingChunks?: Array<{ web?: { title?: string; uri?: string } }>;
+                };
+              }>;
             };
             text = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+            sourceLinks = (json.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [])
+              .map((chunk) => chunk.web)
+              .filter((web): web is { title?: string; uri?: string } => !!web?.uri)
+              .map((web) => ({ title: web.title || "来源", uri: web.uri! }))
+              .filter(
+                (source, index, all) => all.findIndex((item) => item.uri === source.uri) === index,
+              )
+              .slice(0, 5);
           }
           let parsed: { message: string; operations: unknown[] };
           try {
             parsed = JSON.parse(text);
           } catch {
             parsed = { message: text || "(空回复)", operations: [] };
+          }
+          if (sourceLinks.length) {
+            parsed.message += `\n\n联网来源：\n${sourceLinks
+              .map((source) => `- ${source.title}: ${source.uri}`)
+              .join("\n")}`;
           }
           return Response.json(parsed);
         } catch (err) {
