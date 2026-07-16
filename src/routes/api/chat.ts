@@ -193,6 +193,19 @@ const RESEARCH_RE =
 const MAP_REQUEST_RE =
   /(分布图|分布地图|全球分布|range\s*map|distribution\s*map|重绘.*分布|分布.*重绘)/i;
 
+const NAMED_COLORS: Record<string, string> = {
+  红色: "#D32F2F",
+  橙色: "#E26A2C",
+  黄色: "#D4A017",
+  绿色: "#2E7D32",
+  青色: "#00838F",
+  蓝色: "#1565C0",
+  紫色: "#6A1B9A",
+  黑色: "#111111",
+  白色: "#FFFFFF",
+  灰色: "#666666",
+};
+
 type WebSource = { title: string; uri: string; snippet: string };
 
 function decodeHtml(value: string): string {
@@ -251,6 +264,63 @@ async function searchPublicWeb(query: string): Promise<WebSource[]> {
     console.warn("public web search failed", error);
     return [];
   }
+}
+
+function directPageEdit(body: ChatBody): { message: string; operations: unknown[] } | null {
+  if (RESEARCH_RE.test(body.message)) return null;
+  const textBlocks = body.blocks.filter((block) => block.role === "text");
+  const explicitTarget = textBlocks.find((block) => body.message.includes(block.id));
+  const titleTarget = /副标题/.test(body.message)
+    ? textBlocks.find((block) => /title-sub/i.test(block.id))
+    : /标题/.test(body.message)
+      ? textBlocks.find((block) => /^title(?:-|$)/i.test(block.id))
+      : undefined;
+  const target = explicitTarget ?? titleTarget;
+  if (!target) return null;
+
+  const operations: unknown[] = [];
+  const hexColor = body.message.match(/#[0-9a-f]{6}\b/i)?.[0];
+  const namedColor = Object.entries(NAMED_COLORS).find(([name]) => body.message.includes(name));
+  if (/颜色|色彩|color/i.test(body.message) && (hexColor || namedColor)) {
+    const color = hexColor?.toUpperCase() ?? namedColor![1];
+    operations.push({ type: "update_style", id: target.id, color });
+  }
+
+  const fontSize = body.message.match(/(?:字号|字体大小|font\s*size)[^0-9]{0,8}(\d{1,3})/i)?.[1];
+  if (fontSize) {
+    operations.push({ type: "update_style", id: target.id, fontSize: Number(fontSize) });
+  }
+
+  if (!/颜色|色彩|字号|字体大小|font\s*size|加粗|斜体|对齐/i.test(body.message)) {
+    const replacement = body.message.match(
+      /(?:把|将)?(?:主)?(?:副)?标题(?:文字|内容)?(?:改成|修改为|换成)[：:\s]*[“"']?(.+?)[”"']?[。！!]?$/,
+    )?.[1];
+    if (replacement?.trim()) {
+      operations.push({ type: "update_text", id: target.id, text: replacement.trim() });
+    }
+  }
+
+  if (!operations.length) return null;
+  return {
+    message: `已直接执行页面修改，共 ${operations.length} 处。`,
+    operations,
+  };
+}
+
+function repairModelOperations(operations: unknown[]): unknown[] {
+  return operations.map((operation) => {
+    if (!operation || typeof operation !== "object") return operation;
+    const record = operation as Record<string, unknown>;
+    if (
+      record.type === "update_style" &&
+      typeof record.color !== "string" &&
+      typeof record.ink === "string" &&
+      /^#[0-9a-f]{6}$/i.test(record.ink)
+    ) {
+      return { ...record, color: record.ink };
+    }
+    return operation;
+  });
 }
 
 type GbifOccurrence = {
@@ -385,6 +455,8 @@ export const Route = createFileRoute("/api/chat")({
         const key = process.env.GEMINI_API_KEY;
         const lovableKey = process.env.LOVABLE_API_KEY;
         const shouldSearch = RESEARCH_RE.test(body.message);
+        const directEdit = directPageEdit(body);
+        if (directEdit) return Response.json(directEdit);
         if (MAP_REQUEST_RE.test(body.message)) {
           try {
             const directMap = await buildGbifRangeMap(body);
@@ -475,6 +547,7 @@ export const Route = createFileRoute("/api/chat")({
             ];
             const upstream = await fetch(`${custom.baseURL.replace(/\/$/, "")}/chat/completions`, {
               method: "POST",
+              signal: AbortSignal.timeout(25_000),
               headers: {
                 Authorization: `Bearer ${custom.apiKey}`,
                 "Content-Type": "application/json",
@@ -522,6 +595,7 @@ export const Route = createFileRoute("/api/chat")({
             ];
             const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
               method: "POST",
+              signal: AbortSignal.timeout(25_000),
               headers: {
                 Authorization: `Bearer ${lovableKey}`,
                 "Lovable-API-Key": lovableKey,
@@ -554,6 +628,7 @@ export const Route = createFileRoute("/api/chat")({
             )}:generateContent?key=${encodeURIComponent(key!)}`;
             const upstream = await fetch(url, {
               method: "POST",
+              signal: AbortSignal.timeout(25_000),
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 systemInstruction: { role: "system", parts: [{ text: SYSTEM }] },
@@ -604,6 +679,7 @@ export const Route = createFileRoute("/api/chat")({
           } catch {
             parsed = { message: text || "(空回复)", operations: [] };
           }
+          parsed.operations = repairModelOperations(parsed.operations);
           if (sourceLinks.length) {
             parsed.message += `\n\n联网来源：\n${sourceLinks
               .map((source) => `- ${source.title}: ${source.uri}`)
