@@ -185,14 +185,73 @@ type ChatBody = {
   custom?: { baseURL: string; apiKey: string } | null;
 };
 
-// Gemini 3 supports Google Search grounding and structured outputs in the same
-// request. Search when the user explicitly asks for it or when factual
-// verification/distribution work would otherwise rely on stale model memory.
+// Search when the user explicitly asks for it or when factual verification /
+// distribution work would otherwise rely on stale model memory.
 const RESEARCH_RE =
   /(分布|distribut|范围|range|核查|校正|verify|检查|check|准确|正确|accurate|correct|联网|search|搜索|GBIF|POWO|iNaturalist|occurrence|坐标|coordinate)/i;
 
 const MAP_REQUEST_RE =
   /(分布图|分布地图|全球分布|range\s*map|distribution\s*map|重绘.*分布|分布.*重绘)/i;
+
+type WebSource = { title: string; uri: string; snippet: string };
+
+function decodeHtml(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;|&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function unwrapSearchUrl(href: string): string | null {
+  try {
+    const normalized = href.startsWith("//") ? `https:${href}` : href;
+    const url = new URL(decodeHtml(normalized));
+    return url.searchParams.get("uddg") || url.href;
+  } catch {
+    return null;
+  }
+}
+
+async function searchPublicWeb(query: string): Promise<WebSource[]> {
+  try {
+    const url = new URL("https://html.duckduckgo.com/html/");
+    url.searchParams.set("q", query);
+    const response = await fetch(url, {
+      headers: {
+        Accept: "text/html",
+        "User-Agent": "Mozilla/5.0 (compatible; PlantsposterResearch/1.0)",
+      },
+    });
+    if (!response.ok) return [];
+    const html = await response.text();
+    const links = [
+      ...html.matchAll(/<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi),
+    ];
+    const snippets = [...html.matchAll(/<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi)];
+    return links
+      .map((match, index) => {
+        const uri = unwrapSearchUrl(match[1]);
+        if (!uri) return null;
+        return {
+          title: decodeHtml(match[2]) || "来源",
+          uri,
+          snippet: decodeHtml(snippets[index]?.[1] || ""),
+        };
+      })
+      .filter((source): source is WebSource => !!source)
+      .filter((source, index, all) => all.findIndex((item) => item.uri === source.uri) === index)
+      .slice(0, 6);
+  } catch (error) {
+    console.warn("public web search failed", error);
+    return [];
+  }
+}
 
 type GbifOccurrence = {
   decimalLatitude?: number;
@@ -359,13 +418,25 @@ export const Route = createFileRoute("/api/chat")({
 
         const species = (body.pageName || "").trim();
         const today = new Date().toISOString().slice(0, 10);
+        const webSources = shouldSearch
+          ? await searchPublicWeb([species, body.message].filter(Boolean).join(" "))
+          : [];
+        const webContext = webSources.length
+          ? `LIVE WEB SEARCH RESULTS (${today}):\n${webSources
+              .map(
+                (source, index) =>
+                  `${index + 1}. ${source.title}\nURL: ${source.uri}\nSnippet: ${source.snippet}`,
+              )
+              .join("\n\n")}\n\n`
+          : "";
         const contextText =
           `Current date (UTC): ${today}\n` +
           `Current page name / species: ${species || "(infer from the catalog below)"}\n\n` +
           `Block catalog (THIS page's real content — base every edit on it):\n${catalog}\n\n` +
           (shouldSearch
-            ? "Use Google Search grounding for the user's factual request. Prefer primary/authoritative sources, do not invent facts, and include the source names in your message.\n\n"
+            ? "Use the live web search results below for the user's factual request. Prefer primary/authoritative sources, do not invent facts, and include the source names in your message.\n\n"
             : "") +
+          webContext +
           `Conversation so far:\n${historyText}\n\nUser: ${body.message}`;
 
         const userParts: Array<Record<string, unknown>> = [{ text: contextText }];
@@ -380,7 +451,10 @@ export const Route = createFileRoute("/api/chat")({
 
         try {
           let text = "";
-          let sourceLinks: Array<{ title: string; uri: string }> = [];
+          let sourceLinks: Array<{ title: string; uri: string }> = webSources.map((source) => ({
+            title: source.title,
+            uri: source.uri,
+          }));
           if (custom) {
             // OpenAI-compatible chat completions (user-supplied model / endpoint)
             const messages: Array<Record<string, unknown>> = [
@@ -426,7 +500,7 @@ export const Route = createFileRoute("/api/chat")({
               choices?: Array<{ message?: { content?: string } }>;
             };
             text = j.choices?.[0]?.message?.content ?? "";
-          } else if (lovableKey && !(key && shouldSearch)) {
+          } else if (lovableKey) {
             // Prefer the project gateway for text edits too: a personal Gemini
             // key can be quota-limited while image generation already uses it.
             const gatewayModel = model.startsWith("google/") ? model : `google/${model}`;
@@ -484,10 +558,10 @@ export const Route = createFileRoute("/api/chat")({
               body: JSON.stringify({
                 systemInstruction: { role: "system", parts: [{ text: SYSTEM }] },
                 contents: [{ role: "user", parts: userParts }],
-                ...(shouldSearch ? { tools: [{ googleSearch: {} }] } : {}),
                 generationConfig: {
                   responseMimeType: "application/json",
                   responseSchema: OPERATIONS_SCHEMA,
+                  thinkingConfig: { thinkingLevel: "minimal" },
                   temperature: 0.6,
                 },
               }),
@@ -512,14 +586,17 @@ export const Route = createFileRoute("/api/chat")({
               }>;
             };
             text = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-            sourceLinks = (json.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [])
-              .map((chunk) => chunk.web)
-              .filter((web): web is { title?: string; uri?: string } => !!web?.uri)
-              .map((web) => ({ title: web.title || "来源", uri: web.uri! }))
-              .filter(
-                (source, index, all) => all.findIndex((item) => item.uri === source.uri) === index,
-              )
-              .slice(0, 5);
+            if (!sourceLinks.length) {
+              sourceLinks = (json.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [])
+                .map((chunk) => chunk.web)
+                .filter((web): web is { title?: string; uri?: string } => !!web?.uri)
+                .map((web) => ({ title: web.title || "来源", uri: web.uri! }))
+                .filter(
+                  (source, index, all) =>
+                    all.findIndex((item) => item.uri === source.uri) === index,
+                )
+                .slice(0, 5);
+            }
           }
           let parsed: { message: string; operations: unknown[] };
           try {

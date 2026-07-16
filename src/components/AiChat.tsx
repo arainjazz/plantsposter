@@ -60,7 +60,7 @@ export function AiChat({ blocks, pageName, selectedImageId, onApplyOperations }:
     {
       role: "assistant",
       content:
-        "你好，我是页面编辑助理。\n• 说要改什么，我会生成并实际写入当前页面的编辑指令\n• 需要最新资料、核查或搜索时，我会先用 Google Search 联网检索\n• 每次回复都会显示“已实际写入页面”的数量；未写入时会明确提示，不会假称已修改\n• 选中一个图片框，输入描述后点『生成配图』\n• 生成“全球分布图”时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG",
+        "你好，我是页面编辑助理。\n• 说要改什么，我会生成并实际写入当前页面的编辑指令\n• 需要最新资料、核查或搜索时，我会先检索公开网页并列出来源\n• 每次回复都会显示“已实际写入页面”的数量；未写入时会明确提示，不会假称已修改\n• 选中一个图片框，输入描述后点『生成配图』\n• 生成“全球分布图”时，我会按 Wikimedia CC0 底图 + 校正投影公式规范输出 SVG",
     },
   ]);
   const [input, setInput] = useState("");
