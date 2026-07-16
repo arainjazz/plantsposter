@@ -233,33 +233,51 @@ function unwrapSearchUrl(href: string): string | null {
 
 async function searchPublicWeb(query: string): Promise<WebSource[]> {
   try {
-    const url = new URL("https://html.duckduckgo.com/html/");
-    url.searchParams.set("q", query);
-    const response = await fetch(url, {
-      headers: {
-        Accept: "text/html",
-        "User-Agent": "Mozilla/5.0 (compatible; PlantsposterResearch/1.0)",
-      },
-    });
-    if (!response.ok) return [];
-    const html = await response.text();
-    const links = [
-      ...html.matchAll(/<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi),
-    ];
-    const snippets = [...html.matchAll(/<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi)];
-    return links
-      .map((match, index) => {
-        const uri = unwrapSearchUrl(match[1]);
-        if (!uri) return null;
-        return {
-          title: decodeHtml(match[2]) || "来源",
-          uri,
-          snippet: decodeHtml(snippets[index]?.[1] || ""),
-        };
-      })
-      .filter((source): source is WebSource => !!source)
-      .filter((source, index, all) => all.findIndex((item) => item.uri === source.uri) === index)
-      .slice(0, 6);
+    const requestSearchPage = async (endpoint: string) => {
+      const url = new URL(endpoint);
+      url.searchParams.set("q", query);
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(10_000),
+        headers: {
+          Accept: "text/html",
+          "User-Agent": "Mozilla/5.0 (compatible; PlantsposterResearch/1.0)",
+        },
+      });
+      return response.ok ? response.text() : "";
+    };
+
+    const parseResults = (html: string, linkPattern: RegExp, snippetPattern: RegExp) => {
+      const links = [...html.matchAll(linkPattern)];
+      const snippets = [...html.matchAll(snippetPattern)];
+      return links
+        .map((match, index) => {
+          const uri = unwrapSearchUrl(match[1]);
+          if (!uri) return null;
+          return {
+            title: decodeHtml(match[2]) || "来源",
+            uri,
+            snippet: decodeHtml(snippets[index]?.[1] || ""),
+          };
+        })
+        .filter((source): source is WebSource => !!source)
+        .filter((source, index, all) => all.findIndex((item) => item.uri === source.uri) === index)
+        .slice(0, 6);
+    };
+
+    const html = await requestSearchPage("https://html.duckduckgo.com/html/");
+    const primary = parseResults(
+      html,
+      /<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi,
+      /<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi,
+    );
+    if (primary.length) return primary;
+
+    const liteHtml = await requestSearchPage("https://lite.duckduckgo.com/lite/");
+    return parseResults(
+      liteHtml,
+      /<a[^>]*href="([^"]+)"[^>]*class=['"]result-link['"][^>]*>([\s\S]*?)<\/a>/gi,
+      /<td[^>]*class=['"]result-snippet['"][^>]*>([\s\S]*?)<\/td>/gi,
+    );
   } catch (error) {
     console.warn("public web search failed", error);
     return [];
@@ -506,7 +524,9 @@ export const Route = createFileRoute("/api/chat")({
           `Current page name / species: ${species || "(infer from the catalog below)"}\n\n` +
           `Block catalog (THIS page's real content — base every edit on it):\n${catalog}\n\n` +
           (shouldSearch
-            ? "Use the live web search results below for the user's factual request. Prefer primary/authoritative sources, do not invent facts, and include the source names in your message.\n\n"
+            ? webSources.length
+              ? "Use the live web search results below for the user's factual request. Prefer primary/authoritative sources, do not invent facts, and include the source names in your message.\n\n"
+              : "Live web search returned no sources. Explicitly say that online verification is temporarily unavailable, and do not present the answer as web-verified.\n\n"
             : "") +
           webContext +
           `Conversation so far:\n${historyText}\n\nUser: ${body.message}`;
