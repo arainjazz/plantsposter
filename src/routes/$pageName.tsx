@@ -7,6 +7,7 @@ import { ExportMenu } from "@/components/ExportMenu";
 import { PageTabs } from "@/components/PageTabs";
 import { BlockContextMenu } from "@/components/BlockContextMenu";
 import { ImageSearchModal } from "@/components/ImageSearchModal";
+import { LayersPanel } from "@/components/LayersPanel";
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
 import {
   INITIAL_BLOCKS,
@@ -828,6 +829,15 @@ function Editor() {
     return () => window.removeEventListener("banrihua:remove-bg", onRemove);
   });
 
+  const [rightPanelTab, setRightPanelTab] = useState<"properties" | "layers">("properties");
+
+  const reorderBlocks = useCallback(
+    (newBlocks: Block[]) => {
+      updateActiveBlocks(() => newBlocks);
+    },
+    [updateActiveBlocks],
+  );
+
   return (
     <div
       style={{
@@ -930,37 +940,86 @@ function Editor() {
         title="拖动调整宽度"
       />
 
-      <aside style={{ borderLeft: "1px solid #e5e5e5", background: "white", overflowY: "auto" }}>
+      <aside
+        style={{
+          borderLeft: "1px solid #e5e5e5",
+          background: "white",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
         <div
           style={{
-            padding: "12px 14px",
+            display: "flex",
             borderBottom: "1px solid #eee",
-            fontSize: 13,
-            fontWeight: 600,
           }}
         >
-          属性面板 {selectedIds.size > 1 ? `（已选 ${selectedIds.size} 个，仅显示单选属性）` : ""}
+          <button
+            onClick={() => setRightPanelTab("properties")}
+            style={{
+              flex: 1,
+              padding: "12px 14px",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              background: rightPanelTab === "properties" ? "white" : "#f7f5f0",
+              color: rightPanelTab === "properties" ? "#2a2622" : "#888",
+              cursor: "pointer",
+              borderBottom: rightPanelTab === "properties" ? "2px solid #2a2622" : "none",
+            }}
+          >
+            属性 {selectedIds.size > 0 && `(${selectedIds.size})`}
+          </button>
+          <button
+            onClick={() => setRightPanelTab("layers")}
+            style={{
+              flex: 1,
+              padding: "12px 14px",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              background: rightPanelTab === "layers" ? "white" : "#f7f5f0",
+              color: rightPanelTab === "layers" ? "#2a2622" : "#888",
+              cursor: "pointer",
+              borderBottom: rightPanelTab === "layers" ? "2px solid #2a2622" : "none",
+            }}
+          >
+            图层 ({blocks.length})
+          </button>
         </div>
-        <Inspector
-          block={soloSelected}
-          pages={pages}
-          activeId={activeId}
-          background={pages.find(p => p.id === activeId)?.background ?? palette.background}
-          selectionCount={selectedIds.size}
-          onChange={patchSelected}
-          onChangeImage={setImage}
-          onChangeImageLabel={setImageLabel}
-          onChangeBackground={(c) => {
-            setPages(prev => prev.map(p => p.id === activeId ? { ...p, background: c } : p));
-            void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), activeId, palette });
-          }}
-          onApplyBackgroundToPages={(ids, c) => {
-            setPages(prev => prev.map(p => ids.includes(p.id) ? { ...p, background: c } : p));
-            void saveEditorState({ pages: pages.map(p => ids.includes(p.id) ? { ...p, background: c } : p), activeId, palette });
-          }}
-          onAlignToPage={alignToPage}
-          onDistribute={distribute}
-        />
+
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {rightPanelTab === "properties" ? (
+            <Inspector
+              block={soloSelected}
+              pages={pages}
+              activeId={activeId}
+              background={pages.find(p => p.id === activeId)?.background ?? palette.background}
+              selectionCount={selectedIds.size}
+              onChange={patchSelected}
+              onChangeImage={setImage}
+              onChangeImageLabel={setImageLabel}
+              onChangeBackground={(c) => {
+                setPages(prev => prev.map(p => p.id === activeId ? { ...p, background: c } : p));
+                void saveEditorState({ pages: pages.map(p => p.id === activeId ? { ...p, background: c } : p), activeId, palette });
+              }}
+              onApplyBackgroundToPages={(ids, c) => {
+                setPages(prev => prev.map(p => ids.includes(p.id) ? { ...p, background: c } : p));
+                void saveEditorState({ pages: pages.map(p => ids.includes(p.id) ? { ...p, background: c } : p), activeId, palette });
+              }}
+              onAlignToPage={alignToPage}
+              onDistribute={distribute}
+            />
+          ) : (
+            <LayersPanel
+              blocks={blocks}
+              selectedIds={selectedIds}
+              onSelectIds={selectIds}
+              onReorderBlocks={reorderBlocks}
+            />
+          )}
+        </div>
       </aside>
 
       <div style={{ gridColumn: "1 / -1" }}>
