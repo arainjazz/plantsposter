@@ -302,7 +302,10 @@ export function downloadBlob(blob: Blob, filename: string) {
 }
 
 function cleanName(name?: string): string {
-  return (name || "poster").replace(/[\\/:*?"<>|\n\r\t]/g, "_").trim().slice(0, 60);
+  return (name || "poster")
+    .replace(/[\\/:*?"<>|\n\r\t]/g, "_")
+    .trim()
+    .slice(0, 60);
 }
 
 export async function exportPng(
@@ -351,7 +354,8 @@ const PT_PER_MM = 2.834645669;
 // small; we cache the ~23 MB of source fonts in IndexedDB so they download
 // only once, ever.
 const FONT_SOURCES: Record<string, string> = {
-  NotoSans: "https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/google-fonts/NotoSansSC%5Bwght%5D.ttf",
+  NotoSans:
+    "https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/google-fonts/NotoSansSC%5Bwght%5D.ttf",
   ZCOOL: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/zcoolxiaowei/ZCOOLXiaoWei-Regular.ttf",
 };
 
@@ -372,7 +376,8 @@ function fontDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(FONT_DB, 1);
     req.onupgradeneeded = () => {
-      if (!req.result.objectStoreNames.contains(FONT_STORE)) req.result.createObjectStore(FONT_STORE);
+      if (!req.result.objectStoreNames.contains(FONT_STORE))
+        req.result.createObjectStore(FONT_STORE);
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -518,17 +523,17 @@ async function imageToHiResDataUrl(
 
 // Filesystem-safe base name for exports, derived from page name(s).
 function exportBaseName(pages: PosterPage[]): string {
-  const clean = (s: string) => (s || "poster").replace(/[\\/:*?"<>|\n\r\t]/g, "_").trim().slice(0, 60);
+  const clean = (s: string) =>
+    (s || "poster")
+      .replace(/[\\/:*?"<>|\n\r\t]/g, "_")
+      .trim()
+      .slice(0, 60);
   if (pages.length === 1) return clean(pages[0].name);
   return `${clean(pages[0].name)}_等${pages.length}页`;
 }
 
 // Fallback: the old rasterised export (one flattened image per page).
-async function exportPdfRaster(
-  pages: PosterPage[],
-  palette: Palette,
-  mode: "print" | "standard",
-) {
+async function exportPdfRaster(pages: PosterPage[], palette: Palette, mode: "print" | "standard") {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
   for (let i = 0; i < pages.length; i++) {
@@ -587,7 +592,16 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
               ib.h,
               mode === "print" ? 3.5 : 3,
             );
-            pdf.addImage(dataUrl, fmt, ib.x * MM_X, ib.y * MM_Y, ib.w * MM_X, ib.h * MM_Y, undefined, "SLOW");
+            pdf.addImage(
+              dataUrl,
+              fmt,
+              ib.x * MM_X,
+              ib.y * MM_Y,
+              ib.w * MM_X,
+              ib.h * MM_Y,
+              undefined,
+              "SLOW",
+            );
           } catch {
             /* skip unreadable image */
           }
@@ -611,10 +625,14 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
         const leadPx = (lineHeightPx - t.fontSize) / 2; // CSS half-leading
 
         // Approximate the on-screen weight: the embedded face is a single
-        // weight, so simulate heavier weights with a proportional glyph stroke
-        // (≈ the screen gradation across 400–900).
+        // weight, so simulate heavier weights with a very light proportional
+        // glyph stroke. jsPDF line widths are millimetres, while fontPt is in
+        // points; converting before calculating the stroke avoids dramatically
+        // over-bold CJK glyphs (the old formula mixed the two units).
         const weight = t.fontWeight ?? 400;
-        const strokeMm = weight > 400 ? ((weight - 400) / 300) * 0.03 * fontPt : 0;
+        const fontMm = fontPt / PT_PER_MM;
+        const weightFactor = Math.max(0, Math.min(1, (weight - 400) / 300));
+        const strokeMm = weightFactor * Math.min(0.11, fontMm * 0.006);
         if (strokeMm > 0) {
           pdf.setDrawColor(c.r, c.g, c.b);
           pdf.setLineWidth(strokeMm);
@@ -670,7 +688,13 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
         if (b.src) {
           try {
             const { dataUrl } = await imageToHiResDataUrl(b.src, b.w, b.h, 3);
-            slide.addImage({ data: dataUrl, x: toInX(b.x), y: toInY(b.y), w: toInX(b.w), h: toInY(b.h) });
+            slide.addImage({
+              data: dataUrl,
+              x: toInX(b.x),
+              y: toInY(b.y),
+              w: toInX(b.w),
+              h: toInY(b.h),
+            });
             continue;
           } catch {
             /* fall through */

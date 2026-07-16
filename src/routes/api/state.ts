@@ -22,7 +22,7 @@ import { createFileRoute } from "@tanstack/react-router";
 // instead of that stale draft.  Subsequent editor saves stay on this key.
 // A release-specific key prevents a previous editor snapshot in the shared KV
 // namespace from overriding the audited seed that ships with this deployment.
-const STATE_KEY = "ordosica-scientific-illustration-2026-07-15";
+const STATE_KEY = "korshinskii-image2-illustration-2026-07-16";
 const SEED_ASSET = "/banrihua-editor-20plants.json";
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB safety cap
 
@@ -54,7 +54,13 @@ function getEnv(): CfEnv {
 
 function looksLikeState(v: unknown): boolean {
   const s = v as { pages?: unknown; activeId?: unknown; palette?: unknown } | null;
-  return !!s && Array.isArray(s.pages) && s.pages.length > 0 && typeof s.activeId === "string" && !!s.palette;
+  return (
+    !!s &&
+    Array.isArray(s.pages) &&
+    s.pages.length > 0 &&
+    typeof s.activeId === "string" &&
+    !!s.palette
+  );
 }
 
 const noStore = {
