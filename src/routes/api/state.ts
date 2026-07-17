@@ -265,10 +265,20 @@ export const Route = createFileRoute("/api/state")({
             // 1) Move embedded images out of the JSON into the public bucket.
             await externalizeImages(sb, parsed);
             slimBody = JSON.stringify(parsed);
-            // 2) The object GET serves; this write must succeed for the
+            // 2) Version snapshot FIRST: latest.json must never advance
+            //    without a matching rollback point, so a snapshot failure
+            //    aborts the publish before anything is overwritten.
+            await supaUpload(
+              sb,
+              STATE_BUCKET,
+              `versions/${savedAt.replace(/[:.]/g, "-")}.json`,
+              slimBody,
+              "application/json",
+            );
+            // 3) The object GET serves; this write must succeed for the
             //    publish to count.
             await supaUpload(sb, STATE_BUCKET, "latest.json", slimBody, "application/json");
-            // 3) Best-effort side writes: per-page objects, manifest, snapshot.
+            // 4) Best-effort side writes: per-page objects and manifest.
             const sideWrites: Promise<void>[] = [];
             for (const page of parsed.pages) {
               if (typeof page.id !== "string") continue;
@@ -288,15 +298,6 @@ export const Route = createFileRoute("/api/state")({
                   palette: parsed.palette,
                   pageOrder: parsed.pages.map((p) => ({ id: p.id, name: p.name })),
                 }),
-                "application/json",
-              ),
-            );
-            sideWrites.push(
-              supaUpload(
-                sb,
-                STATE_BUCKET,
-                `versions/${savedAt.replace(/[:.]/g, "-")}.json`,
-                slimBody,
                 "application/json",
               ),
             );

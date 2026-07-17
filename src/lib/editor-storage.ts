@@ -167,17 +167,27 @@ export async function clearEditorState(): Promise<void> {
 // ── Global published state (shared by all visitors, stored in R2) ─────────
 
 // Fetch the globally published state from the server (/api/state).
-// Returns null on any failure so callers can fall back to local/default.
+// Unstable links can cut the response mid-transfer (res.json() then throws),
+// so transient failures are retried before giving up. Returns null only after
+// all attempts fail, so callers can fall back to local/default.
 export async function loadPublishedState(): Promise<PersistedEditorState | null> {
   if (typeof window === "undefined") return null;
-  try {
-    const res = await fetch("/api/state?t=" + Date.now(), { cache: "no-store" });
-    if (!res.ok) return null;
-    const data = (await res.json()) as unknown;
-    return isState(data) ? sanitizeState(data as PersistedEditorState) : null;
-  } catch {
-    return null;
+  const ATTEMPTS = 3;
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch("/api/state?t=" + Date.now(), { cache: "no-store" });
+      if (res.ok) {
+        const data = (await res.json()) as unknown;
+        if (isState(data)) return sanitizeState(data as PersistedEditorState);
+        return null; // intact response, wrong shape — retrying won't change it
+      }
+      if (res.status >= 400 && res.status < 500) return null; // definitive answer
+    } catch {
+      // network error or truncated body — retry
+    }
+    if (attempt < ATTEMPTS) await new Promise((r) => setTimeout(r, 800 * attempt));
   }
+  return null;
 }
 
 // Publish the current state globally so every visitor sees it. POSTs to
