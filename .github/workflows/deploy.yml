@@ -6,6 +6,10 @@ name: Deploy to Cloudflare
 #   CLOUDFLARE_ACCOUNT_ID  – your Cloudflare account id
 # Optional (only if you want CI to (re)set the Worker's runtime secrets):
 #   GEMINI_API_KEY, LOVABLE_API_KEY, EDIT_KEY
+# Content storage (Supabase; /api/state falls back to KV then the seed file
+# when these are absent):
+#   SUPABASE_URL           – project base URL, e.g. https://xxxx.supabase.co
+#   SUPABASE_SECRET_KEY    – service_role secret (server-side only)
 
 on:
   push:
@@ -76,6 +80,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
           EDIT_KEY: ${{ secrets.EDIT_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: |
           set -e
           put_secret () {
@@ -88,6 +94,8 @@ jobs:
           put_secret GEMINI_API_KEY "$GEMINI_API_KEY"
           put_secret LOVABLE_API_KEY "$LOVABLE_API_KEY"
           put_secret EDIT_KEY "$EDIT_KEY"
+          put_secret SUPABASE_URL "$SUPABASE_URL"
+          put_secret SUPABASE_SECRET_KEY "$SUPABASE_SECRET_KEY"
 
       - name: Deploy Worker
         working-directory: .output/server
