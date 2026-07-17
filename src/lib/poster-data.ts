@@ -43,6 +43,13 @@ export type ImageBlock = {
 
 export type Block = TextBlock | ImageBlock;
 
+// SVG sources render with object-fit "fill" (stretch to the block) both in
+// the editor and in exports; every other image uses "cover". Matches both
+// inline data: SVGs and externalized .svg URLs (e.g. Supabase storage).
+export function isSvgSrc(src: string): boolean {
+  return src.startsWith("data:image/svg+xml") || /\.svg(?:[?#]|$)/i.test(src);
+}
+
 export type PosterPage = {
   id: string;
   name: string;

@@ -1,4 +1,4 @@
-import { Block, TextBlock, ImageBlock, POSTER_H, POSTER_W } from "@/lib/poster-data";
+import { Block, TextBlock, ImageBlock, POSTER_H, POSTER_W, isSvgSrc } from "@/lib/poster-data";
 import type { Palette } from "@/lib/poster-ops";
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 
@@ -699,7 +699,7 @@ function ImageEl({
             top: -crop.top,
             width: mediaW,
             height: mediaH,
-            objectFit: block.src.startsWith("data:image/svg+xml") ? "fill" : "cover",
+            objectFit: isSvgSrc(block.src) ? "fill" : "cover",
             pointerEvents: "none",
           }}
         />

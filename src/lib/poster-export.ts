@@ -1,5 +1,5 @@
 import type { Block, TextBlock, ImageBlock, PosterPage } from "@/lib/poster-data";
-import { POSTER_H, POSTER_W } from "@/lib/poster-data";
+import { POSTER_H, POSTER_W, isSvgSrc } from "@/lib/poster-data";
 import type { Palette } from "@/lib/poster-ops";
 
 const FONT_FAMILY: Record<NonNullable<TextBlock["fontFamily"]>, string> = {
@@ -93,6 +93,40 @@ function paintBackground(ctx: CanvasRenderingContext2D, background: string) {
   ctx.fillRect(0, 0, POSTER_W, POSTER_H);
 }
 
+// Source-rect of `img` that the editor actually shows inside an image block:
+// the image is object-fit into the media box (the block expanded by its
+// non-destructive crop offsets) — "fill" for SVGs, "cover" (centered) for
+// everything else — and the block then windows [crop.left, crop.top, w, h]
+// of that box. Exports must draw this rect, not the whole image, or photos
+// come out stretched and crops are ignored.
+function visibleSourceRect(
+  img: HTMLImageElement,
+  ib: ImageBlock,
+): { sx: number; sy: number; sw: number; sh: number } {
+  const left = Math.max(0, ib.crop?.left ?? 0);
+  const right = Math.max(0, ib.crop?.right ?? 0);
+  const top = Math.max(0, ib.crop?.top ?? 0);
+  const bottom = Math.max(0, ib.crop?.bottom ?? 0);
+  const mediaW = ib.w + left + right;
+  const mediaH = ib.h + top + bottom;
+  const iw = img.naturalWidth || mediaW;
+  const ih = img.naturalHeight || mediaH;
+  let sx = 0;
+  let sy = 0;
+  let sw = iw;
+  let sh = ih;
+  if (!(ib.src && isSvgSrc(ib.src))) {
+    const cover = Math.max(mediaW / iw, mediaH / ih);
+    sw = mediaW / cover;
+    sh = mediaH / cover;
+    sx = (iw - sw) / 2;
+    sy = (ih - sh) / 2;
+  }
+  const kx = sw / mediaW;
+  const ky = sh / mediaH;
+  return { sx: sx + left * kx, sy: sy + top * ky, sw: ib.w * kx, sh: ib.h * ky };
+}
+
 async function imageToDataUrl(src: string): Promise<string> {
   const img = await loadImage(src);
   const c = document.createElement("canvas");
@@ -107,6 +141,7 @@ export async function renderPosterToCanvas(
   blocks: Block[],
   palette: Palette,
   scale = 2,
+  background?: string,
 ): Promise<HTMLCanvasElement> {
   const imgs = await preloadImages(blocks);
   const canvas = document.createElement("canvas");
@@ -115,14 +150,15 @@ export async function renderPosterToCanvas(
   const ctx = canvas.getContext("2d")!;
   ctx.scale(scale, scale);
 
-  paintBackground(ctx, palette.background);
+  paintBackground(ctx, background ?? palette.background);
 
   for (const b of blocks) {
     if (b.type === "image") {
       const ib = b as ImageBlock;
       const img = ib.src ? imgs.get(ib.src) : null;
       if (img) {
-        ctx.drawImage(img, ib.x, ib.y, ib.w, ib.h);
+        const s = visibleSourceRect(img, ib);
+        ctx.drawImage(img, s.sx, s.sy, s.sw, s.sh, ib.x, ib.y, ib.w, ib.h);
       } else {
         ctx.fillStyle = "rgba(0,0,0,0.04)";
         ctx.fillRect(ib.x, ib.y, ib.w, ib.h);
@@ -228,27 +264,25 @@ function drawLineWithSpacing(
   ctx.textAlign = prevAlign;
 }
 
-export async function renderPosterToSVG(blocks: Block[], palette: Palette): Promise<string> {
+export async function renderPosterToSVG(
+  blocks: Block[],
+  palette: Palette,
+  background?: string,
+): Promise<string> {
+  const bg = background ?? palette.background;
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const parts: string[] = [];
   parts.push(
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">`,
   );
-  if (palette.background.startsWith("linear-gradient")) {
-    const colors = palette.background.match(/#[\da-fA-F]{6}|rgba?\([^)]*\)/g) ?? [
-      "#f7f2e4",
-      "#d7c7a6",
-    ];
+  if (bg.startsWith("linear-gradient")) {
+    const colors = bg.match(/#[\da-fA-F]{6}|rgba?\([^)]*\)/g) ?? ["#f7f2e4", "#d7c7a6"];
     parts.push(
       `<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[1] ?? colors[0]}"/></linearGradient></defs>`,
     );
     parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="url(#bg)"/>`);
-  } else if (
-    palette.background &&
-    palette.background !== "rgba(0,0,0,0)" &&
-    palette.background !== "transparent"
-  ) {
-    parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="${palette.background}"/>`);
+  } else if (bg && bg !== "rgba(0,0,0,0)" && bg !== "transparent") {
+    parts.push(`<rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>`);
   }
   for (const b of blocks) {
     if (b.type === "image") {
@@ -313,11 +347,13 @@ export async function exportPng(
   palette: Palette,
   transparent: boolean,
   name?: string,
+  background?: string,
 ) {
   const canvas = await renderPosterToCanvas(
     blocks,
-    transparent ? { ...palette, background: "rgba(0,0,0,0)" } : palette,
+    palette,
     3,
+    transparent ? "rgba(0,0,0,0)" : background,
   );
   await new Promise<void>((resolve) => {
     canvas.toBlob((blob) => {
@@ -327,8 +363,13 @@ export async function exportPng(
   });
 }
 
-export async function exportJpg(blocks: Block[], palette: Palette, name?: string) {
-  const canvas = await renderPosterToCanvas(blocks, palette, 3);
+export async function exportJpg(
+  blocks: Block[],
+  palette: Palette,
+  name?: string,
+  background?: string,
+) {
+  const canvas = await renderPosterToCanvas(blocks, palette, 3, background);
   await new Promise<void>((resolve) => {
     canvas.toBlob(
       (blob) => {
@@ -500,22 +541,22 @@ function measureVisualLines(t: TextBlock): string[] {
 // transparent range maps composite over the page background instead of turning
 // black. Returns the data URL and the format for jsPDF.addImage.
 async function imageToHiResDataUrl(
-  src: string,
-  targetWpx: number,
-  targetHpx: number,
+  ib: ImageBlock,
   scale = 3,
 ): Promise<{ dataUrl: string; fmt: "PNG" | "JPEG" }> {
+  const src = ib.src!;
   const img = await loadImage(src);
-  const w = Math.max(1, Math.round((targetWpx || img.naturalWidth) * scale));
-  const h = Math.max(1, Math.round((targetHpx || img.naturalHeight) * scale));
+  const w = Math.max(1, Math.round((ib.w || img.naturalWidth) * scale));
+  const h = Math.max(1, Math.round((ib.h || img.naturalHeight) * scale));
   const c = document.createElement("canvas");
   c.width = w;
   c.height = h;
   const ctx = c.getContext("2d")!;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(img, 0, 0, w, h);
-  const opaque = /^data:image\/jpe?g/.test(src);
+  const s = visibleSourceRect(img, ib);
+  ctx.drawImage(img, s.sx, s.sy, s.sw, s.sh, 0, 0, w, h);
+  const opaque = /^data:image\/jpe?g/.test(src) || /\.jpe?g(?:[?#]|$)/i.test(src);
   return opaque
     ? { dataUrl: c.toDataURL("image/jpeg", 0.95), fmt: "JPEG" }
     : { dataUrl: c.toDataURL("image/png"), fmt: "PNG" };
@@ -537,7 +578,12 @@ async function exportPdfRaster(pages: PosterPage[], palette: Palette, mode: "pri
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
   for (let i = 0; i < pages.length; i++) {
-    const canvas = await renderPosterToCanvas(pages[i].blocks, palette, mode === "print" ? 3 : 2);
+    const canvas = await renderPosterToCanvas(
+      pages[i].blocks,
+      palette,
+      mode === "print" ? 3 : 2,
+      pages[i].background,
+    );
     const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
     if (i > 0) pdf.addPage("a3", "portrait");
     pdf.addImage(dataUrl, "JPEG", 0, 0, A3_W_MM, A3_H_MM);
@@ -571,13 +617,27 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
       if (pi > 0) pdf.addPage("a3", "portrait");
       const page = pages[pi];
 
-      // Background (solid; gradients approximated by their first colour).
+      // Background. jsPDF has no native gradient fills, so gradients are
+      // rasterised to a full-page image; solid colours stay vector rects.
       const bg = page.background ?? palette.background;
       if (bg && bg !== "transparent" && bg !== "rgba(0,0,0,0)") {
-        const c = parseRgba(firstColor(bg));
-        if (c) {
-          pdf.setFillColor(c.r, c.g, c.b);
-          pdf.rect(0, 0, A3_W_MM, A3_H_MM, "F");
+        if (bg.includes("gradient")) {
+          const bgCanvas = document.createElement("canvas");
+          const bgScale = 2;
+          bgCanvas.width = POSTER_W * bgScale;
+          bgCanvas.height = POSTER_H * bgScale;
+          const bgCtx = bgCanvas.getContext("2d")!;
+          bgCtx.scale(bgScale, bgScale);
+          bgCtx.fillStyle = "#ffffff"; // under semi-transparent gradient stops
+          bgCtx.fillRect(0, 0, POSTER_W, POSTER_H);
+          paintBackground(bgCtx, bg);
+          pdf.addImage(bgCanvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, A3_W_MM, A3_H_MM);
+        } else {
+          const c = parseRgba(firstColor(bg));
+          if (c) {
+            pdf.setFillColor(c.r, c.g, c.b);
+            pdf.rect(0, 0, A3_W_MM, A3_H_MM, "F");
+          }
         }
       }
 
@@ -586,12 +646,7 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
           const ib = b as ImageBlock;
           if (!ib.src) continue;
           try {
-            const { dataUrl, fmt } = await imageToHiResDataUrl(
-              ib.src,
-              ib.w,
-              ib.h,
-              mode === "print" ? 3.5 : 3,
-            );
+            const { dataUrl, fmt } = await imageToHiResDataUrl(ib, mode === "print" ? 3.5 : 3);
             pdf.addImage(
               dataUrl,
               fmt,
@@ -659,8 +714,13 @@ export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "pr
   }
 }
 
-export async function exportSvg(blocks: Block[], palette: Palette, name?: string) {
-  const svg = await renderPosterToSVG(blocks, palette);
+export async function exportSvg(
+  blocks: Block[],
+  palette: Palette,
+  name?: string,
+  background?: string,
+) {
+  const svg = await renderPosterToSVG(blocks, palette, background);
   downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `${cleanName(name)}.svg`);
 }
 
@@ -676,7 +736,7 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
 
   for (const page of pages) {
     const slide = pptx.addSlide();
-    const bg = parseRgba(firstColor(palette.background));
+    const bg = parseRgba(firstColor(page.background ?? palette.background));
     slide.background = {
       color: bg
         ? [bg.r, bg.g, bg.b].map((n) => n.toString(16).padStart(2, "0")).join("")
@@ -687,7 +747,7 @@ export async function exportPptx(pages: PosterPage[], palette: Palette) {
       if (b.type === "image") {
         if (b.src) {
           try {
-            const { dataUrl } = await imageToHiResDataUrl(b.src, b.w, b.h, 3);
+            const { dataUrl } = await imageToHiResDataUrl(b, 3);
             slide.addImage({
               data: dataUrl,
               x: toInX(b.x),
