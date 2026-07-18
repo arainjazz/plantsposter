@@ -70,6 +70,10 @@ const operationSchema = z.discriminatedUnion("type", [
     crop: cropSchema.nullable().optional(),
   }),
   z.object({
+    type: z.literal("clear_image"),
+    id: blockId,
+  }),
+  z.object({
     type: z.literal("set_crop"),
     id: blockId,
     crop: cropSchema.nullable(),
@@ -141,7 +145,7 @@ export default defineTool({
   name: "edit_poster",
   title: "Edit and publish poster blocks",
   description:
-    "Atomically edit one live poster page and publish it with a version snapshot. Supports text/style, movement/size, images/crops, page background, palette, block creation, and exact layer order. Use delete_block for deletion. Call get_editor_state first and pass expectedRevision to prevent overwriting concurrent browser edits.",
+    "Atomically edit one live poster page and publish it with a version snapshot. Supports text/style, movement/size, setting or clearing images/crops, page background, palette, block creation, and exact layer order. Use delete_block for deletion. Call get_editor_state first and pass expectedRevision to prevent overwriting concurrent browser edits.",
   inputSchema: {
     page: z.string().min(1).describe("Target page id or exact page name."),
     expectedRevision: z.string().min(8).max(128).optional(),
@@ -207,6 +211,15 @@ export default defineTool({
             if (operation.label != null) block.label = operation.label;
             if (operation.crop === null) delete block.crop;
             else if (operation.crop) block.crop = operation.crop;
+            changedIds.add(block.id);
+            break;
+          }
+          case "clear_image": {
+            const block = requireBlock(target.blocks, operation.id);
+            if (block.type !== "image")
+              throw new Error(`Block ${operation.id} is not an image block.`);
+            block.src = null;
+            delete block.crop;
             changedIds.add(block.id);
             break;
           }
