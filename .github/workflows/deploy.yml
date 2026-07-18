@@ -5,7 +5,7 @@ name: Deploy to Cloudflare
 #   CLOUDFLARE_API_TOKEN   – token with "Edit Cloudflare Workers" + "Workers R2 Storage: Edit"
 #   CLOUDFLARE_ACCOUNT_ID  – your Cloudflare account id
 # Optional (only if you want CI to (re)set the Worker's runtime secrets):
-#   GEMINI_API_KEY, LOVABLE_API_KEY, EDIT_KEY
+#   GEMINI_API_KEY, LOVABLE_API_KEY, EDIT_KEY, MCP_API_TOKEN
 # Content storage (Supabase; /api/state falls back to KV then the seed file
 # when these are absent):
 #   SUPABASE_URL           – project base URL, e.g. https://xxxx.supabase.co
@@ -80,6 +80,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
           EDIT_KEY: ${{ secrets.EDIT_KEY }}
+          MCP_API_TOKEN: ${{ secrets.MCP_API_TOKEN }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: |
@@ -94,6 +95,7 @@ jobs:
           put_secret GEMINI_API_KEY "$GEMINI_API_KEY"
           put_secret LOVABLE_API_KEY "$LOVABLE_API_KEY"
           put_secret EDIT_KEY "$EDIT_KEY"
+          put_secret MCP_API_TOKEN "$MCP_API_TOKEN"
           put_secret SUPABASE_URL "$SUPABASE_URL"
           put_secret SUPABASE_SECRET_KEY "$SUPABASE_SECRET_KEY"
 

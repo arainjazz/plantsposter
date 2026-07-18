@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { authorizeMcpRequest, isMcpSurface } from "./lib/mcp/bearer-auth.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -39,14 +40,19 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const inherited =
+      (globalThis as unknown as { __env__?: Record<string, unknown> }).__env__ ?? {};
+    const direct = (env && typeof env === "object" ? env : {}) as Record<string, unknown>;
+    const bindings = { ...inherited, ...direct };
+    (globalThis as unknown as { __env__?: Record<string, unknown> }).__env__ = bindings;
     const url = new URL(request.url);
-    if (
-      process.env.NODE_ENV === "production" &&
-      (url.pathname === "/mcp" ||
-        url.pathname.startsWith("/.mcp/") ||
-        url.pathname === "/.well-known/oauth-protected-resource")
-    ) {
-      return new Response("Not Found", { status: 404 });
+    if (isMcpSurface(url.pathname)) {
+      const denied = await authorizeMcpRequest(
+        request,
+        bindings,
+        process.env.NODE_ENV === "production",
+      );
+      if (denied) return denied;
     }
 
     try {
