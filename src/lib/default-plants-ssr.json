@@ -12751,7 +12751,7 @@
           "y": 300,
           "w": 105,
           "h": 78,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/season-spring.png",
           "label": "黄柳（Salix gordejevii）春季物候"
         },
         {
@@ -12761,7 +12761,7 @@
           "y": 300,
           "w": 105,
           "h": 78,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/season-summer.png",
           "label": "黄柳（Salix gordejevii）夏季物候"
         },
         {
@@ -12771,7 +12771,7 @@
           "y": 300,
           "w": 105,
           "h": 78,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/season-autumn.png",
           "label": "黄柳（Salix gordejevii）秋季物候"
         },
         {
@@ -12781,7 +12781,7 @@
           "y": 300,
           "w": 105,
           "h": 78,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/season-winter.png",
           "label": "黄柳（Salix gordejevii）冬季物候"
         },
         {
@@ -12972,7 +12972,7 @@
           "y": 875,
           "w": 60,
           "h": 60,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/trait-twigs.png",
           "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
@@ -13007,7 +13007,7 @@
           "y": 875,
           "w": 60,
           "h": 60,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/trait-leaves.png",
           "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
@@ -13042,7 +13042,7 @@
           "y": 955,
           "w": 60,
           "h": 60,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/trait-catkins.png",
           "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
@@ -13077,7 +13077,7 @@
           "y": 955,
           "w": 60,
           "h": 60,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/trait-fruit.png",
           "label": "黄柳（Salix gordejevii）识别特征图"
         },
         {
@@ -13202,7 +13202,7 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/sim-gordejevii.png",
           "label": "黄柳（Salix gordejevii）页面本种识别图"
         },
         {
@@ -13237,7 +13237,7 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/sim-microstachya.png",
           "label": "小叶柳（Salix microstachya）相似种对照图"
         },
         {
@@ -13440,7 +13440,7 @@
           "y": 1605,
           "w": 300,
           "h": 130,
-          "src": null,
+          "src": "/illustrations/huangliu-scientific/details/humanities-restoration.png",
           "label": "黄柳（Salix gordejevii）生活、生产或地方知识相关图"
         },
         {
