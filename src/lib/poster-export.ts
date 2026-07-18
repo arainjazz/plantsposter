@@ -70,22 +70,58 @@ function firstColor(input: string, fallback = "#f7f2e4") {
   return match?.[0] ?? fallback;
 }
 
+type LinearGradientSpec = {
+  angle: number;
+  stops: Array<{ color: string; offset: number }>;
+};
+
+// BackgroundPicker currently writes two-stop rgba()/hex gradients. Keep the
+// parser deliberately strict enough to reject malformed CSS, but allow decimal
+// offsets and embedded commas inside rgba() values.
+function parseLinearGradient(background: string): LinearGradientSpec | null {
+  const css = background.trim();
+  const head = /^linear-gradient\(\s*([-\d.]+)deg\s*,\s*/i.exec(css);
+  if (!head) return null;
+  if (!css.endsWith(")")) return null;
+  const body = css.slice(head[0].length, -1).trim();
+  const stopPattern = /(#[\da-f]{3,8}|rgba?\([^)]*\)|hsla?\([^)]*\))\s+([-\d.]+)%/gi;
+  const stops: LinearGradientSpec["stops"] = [];
+  let match: RegExpExecArray | null;
+  while ((match = stopPattern.exec(body))) {
+    stops.push({
+      color: match[1].trim(),
+      offset: Math.max(0, Math.min(1, Number(match[2]) / 100)),
+    });
+  }
+  if (stops.length < 2) return null;
+  return { angle: Number(head[1]), stops };
+}
+
+function gradientEndpoints(angle: number) {
+  // CSS angles start at north and rotate clockwise; Canvas uses ordinary x/y
+  // coordinates. Project the page corners onto the CSS direction so 0/90/180
+  // degree gradients reach the exact same edges as the browser.
+  const radians = (angle * Math.PI) / 180;
+  const dx = Math.sin(radians);
+  const dy = -Math.cos(radians);
+  const length = Math.abs(POSTER_W * dx) + Math.abs(POSTER_H * dy);
+  const cx = POSTER_W / 2;
+  const cy = POSTER_H / 2;
+  return {
+    x1: cx - (dx * length) / 2,
+    y1: cy - (dy * length) / 2,
+    x2: cx + (dx * length) / 2,
+    y2: cy + (dy * length) / 2,
+  };
+}
+
 function paintBackground(ctx: CanvasRenderingContext2D, background: string) {
   if (!background || background === "transparent" || background === "rgba(0,0,0,0)") return;
-  const gradient =
-    /linear-gradient\(([-\d.]+)deg,\s*([^,]+(?:,[^,]+)*?)\s+0%,\s*([^,]+(?:,[^,]+)*?)\s+100%\)/i.exec(
-      background,
-    );
+  const gradient = parseLinearGradient(background);
   if (gradient) {
-    const angle = (Number(gradient[1]) * Math.PI) / 180;
-    const cx = POSTER_W / 2;
-    const cy = POSTER_H / 2;
-    const len = Math.sqrt(POSTER_W * POSTER_W + POSTER_H * POSTER_H) / 2;
-    const x = Math.cos(angle) * len;
-    const y = Math.sin(angle) * len;
-    const g = ctx.createLinearGradient(cx - x, cy - y, cx + x, cy + y);
-    g.addColorStop(0, gradient[2].trim());
-    g.addColorStop(1, gradient[3].trim());
+    const { x1, y1, x2, y2 } = gradientEndpoints(gradient.angle);
+    const g = ctx.createLinearGradient(x1, y1, x2, y2);
+    gradient.stops.forEach((stop) => g.addColorStop(stop.offset, stop.color));
     ctx.fillStyle = g;
   } else {
     ctx.fillStyle = background;
@@ -382,156 +418,168 @@ export async function exportJpg(
   });
 }
 
-// ── Editable (vector) PDF export ───────────────────────────────────────────
-// A3 page in mm and the poster→page transforms.
+// ── WYSIWYG PDF export ─────────────────────────────────────────────────────
+// A3 page in mm. PDF is intentionally rendered through a browser DOM mirror:
+// it uses the same CSS gradient, object-fit/crop and font shaping engine as the
+// editor. Re-laying text with jsPDF caused substituted fonts, different CJK
+// line breaks and baseline drift, while drawing raw images stretched crops.
 const A3_W_MM = 297;
 const A3_H_MM = 420;
-const MM_X = A3_W_MM / POSTER_W;
-const MM_Y = A3_H_MM / POSTER_H;
-const PT_PER_MM = 2.834645669;
 
-// Real fonts used by the poster (matching the on-screen Google webfonts), as
-// jsPDF-compatible TrueType. jsPDF subsets these in the output so files stay
-// small; we cache the ~23 MB of source fonts in IndexedDB so they download
-// only once, ever.
-const FONT_SOURCES: Record<string, string> = {
-  NotoSans:
-    "https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/google-fonts/NotoSansSC%5Bwght%5D.ttf",
-  ZCOOL: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/zcoolxiaowei/ZCOOLXiaoWei-Regular.ttf",
-};
-
-function arrayBufferToBase64(buf: ArrayBuffer): string {
-  const bytes = new Uint8Array(buf);
-  let binary = "";
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk) as unknown as number[]);
-  }
-  return btoa(binary);
+function applyStyles(el: HTMLElement, styles: Record<string, string>) {
+  Object.assign(el.style, styles);
 }
 
-// ── font cache (IndexedDB) ──
-const FONT_DB = "banrihua-fonts";
-const FONT_STORE = "ttf";
-function fontDb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(FONT_DB, 1);
-    req.onupgradeneeded = () => {
-      if (!req.result.objectStoreNames.contains(FONT_STORE))
-        req.result.createObjectStore(FONT_STORE);
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-async function fontCacheGet(key: string): Promise<string | null> {
-  try {
-    const db = await fontDb();
-    return await new Promise((resolve) => {
-      const r = db.transaction(FONT_STORE, "readonly").objectStore(FONT_STORE).get(key);
-      r.onsuccess = () => resolve(typeof r.result === "string" ? r.result : null);
-      r.onerror = () => resolve(null);
-    });
-  } catch {
-    return null;
-  }
-}
-async function fontCachePut(key: string, val: string): Promise<void> {
-  try {
-    const db = await fontDb();
-    await new Promise<void>((resolve) => {
-      const tx = db.transaction(FONT_STORE, "readwrite");
-      tx.objectStore(FONT_STORE).put(val, key);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => resolve();
-    });
-  } catch {
-    /* ignore */
-  }
-}
-
-const fontMem = new Map<string, Promise<string>>();
-async function loadFontB64(name: string): Promise<string> {
-  let p = fontMem.get(name);
-  if (!p) {
-    p = (async () => {
-      const cached = await fontCacheGet(name);
-      if (cached) return cached;
-      const res = await fetch(FONT_SOURCES[name]);
-      if (!res.ok) throw new Error(`font ${name} ${res.status}`);
-      const b64 = arrayBufferToBase64(await res.arrayBuffer());
-      void fontCachePut(name, b64);
-      return b64;
-    })().catch((e) => {
-      fontMem.delete(name);
-      throw e;
-    });
-    fontMem.set(name, p);
-  }
-  return p;
-}
-
-const CJK_RE = /[㐀-鿿豈-﫿]/;
-
-// Measure the exact visual line breaks the browser produces for a text block,
-// so the PDF layout matches the screen (which uses a DOM div with pre-wrap).
-function measureVisualLines(t: TextBlock): string[] {
-  if (typeof document === "undefined") return t.text.split("\n");
-  const div = document.createElement("div");
-  Object.assign(div.style, {
-    position: "absolute",
-    left: "-99999px",
+function createPosterDom(page: PosterPage, palette: Palette): HTMLDivElement {
+  const root = document.createElement("div");
+  root.dataset.posterExportRoot = "true";
+  root.setAttribute("aria-hidden", "true");
+  applyStyles(root, {
+    position: "fixed",
+    left: "0",
     top: "0",
-    visibility: "hidden",
-    width: `${t.w}px`,
-    fontFamily: FONT_FAMILY[t.fontFamily ?? "sans"],
-    fontSize: `${t.fontSize}px`,
-    fontWeight: String(t.fontWeight ?? 400),
-    fontStyle: t.fontStyle ?? "normal",
-    lineHeight: String(t.lineHeight ?? 1.4),
-    letterSpacing: t.letterSpacing ? `${t.letterSpacing}px` : "normal",
-    textTransform: t.textTransform ?? "none",
-    whiteSpace: "pre-wrap",
-    wordBreak: "normal",
-  } as CSSStyleDeclaration);
-  const raw = t.textTransform === "uppercase" ? t.text : t.text; // CSS handles transform for measuring
-  div.textContent = raw;
-  document.body.appendChild(div);
-  const node = div.firstChild as Text | null;
-  const lines: string[] = [];
-  if (node) {
-    const range = document.createRange();
-    const chars = Array.from(t.text);
-    let cur = "";
-    let prevTop: number | null = null;
-    let offset = 0;
-    for (const ch of chars) {
-      if (ch === "\n") {
-        lines.push(cur);
-        cur = "";
-        prevTop = null;
-        offset += ch.length;
-        continue;
-      }
-      try {
-        range.setStart(node, offset);
-        range.setEnd(node, offset + ch.length);
-        const top = range.getBoundingClientRect().top;
-        if (prevTop !== null && top - prevTop > 1) {
-          lines.push(cur);
-          cur = "";
-        }
-        prevTop = top;
-      } catch {
-        /* ignore */
-      }
-      cur += ch;
-      offset += ch.length;
+    zIndex: "-2147483647",
+    width: `${POSTER_W}px`,
+    height: `${POSTER_H}px`,
+    overflow: "hidden",
+    boxSizing: "border-box",
+    background: page.background ?? palette.background,
+    pointerEvents: "none",
+  });
+
+  for (const block of page.blocks) {
+    if (block.type === "text") {
+      const text = document.createElement("div");
+      applyStyles(text, {
+        position: "absolute",
+        left: `${block.x}px`,
+        top: `${block.y}px`,
+        width: `${block.w}px`,
+        margin: "0",
+        padding: "0",
+        border: "0",
+        boxSizing: "border-box",
+        fontFamily: FONT_FAMILY[block.fontFamily ?? "sans"],
+        fontSize: `${block.fontSize}px`,
+        fontWeight: String(block.fontWeight ?? 400),
+        fontStyle: block.fontStyle ?? "normal",
+        color: block.color,
+        textAlign: block.align ?? "left",
+        lineHeight: String(block.lineHeight ?? 1.4),
+        letterSpacing: block.letterSpacing ? `${block.letterSpacing}px` : "normal",
+        textTransform: block.textTransform ?? "none",
+        whiteSpace: "pre-wrap",
+        wordBreak: "normal",
+      });
+      text.textContent = block.text;
+      root.appendChild(text);
+      continue;
     }
-    lines.push(cur);
+
+    const crop = {
+      left: Math.max(0, block.crop?.left ?? 0),
+      right: Math.max(0, block.crop?.right ?? 0),
+      top: Math.max(0, block.crop?.top ?? 0),
+      bottom: Math.max(0, block.crop?.bottom ?? 0),
+    };
+    const frame = document.createElement("div");
+    applyStyles(frame, {
+      position: "absolute",
+      left: `${block.x}px`,
+      top: `${block.y}px`,
+      width: `${block.w}px`,
+      height: `${block.h}px`,
+      overflow: "hidden",
+      boxSizing: "border-box",
+    });
+    if (block.src) {
+      const img = document.createElement("img");
+      img.crossOrigin = "anonymous";
+      img.alt = block.label;
+      img.decoding = "async";
+      applyStyles(img, {
+        position: "absolute",
+        left: `${-crop.left}px`,
+        top: `${-crop.top}px`,
+        width: `${block.w + crop.left + crop.right}px`,
+        height: `${block.h + crop.top + crop.bottom}px`,
+        objectFit: isSvgSrc(block.src) ? "fill" : "cover",
+        objectPosition: "50% 50%",
+        maxWidth: "none",
+        pointerEvents: "none",
+      });
+      img.src = block.src;
+      frame.appendChild(img);
+    } else {
+      applyStyles(frame, {
+        border: "2px dashed rgba(0,0,0,0.25)",
+        background: "rgba(0,0,0,0.03)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: palette.muted,
+        fontFamily: FONT_FAMILY.serif,
+        fontStyle: "italic",
+        fontSize: "14px",
+        textAlign: "center",
+        padding: "6px",
+      });
+      frame.textContent = block.label;
+    }
+    root.appendChild(frame);
   }
-  document.body.removeChild(div);
-  return lines.length ? lines : [t.text];
+  return root;
+}
+
+async function waitForPosterDom(root: HTMLElement, blocks: Block[]) {
+  const fontLoads = blocks
+    .filter((b): b is TextBlock => b.type === "text" && !!b.text)
+    .map((t) => {
+      const descriptor = `${t.fontStyle ?? "normal"} ${t.fontWeight ?? 400} ${t.fontSize}px ${FONT_FAMILY[t.fontFamily ?? "sans"]}`;
+      return document.fonts.load(descriptor, t.text.slice(0, 64)).catch(() => []);
+    });
+  const imageLoads = Array.from(root.querySelectorAll("img")).map(async (img) => {
+    if (!img.complete) {
+      await new Promise<void>((resolve) => {
+        img.addEventListener("load", () => resolve(), { once: true });
+        img.addEventListener("error", () => resolve(), { once: true });
+      });
+    }
+    if (img.naturalWidth > 0) await img.decode().catch(() => undefined);
+  });
+  await Promise.all([...fontLoads, ...imageLoads]);
+  await document.fonts.ready;
+  await new Promise<void>((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+  );
+}
+
+async function renderPosterDomToCanvas(
+  page: PosterPage,
+  palette: Palette,
+  scale: number,
+): Promise<HTMLCanvasElement> {
+  const root = createPosterDom(page, palette);
+  document.body.appendChild(root);
+  try {
+    await waitForPosterDom(root, page.blocks);
+    const { default: html2canvas } = await import("html2canvas-pro");
+    return await html2canvas(root, {
+      scale,
+      width: POSTER_W,
+      height: POSTER_H,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      allowTaint: false,
+      imageTimeout: 30_000,
+      logging: false,
+      onclone: (_doc, clonedRoot) => {
+        (clonedRoot as HTMLElement).style.zIndex = "0";
+      },
+    });
+  } finally {
+    root.remove();
+  }
 }
 
 // Rasterise an image src at HIGH resolution for crisp export. Renders at
@@ -573,145 +621,31 @@ function exportBaseName(pages: PosterPage[]): string {
   return `${clean(pages[0].name)}_等${pages.length}页`;
 }
 
-// Fallback: the old rasterised export (one flattened image per page).
-async function exportPdfRaster(pages: PosterPage[], palette: Palette, mode: "print" | "standard") {
+export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "print" | "standard") {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
   for (let i = 0; i < pages.length; i++) {
-    const canvas = await renderPosterToCanvas(
-      pages[i].blocks,
-      palette,
-      mode === "print" ? 3 : 2,
-      pages[i].background,
-    );
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    let canvas: HTMLCanvasElement;
+    try {
+      canvas = await renderPosterDomToCanvas(pages[i], palette, mode === "print" ? 3 : 2);
+    } catch (error) {
+      // A browser extension or a third-party image without CORS must not make
+      // export unusable. The Canvas renderer remains a safe degraded fallback.
+      console.error(
+        "WYSIWYG PDF rendering failed; using Canvas fallback:",
+        error instanceof Error ? error.message : error,
+      );
+      canvas = await renderPosterToCanvas(
+        pages[i].blocks,
+        palette,
+        mode === "print" ? 3 : 2,
+        pages[i].background,
+      );
+    }
     if (i > 0) pdf.addPage("a3", "portrait");
-    pdf.addImage(dataUrl, "JPEG", 0, 0, A3_W_MM, A3_H_MM);
+    pdf.addImage(canvas.toDataURL("image/jpeg", 0.97), "JPEG", 0, 0, A3_W_MM, A3_H_MM);
   }
   pdf.save(`${exportBaseName(pages)}${mode === "print" ? "_print" : ""}.pdf`);
-}
-
-// Which embedded/built-in PDF font to use for a text block so it matches the
-// on-screen webfont: sans→Noto Sans SC, display→ZCOOL XiaoWei, serif→Noto Sans
-// SC when it contains CJK (no CJK serif TTF is jsPDF-embeddable) or the built-in
-// Times serif for Latin-only labels (scientific names).
-function pdfFontFor(t: TextBlock): string {
-  const fam = t.fontFamily ?? "sans";
-  if (fam === "display") return "ZCOOL";
-  if (fam === "serif") return CJK_RE.test(t.text) ? "NotoSans" : "times";
-  return "NotoSans";
-}
-
-export async function exportPdf(pages: PosterPage[], palette: Palette, mode: "print" | "standard") {
-  try {
-    const { jsPDF } = await import("jspdf");
-    const [notoSans, zcool] = await Promise.all([loadFontB64("NotoSans"), loadFontB64("ZCOOL")]);
-
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a3" });
-    pdf.addFileToVFS("NotoSansSC.ttf", notoSans);
-    pdf.addFont("NotoSansSC.ttf", "NotoSans", "normal");
-    pdf.addFileToVFS("ZCOOL.ttf", zcool);
-    pdf.addFont("ZCOOL.ttf", "ZCOOL", "normal");
-
-    for (let pi = 0; pi < pages.length; pi++) {
-      if (pi > 0) pdf.addPage("a3", "portrait");
-      const page = pages[pi];
-
-      // Background. jsPDF has no native gradient fills, so gradients are
-      // rasterised to a full-page image; solid colours stay vector rects.
-      const bg = page.background ?? palette.background;
-      if (bg && bg !== "transparent" && bg !== "rgba(0,0,0,0)") {
-        if (bg.includes("gradient")) {
-          const bgCanvas = document.createElement("canvas");
-          const bgScale = 2;
-          bgCanvas.width = POSTER_W * bgScale;
-          bgCanvas.height = POSTER_H * bgScale;
-          const bgCtx = bgCanvas.getContext("2d")!;
-          bgCtx.scale(bgScale, bgScale);
-          bgCtx.fillStyle = "#ffffff"; // under semi-transparent gradient stops
-          bgCtx.fillRect(0, 0, POSTER_W, POSTER_H);
-          paintBackground(bgCtx, bg);
-          pdf.addImage(bgCanvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, A3_W_MM, A3_H_MM);
-        } else {
-          const c = parseRgba(firstColor(bg));
-          if (c) {
-            pdf.setFillColor(c.r, c.g, c.b);
-            pdf.rect(0, 0, A3_W_MM, A3_H_MM, "F");
-          }
-        }
-      }
-
-      for (const b of page.blocks) {
-        if (b.type === "image") {
-          const ib = b as ImageBlock;
-          if (!ib.src) continue;
-          try {
-            const { dataUrl, fmt } = await imageToHiResDataUrl(ib, mode === "print" ? 3.5 : 3);
-            pdf.addImage(
-              dataUrl,
-              fmt,
-              ib.x * MM_X,
-              ib.y * MM_Y,
-              ib.w * MM_X,
-              ib.h * MM_Y,
-              undefined,
-              "SLOW",
-            );
-          } catch {
-            /* skip unreadable image */
-          }
-          continue;
-        }
-
-        const t = b as TextBlock;
-        if (!t.text) continue;
-        const c = parseRgba(t.color) ?? { r: 34, g: 34, b: 34, a: 1 };
-        const fontPt = t.fontSize * MM_Y * PT_PER_MM; // exact on-screen size
-        pdf.setFont(pdfFontFor(t), "normal");
-        pdf.setFontSize(fontPt);
-        pdf.setTextColor(c.r, c.g, c.b);
-        pdf.setCharSpace(t.letterSpacing ? t.letterSpacing * MM_X : 0);
-
-        // Exact on-screen line breaks (browser pre-wrap) and line spacing.
-        const lines = measureVisualLines(t);
-        const align = (t.align ?? "left") as "left" | "center" | "right";
-        const anchorXpx = align === "center" ? t.x + t.w / 2 : align === "right" ? t.x + t.w : t.x;
-        const lineHeightPx = t.fontSize * (t.lineHeight ?? 1.4);
-        const leadPx = (lineHeightPx - t.fontSize) / 2; // CSS half-leading
-
-        // Approximate the on-screen weight: the embedded face is a single
-        // weight, so simulate heavier weights with a very light proportional
-        // glyph stroke. jsPDF line widths are millimetres, while fontPt is in
-        // points; converting before calculating the stroke avoids dramatically
-        // over-bold CJK glyphs (the old formula mixed the two units).
-        const weight = t.fontWeight ?? 400;
-        const fontMm = fontPt / PT_PER_MM;
-        const weightFactor = Math.max(0, Math.min(1, (weight - 400) / 300));
-        const strokeMm = weightFactor * Math.min(0.11, fontMm * 0.006);
-        if (strokeMm > 0) {
-          pdf.setDrawColor(c.r, c.g, c.b);
-          pdf.setLineWidth(strokeMm);
-        }
-        lines.forEach((line, i) => {
-          const text = t.textTransform === "uppercase" ? line.toUpperCase() : line;
-          const yTopPx = t.y + i * lineHeightPx + leadPx;
-          pdf.text(text, anchorXpx * MM_X, yTopPx * MM_Y, {
-            align,
-            baseline: "top",
-            ...(strokeMm > 0 ? { renderingMode: "fillThenStroke" } : {}),
-          });
-        });
-        if (strokeMm > 0) pdf.setLineWidth(0);
-        pdf.setCharSpace(0);
-      }
-    }
-
-    pdf.save(`${exportBaseName(pages)}${mode === "print" ? "_print" : ""}.pdf`);
-  } catch (e) {
-    // Any failure (font load, parsing, etc.) → never break export; use raster.
-    console.error("vector PDF failed, falling back to raster:", e instanceof Error ? e.message : e);
-    await exportPdfRaster(pages, palette, mode);
-  }
 }
 
 export async function exportSvg(

@@ -25,7 +25,14 @@ function cropOffsets(crop: ImageBlock["crop"]): CropOffsets {
   };
 }
 
-export type ResizePatch = { id: string; x: number; y: number; w: number; h?: number; crop?: ImageBlock["crop"] };
+export type ResizePatch = {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h?: number;
+  crop?: ImageBlock["crop"];
+};
 
 type Props = {
   blocks: Block[];
@@ -34,13 +41,15 @@ type Props = {
   selectedIds: Set<string>;
   onSelectIds: (ids: string[], additive?: boolean) => void;
   onMoveMany: (dx: number, dy: number) => void;
-  onResize: (id: string, patch: { x: number; y: number; w: number; h?: number; crop?: ImageBlock["crop"] }) => void;
+  onResize: (
+    id: string,
+    patch: { x: number; y: number; w: number; h?: number; crop?: ImageBlock["crop"] },
+  ) => void;
   onResizeMany?: (patches: ResizePatch[]) => void;
   onChangeText: (id: string, text: string) => void;
   onImageContextMenu: (id: string, clientX: number, clientY: number) => void;
   displayWidth: number;
 };
-
 
 type MoveState = {
   kind: "move";
@@ -243,7 +252,8 @@ export function PosterCanvas({
       } else if (d.isImage) {
         // Side pills crop an edge without resampling or stretching the source.
         // Pulling the same edge back out reveals the cropped region again.
-        const between = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+        const between = (value: number, min: number, max: number) =>
+          Math.max(min, Math.min(max, value));
         if (d.handle === "e") {
           const change = between(dx, -(d.origW - 20), d.origCrop.right);
           w = d.origW + change;
@@ -513,21 +523,56 @@ function ResizeHandles({
   isText: boolean;
   onStart: (handle: Handle, e: React.PointerEvent) => void;
 }) {
-  const handles: Array<{ h: Handle; l: number; t: number; cursor: string; visible: boolean; title: string }> = [
+  const handles: Array<{
+    h: Handle;
+    l: number;
+    t: number;
+    cursor: string;
+    visible: boolean;
+    title: string;
+  }> = [
     { h: "nw", l: 0, t: 0, cursor: "nwse-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "n", l: w / 2, t: 0, cursor: "ns-resize", visible: !isText, title: "调整可见取景上边（可恢复）" },
+    {
+      h: "n",
+      l: w / 2,
+      t: 0,
+      cursor: "ns-resize",
+      visible: !isText,
+      title: "调整可见取景上边（可恢复）",
+    },
     { h: "ne", l: w, t: 0, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "e", l: w, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "调整可见取景右边（可恢复）" },
+    {
+      h: "e",
+      l: w,
+      t: (h ?? 20) / 2,
+      cursor: "ew-resize",
+      visible: true,
+      title: isText ? "调整文字宽度" : "调整可见取景右边（可恢复）",
+    },
     { h: "se", l: w, t: h ?? 20, cursor: "nwse-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "s", l: w / 2, t: h ?? 20, cursor: "ns-resize", visible: !isText, title: "调整可见取景下边（可恢复）" },
+    {
+      h: "s",
+      l: w / 2,
+      t: h ?? 20,
+      cursor: "ns-resize",
+      visible: !isText,
+      title: "调整可见取景下边（可恢复）",
+    },
     { h: "sw", l: 0, t: h ?? 20, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
-    { h: "w", l: 0, t: (h ?? 20) / 2, cursor: "ew-resize", visible: true, title: isText ? "调整文字宽度" : "调整可见取景左边（可恢复）" },
+    {
+      h: "w",
+      l: 0,
+      t: (h ?? 20) / 2,
+      cursor: "ew-resize",
+      visible: true,
+      title: isText ? "调整文字宽度" : "调整可见取景左边（可恢复）",
+    },
   ];
   return (
     <>
       {handles
         .filter((x) => x.visible)
-        .map((x) => (
+        .map((x) =>
           (() => {
             const corner = x.h.length === 2 && !isText;
             const horizontalEdge = x.h === "n" || x.h === "s";
@@ -559,8 +604,8 @@ function ResizeHandles({
                 }}
               />
             );
-          })()
-        ))}
+          })(),
+        )}
     </>
   );
 }
@@ -699,7 +744,9 @@ function ImageEl({
             top: -crop.top,
             width: mediaW,
             height: mediaH,
+            maxWidth: "none",
             objectFit: isSvgSrc(block.src) ? "fill" : "cover",
+            objectPosition: "50% 50%",
             pointerEvents: "none",
           }}
         />
