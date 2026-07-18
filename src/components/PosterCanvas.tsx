@@ -251,30 +251,29 @@ export function PosterCanvas({
         };
       } else if (d.isImage) {
         // Side pills crop an edge without resampling or stretching the source.
-        // Pulling the same edge back out reveals the cropped region again.
-        const between = (value: number, min: number, max: number) =>
-          Math.max(min, Math.min(max, value));
+        // Pulling an edge back out first reveals any cropped region, then keeps
+        // expanding the frame once that crop reaches zero.
         if (d.handle === "e") {
-          const change = between(dx, -(d.origW - 20), d.origCrop.right);
+          const change = Math.max(dx, -(d.origW - 20));
           w = d.origW + change;
-          crop = { ...d.origCrop, right: d.origCrop.right - change };
+          crop = { ...d.origCrop, right: Math.max(0, d.origCrop.right - change) };
         }
         if (d.handle === "w") {
-          const change = between(dx, -d.origCrop.left, d.origW - 20);
+          const change = Math.min(dx, d.origW - 20);
           w = d.origW - change;
           x = d.origX + change;
-          crop = { ...d.origCrop, left: d.origCrop.left + change };
+          crop = { ...d.origCrop, left: Math.max(0, d.origCrop.left + change) };
         }
         if (d.handle === "s") {
-          const change = between(dy, -(d.origH - 20), d.origCrop.bottom);
+          const change = Math.max(dy, -(d.origH - 20));
           h = d.origH + change;
-          crop = { ...d.origCrop, bottom: d.origCrop.bottom - change };
+          crop = { ...d.origCrop, bottom: Math.max(0, d.origCrop.bottom - change) };
         }
         if (d.handle === "n") {
-          const change = between(dy, -d.origCrop.top, d.origH - 20);
+          const change = Math.min(dy, d.origH - 20);
           h = d.origH - change;
           y = d.origY + change;
-          crop = { ...d.origCrop, top: d.origCrop.top + change };
+          crop = { ...d.origCrop, top: Math.max(0, d.origCrop.top + change) };
         }
       } else {
         if (d.handle.includes("e")) w = Math.max(20, d.origW + dx);
@@ -436,7 +435,11 @@ export function PosterCanvas({
         {blocks.map((b) => {
           const selected = selectedIds.has(b.id);
           return (
-            <div key={b.id} style={{ position: "absolute", left: b.x, top: b.y }}>
+            <div
+              key={b.id}
+              data-block-id={b.id}
+              style={{ position: "absolute", left: b.x, top: b.y }}
+            >
               {b.type === "text" ? (
                 <TextEl
                   block={b}
@@ -538,7 +541,7 @@ function ResizeHandles({
       t: 0,
       cursor: "ns-resize",
       visible: !isText,
-      title: "调整可见取景上边（可恢复）",
+      title: "裁切或扩展图片上边",
     },
     { h: "ne", l: w, t: 0, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
     {
@@ -547,7 +550,7 @@ function ResizeHandles({
       t: (h ?? 20) / 2,
       cursor: "ew-resize",
       visible: true,
-      title: isText ? "调整文字宽度" : "调整可见取景右边（可恢复）",
+      title: isText ? "调整文字宽度" : "裁切或扩展图片右边",
     },
     { h: "se", l: w, t: h ?? 20, cursor: "nwse-resize", visible: !isText, title: "等比例缩放图片" },
     {
@@ -556,7 +559,7 @@ function ResizeHandles({
       t: h ?? 20,
       cursor: "ns-resize",
       visible: !isText,
-      title: "调整可见取景下边（可恢复）",
+      title: "裁切或扩展图片下边",
     },
     { h: "sw", l: 0, t: h ?? 20, cursor: "nesw-resize", visible: !isText, title: "等比例缩放图片" },
     {
@@ -565,7 +568,7 @@ function ResizeHandles({
       t: (h ?? 20) / 2,
       cursor: "ew-resize",
       visible: true,
-      title: isText ? "调整文字宽度" : "调整可见取景左边（可恢复）",
+      title: isText ? "调整文字宽度" : "裁切或扩展图片左边",
     },
   ];
   return (
@@ -581,6 +584,7 @@ function ResizeHandles({
             return (
               <div
                 key={x.h}
+                data-resize-handle={x.h}
                 title={x.title}
                 aria-label={x.title}
                 onPointerDown={(e) => {

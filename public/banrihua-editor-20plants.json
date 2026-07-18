@@ -656,7 +656,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -670,7 +670,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "半日花（Helianthemum songaricum）相似种对照图"
+          "label": "半日花（Helianthemum songaricum）页面本种识别图"
         },
         {
           "id": "sim-1-title",
@@ -690,7 +690,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "花瓣宽楔形、橘黄色，干后不变色；萼片3条褐色纵肋；花期花梗下弯。\nPetals broadly cuneate, orange-yellow, not changing color when dry; sepals with 3 brown ribs; pedicels reflexed during anthesis.",
+          "text": "页面本种：花瓣宽楔形、橘黄色，干后不变色，萼片具3条褐色纵肋，花期花梗下弯；区别于鄂尔多斯半日花的5条绿色纵肋和直立花梗。\nPage species: broadly cuneate orange-yellow petals that retain their colour when dry, 3 brown sepal ribs, and reflexed flowering pedicels; unlike H. ordosicum with 5 green ribs and erect pedicels.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -705,7 +705,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "半日花（Helianthemum songaricum）相似种对照图"
+          "label": "鄂尔多斯半日花（Helianthemum ordosicum）相似种对照图"
         },
         {
           "id": "sim-2-title",
@@ -725,7 +725,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "花瓣倒卵形，鲜黄、干后淡粉红；萼片5条绿色纵肋；花期花梗直立。\nPetals obovate, bright yellow, turning pale pink when dry; sepals with 5 green ribs; pedicels erect during anthesis.",
+          "text": "相似种：花瓣倒卵形、鲜黄色，干后淡粉红，萼片具5条绿色纵肋，花期花梗直立；本页半日花则为橘黄色宽楔形花瓣、3条褐色纵肋和下弯花梗。\nSimilar species: obovate bright-yellow petals turning pale pink when dry, 5 green sepal ribs, and erect flowering pedicels; the page species instead has orange-yellow cuneate petals, 3 brown ribs, and reflexed pedicels.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -1620,7 +1620,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -1634,7 +1634,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "四合木（Tetraena mongolica）相似种对照图"
+          "label": "四合木（Tetraena mongolica）页面本种识别图"
         },
         {
           "id": "sim-1-title-c9ac9",
@@ -1642,7 +1642,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "霸王 Zygophyllum xanthoxylum",
+          "text": "四合木 Tetraena mongolica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -1654,7 +1654,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "霸王为落叶灌木，叶片为二回羽状复叶，小叶肉质，花黄色，但果实为倒卵形或近球形的翅果，而非四合木的球形蒴果。 \n *Zygophyllum xanthoxylum* is a deciduous shrub with bipinnate compound leaves, succulent leaflets, and yellow flowers, but its fruit is an obovoid or subglobose samara, not the spherical capsule of *Tetraena mongolica*.",
+          "text": "页面本种：叶对生、单叶肉质，花4瓣黄色，果为球形蒴果；区别于霸王的二回羽状复叶和翅果。\nPage species: opposite succulent simple leaves, 4 yellow petals, and a spherical capsule; unlike Z. xanthoxylum with bipinnate leaves and a samara.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -1669,7 +1669,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "四合木（Tetraena mongolica）相似种对照图"
+          "label": "霸王（Zygophyllum xanthoxylum）相似种对照图"
         },
         {
           "id": "sim-2-title-c9ac9",
@@ -1677,7 +1677,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "白刺 Nitraria tangutorum",
+          "text": "霸王 Zygophyllum xanthoxylum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -1689,7 +1689,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "白刺为落叶灌木，枝条常具刺，叶片肉质，条形或倒披针形，花白色或淡黄色，果实为红色浆果，与四合木的黄色花和蒴果明显不同。 \n *Nitraria tangutorum* is a deciduous shrub with spiny branches, succulent, linear or oblanceolate leaves, white or pale yellow flowers, and red berries, distinctly different from *Tetraena mongolica*'s yellow flowers and capsules.",
+          "text": "相似种：霸王具二回羽状复叶和肉质小叶，果为倒卵形或近球形翅果；本页四合木则为对生肉质单叶和球形蒴果。\nSimilar species: bipinnate leaves with succulent leaflets and an obovoid or subglobose samara; the page species has opposite succulent simple leaves and a spherical capsule.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -2584,7 +2584,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -2598,7 +2598,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）相似种对照图"
+          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）页面本种识别图"
         },
         {
           "id": "sim-1-title-cqgfn",
@@ -2606,7 +2606,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "短柄沙冬青 Ammopiptanthus nanus",
+          "text": "蒙古沙冬青 A. mongolicus",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -2618,7 +2618,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "短柄沙冬青植株矮小，叶片较小且通常为倒卵形，花序更短，荚果被毛更密。 \n A. nanus is a smaller plant with smaller, typically obovate leaves, shorter inflorescences, and more densely hairy pods.",
+          "text": "页面本种：常绿灌木，植株及叶片相对较大，花序较长，荚果毛被较疏；区别于短柄沙冬青的矮小株形、小型倒卵叶和密毛荚果。\nPage species: a relatively larger evergreen shrub with larger leaves, longer inflorescences, and less densely hairy pods; unlike the dwarf A. nanus with small obovate leaves and densely hairy pods.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -2633,7 +2633,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "蒙古沙冬青（Ammopiptanthus mongolicus）相似种对照图"
+          "label": "短柄沙冬青（Ammopiptanthus nanus）相似种对照图"
         },
         {
           "id": "sim-2-title-cqgfn",
@@ -2641,7 +2641,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "锦鸡儿属 Caragana spp.",
+          "text": "短柄沙冬青 A. nanus",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -2653,7 +2653,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "锦鸡儿属植物通常为落叶灌木，叶片为羽状复叶，且多数种类具有明显的刺，与蒙古沙冬青的常绿单叶形态差异显著。 \n Caragana species are typically deciduous shrubs with pinnately compound leaves, and most species have prominent thorns, differing significantly from the evergreen simple leaves of Ammopiptanthus mongolicus.",
+          "text": "相似种：短柄沙冬青植株较矮，叶较小且多为倒卵形，花序更短，荚果毛被更密；本页蒙古沙冬青通常株形、叶片和花序更大。\nSimilar species: a smaller shrub with smaller, usually obovate leaves, shorter inflorescences, and more densely hairy pods; the page species is generally larger in habit, leaf, and inflorescence.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -3548,7 +3548,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -3562,7 +3562,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "绵刺（Potaninia mongolica）相似种对照图"
+          "label": "绵刺（Potaninia mongolica）页面本种识别图"
         },
         {
           "id": "sim-1-title-cklvf",
@@ -3570,7 +3570,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "锦鸡儿属植物 (Caragana spp.)",
+          "text": "绵刺 Potaninia mongolica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -3582,7 +3582,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "锦鸡儿属植物通常有羽状复叶和蝶形花，果实为荚果，与绵刺的单叶和棉毛状果实明显不同。\n*Caragana* species typically have pinnate leaves and papilionaceous flowers, with pods as fruits, distinctly different from *Potaninia*'s simple leaves and cotton-like fruits.",
+          "text": "页面本种：矮小垫状灌木，具单叶，果实外有棉毛状宿萼；区别于柠条锦鸡儿的羽状复叶、蝶形花和荚果。\nPage species: a dwarf cushion shrub with simple leaves and cottony persistent calyces around the fruit; unlike C. korshinskii with pinnate leaves, papilionaceous flowers, and pods.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -3597,7 +3597,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "绵刺（Potaninia mongolica）相似种对照图"
+          "label": "柠条锦鸡儿（Caragana korshinskii）相似种对照图"
         },
         {
           "id": "sim-2-title-cklvf",
@@ -3605,7 +3605,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "沙棘 (Hippophae rhamnoides L.)",
+          "text": "柠条锦鸡儿 C. korshinskii",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -3617,7 +3617,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "沙棘的叶片为线形或披针形，花小不显，果实为橙黄色浆果状，无绵刺特有的棉毛状萼片。\n*Hippophae rhamnoides* has linear or lanceolate leaves, inconspicuous small flowers, and orange-yellow berry-like fruits, lacking the cotton-like sepals typical of *Potaninia*.",
+          "text": "相似种：柠条锦鸡儿具羽状复叶、蝶形花和荚果；本页绵刺为单叶，果实具有醒目的棉毛状宿萼。\nSimilar species: pinnate leaves, papilionaceous flowers, and pods; the page species has simple leaves and conspicuous cottony persistent calyces around its fruit.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -4512,7 +4512,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -4526,7 +4526,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "鄂尔多斯野丁香（Leptodermis ordosica）相似种对照图"
+          "label": "鄂尔多斯野丁香（Leptodermis ordosica）页面本种识别图"
         },
         {
           "id": "sim-1-title-ca7tj",
@@ -4534,7 +4534,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "长圆叶野丁香 Leptodermis oblonga",
+          "text": "鄂尔多斯野丁香 L. ordosica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -4546,7 +4546,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "主要区别在于叶形。长圆叶野丁香的叶片通常为长圆形或长圆状披针形，而鄂尔多斯野丁香的叶片为椭圆形至卵形，且通常更小。花色上，长圆叶野丁香多为白色或淡粉色。\nThe main difference lies in the leaf shape. *Leptodermis oblonga* typically has oblong or oblong-lanceolate leaves, while *L. ordosica* has elliptic to ovate leaves that are usually smaller. Regarding flower color, *L. oblonga* is mostly white or pale pink.",
+          "text": "页面本种：植株矮小呈垫状，叶较小、椭圆形至卵形，花粉红至紫红；区别于长圆叶野丁香的长圆叶和白至淡粉色花。\nPage species: a dwarf cushion shrub with smaller elliptic to ovate leaves and pink to purplish-red flowers; unlike L. oblonga with oblong leaves and white to pale-pink flowers.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -4561,7 +4561,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "鄂尔多斯野丁香（Leptodermis ordosica）相似种对照图"
+          "label": "长圆叶野丁香（Leptodermis oblonga）相似种对照图"
         },
         {
           "id": "sim-2-title-ca7tj",
@@ -4569,7 +4569,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "甘肃野丁香 Leptodermis potaninii",
+          "text": "长圆叶野丁香 L. oblonga",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -4581,7 +4581,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "甘肃野丁香通常植株更高大，花色多为白色，且花序通常更密集。鄂尔多斯野丁香则矮小呈垫状，花色为粉红色至紫红色，花序较疏散。\n*Leptodermis kansuensis* is usually taller, with mostly white flowers and denser inflorescences. *L. ordosica* is dwarf and cushion-like, with pink to purplish-red flowers and looser inflorescences.",
+          "text": "相似种：叶片多为长圆形或长圆状披针形，花多白色或淡粉色；本页鄂尔多斯野丁香叶较小且偏椭圆至卵形，花色更深。\nSimilar species: usually oblong to oblong-lanceolate leaves and white to pale-pink flowers; the page species has smaller elliptic to ovate leaves and deeper-coloured flowers.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -5476,7 +5476,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -5490,7 +5490,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "鄂尔多斯蒿（Artemisia ordosica）相似种对照图"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）页面本种识别图"
         },
         {
           "id": "sim-1-title-co5wu",
@@ -5498,7 +5498,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "白沙蒿 Artemisia sphaerocephala",
+          "text": "鄂尔多斯蒿 A. ordosica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -5510,7 +5510,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "白沙蒿的头状花序通常为球形或近球形，排列成紧密的圆锥花序，且叶片通常更细裂，整体植株常呈银白色。 \n *Artemisia sphaerocephala* typically has spherical or subglobose capitula arranged in dense panicles, with more finely dissected leaves, and the overall plant often appears silvery-white.",
+          "text": "页面本种：叶二回羽状深裂，裂片线形且较厚，头状花序排成狭圆锥状；区别于白沙蒿的小型线形叶和球形头状花序。\nPage species: bipinnately divided leaves with thick linear lobes and capitula in narrow panicles; unlike A. sphaerocephala with small linear leaves and globose capitula.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -5525,7 +5525,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "鄂尔多斯蒿（Artemisia ordosica）相似种对照图"
+          "label": "白沙蒿（Artemisia sphaerocephala）相似种对照图"
         },
         {
           "id": "sim-2-title-co5wu",
@@ -5533,7 +5533,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "沙蒿 Artemisia desertorum",
+          "text": "白沙蒿 A. sphaerocephala",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -5545,7 +5545,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "沙蒿的叶片裂片通常更细长，头状花序排列成总状或穗状花序，且植株通常比鄂尔多斯蒿矮小。 \n *Artemisia desertorum* typically has more slender leaf lobes, capitula arranged in racemes or spikes, and the plant is generally smaller than *Artemisia ordosica*.",
+          "text": "相似种：白沙蒿幼枝和小型线形叶密被白绒毛，头状花序球形或近球形；本页鄂尔多斯蒿叶为二回羽状深裂，裂片较厚。\nSimilar species: young shoots and small linear leaves densely white-tomentose, with globose to subglobose capitula; the page species has bipinnately divided leaves with thicker lobes.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -6440,7 +6440,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -6453,8 +6453,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/photos/ordosica-field/compare-sphaerocephala.jpg",
-          "label": "白沙蒿（Artemisia sphaerocephala）标本实拍 · CC BY 4.0"
+          "src": "/photos/ordosica-field/main-plant.jpg",
+          "label": "鄂尔多斯蒿（Artemisia ordosica）页面本种识别图"
         },
         {
           "id": "sim-1-title-co5wu-field",
@@ -6462,7 +6462,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "白沙蒿 Artemisia sphaerocephala",
+          "text": "鄂尔多斯蒿 A. ordosica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -6474,7 +6474,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "白沙蒿的头状花序通常为球形或近球形，排列成紧密的圆锥花序，且叶片通常更细裂，整体植株常呈银白色。 \n *Artemisia sphaerocephala* typically has spherical or subglobose capitula arranged in dense panicles, with more finely dissected leaves, and the overall plant often appears silvery-white.",
+          "text": "页面本种：叶二回羽状深裂，裂片线形且较厚，头状花序排成狭圆锥状；区别于白沙蒿的小型线形叶和球形头状花序。\nPage species: bipinnately divided leaves with thick linear lobes and capitula in narrow panicles; unlike A. sphaerocephala with small linear leaves and globose capitula.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -6488,8 +6488,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/photos/ordosica-field/compare-desertorum.jpg",
-          "label": "沙蒿（Artemisia desertorum）野外实拍 · Urgamal Magsar / iNaturalist CC BY"
+          "src": "/photos/ordosica-field/compare-sphaerocephala.jpg",
+          "label": "白沙蒿（Artemisia sphaerocephala）相似种对照图"
         },
         {
           "id": "sim-2-title-co5wu-field",
@@ -6497,7 +6497,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "沙蒿 Artemisia desertorum",
+          "text": "白沙蒿 A. sphaerocephala",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -6509,7 +6509,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "沙蒿的叶片裂片通常更细长，头状花序排列成总状或穗状花序，且植株通常比鄂尔多斯蒿矮小。 \n *Artemisia desertorum* typically has more slender leaf lobes, capitula arranged in racemes or spikes, and the plant is generally smaller than *Artemisia ordosica*.",
+          "text": "相似种：白沙蒿幼枝和小型线形叶密被白绒毛，头状花序球形或近球形；本页鄂尔多斯蒿叶为二回羽状深裂，裂片较厚。\nSimilar species: young shoots and small linear leaves densely white-tomentose, with globose to subglobose capitula; the page species has bipinnately divided leaves with thicker lobes.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -7404,7 +7404,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -7417,8 +7417,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/ordosica-scientific/compare-sphaerocephala.png",
-          "label": "白沙蒿（Artemisia sphaerocephala）对照植物科学插图 · 透明背景"
+          "src": "/illustrations/ordosica-scientific/main-plant.png",
+          "label": "鄂尔多斯蒿（Artemisia ordosica）页面本种识别图"
         },
         {
           "id": "sim-1-title-co5wu-field-illustration",
@@ -7426,7 +7426,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "白沙蒿 Artemisia sphaerocephala",
+          "text": "鄂尔多斯蒿 A. ordosica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -7438,7 +7438,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "白沙蒿的头状花序通常为球形或近球形，排列成紧密的圆锥花序，且叶片通常更细裂，整体植株常呈银白色。 \n *Artemisia sphaerocephala* typically has spherical or subglobose capitula arranged in dense panicles, with more finely dissected leaves, and the overall plant often appears silvery-white.",
+          "text": "页面本种：叶二回羽状深裂，裂片线形且较厚，头状花序排成狭圆锥状；区别于白沙蒿的小型线形叶和球形头状花序。\nPage species: bipinnately divided leaves with thick linear lobes and capitula in narrow panicles; unlike A. sphaerocephala with small linear leaves and globose capitula.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -7452,8 +7452,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/ordosica-scientific/compare-desertorum.png",
-          "label": "沙蒿（Artemisia desertorum）对照植物科学插图 · 透明背景"
+          "src": "/illustrations/ordosica-scientific/compare-sphaerocephala.png",
+          "label": "白沙蒿（Artemisia sphaerocephala）相似种对照图"
         },
         {
           "id": "sim-2-title-co5wu-field-illustration",
@@ -7461,7 +7461,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "沙蒿 Artemisia desertorum",
+          "text": "白沙蒿 A. sphaerocephala",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -7473,7 +7473,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "沙蒿的叶片裂片通常更细长，头状花序排列成总状或穗状花序，且植株通常比鄂尔多斯蒿矮小。 \n *Artemisia desertorum* typically has more slender leaf lobes, capitula arranged in racemes or spikes, and the plant is generally smaller than *Artemisia ordosica*.",
+          "text": "相似种：白沙蒿幼枝和小型线形叶密被白绒毛，头状花序球形或近球形；本页鄂尔多斯蒿叶为二回羽状深裂，裂片较厚。\nSimilar species: young shoots and small linear leaves densely white-tomentose, with globose to subglobose capitula; the page species has bipinnately divided leaves with thicker lobes.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -8342,7 +8342,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "种子遇水形成黏液层，可黏附沙粒并调节吸水；这是有实证的适沙特征，比笼统的“基因家族扩张”更适合公众理解。\nWhen wetted, the seed coat forms mucilage that binds sand and regulates hydration—a directly observed adaptation to mobile dunes.",
+          "text": "白沙蒿与近缘蒿属植物仅凭整体灰白程度容易误判；可靠鉴定应同时查看叶片分裂方式、头状花序形状和成熟瘦果。\nA grey-white appearance alone is unreliable; leaf division, capitulum shape, and mature achenes should be checked together.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -8368,7 +8368,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -8382,7 +8382,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "白沙蒿（Artemisia sphaerocephala）相似种对照图"
+          "label": "白沙蒿（Artemisia sphaerocephala）页面本种识别图"
         },
         {
           "id": "sim-1-title-cwnb6",
@@ -8390,7 +8390,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "籽蒿 Artemisia ordosica",
+          "text": "白沙蒿 A. sphaerocephala",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -8402,7 +8402,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "籽蒿的叶片通常为二回羽状深裂，裂片线形，植株整体绿色或灰绿色，不似白沙蒿的显著灰白色。其头状花序也较白沙蒿小且排列更疏散。\n*Artemisia siversiana* leaves are usually bipinnatisect with linear lobes, and the whole plant is green or grayish-green, unlike the distinct grayish-white of *A. sphaerocephala*. Its capitula are also smaller and more loosely arranged.",
+          "text": "页面本种：幼枝和小型线形叶密被白绒毛，头状花序球形或近球形；区别于鄂尔多斯蒿的二回羽状深裂叶。\nPage species: young shoots and small linear leaves densely white-tomentose, with globose to subglobose capitula; unlike A. ordosica with bipinnately divided leaves.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -8417,7 +8417,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "白沙蒿（Artemisia sphaerocephala）相似种对照图"
+          "label": "鄂尔多斯蒿（Artemisia ordosica）相似种对照图"
         },
         {
           "id": "sim-2-title-cwnb6",
@@ -8425,7 +8425,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "乌拉尔蒿 Artemisia wulianhuadongensis",
+          "text": "鄂尔多斯蒿 A. ordosica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -8437,7 +8437,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "乌拉尔蒿的叶片通常为一至二回羽状全裂，裂片丝状，植株通常较高大，且头状花序排列方式和苞片形态与白沙蒿有明显差异。\n*Artemisia dracunculus* leaves are usually 1-2 pinnatisect with filiform lobes, the plant is usually taller, and its capitula arrangement and bract morphology differ significantly from *A. sphaerocephala*.",
+          "text": "相似种：鄂尔多斯蒿叶二回羽状深裂，裂片线形且较厚，头状花序排成狭圆锥状；本页白沙蒿以小型白绒毛叶和球形头状花序为要点。\nSimilar species: bipinnately divided leaves with thick linear lobes and capitula in narrow panicles; the page species is identified by small white-tomentose leaves and globose capitula.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -9306,7 +9306,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "枝叶精油含多种有毒萜类，尤其富含 sabinyl acetate 的材料可造成严重刺激和器官损伤；不能把风险简单归因于 sabinene，也不应自行内服。\nIts foliage oil contains a toxic terpene mixture, often rich in sabinyl acetate; toxicity cannot be attributed to sabinene alone, and ingestion is unsafe.",
+          "text": "刺形叶与鳞形叶可在同一株叉子圆柏上出现；不能只凭一种叶型判断，应结合匍匐株形、枝条和成熟球果共同鉴定。\nNeedle and scale leaves may occur on one plant; identification should combine its creeping habit, shoots, and mature cones rather than one leaf type.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -9332,7 +9332,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -9346,7 +9346,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
+          "label": "叉子圆柏（Juniperus sabina）页面本种识别图"
         },
         {
           "id": "sim-1-title-cvenr",
@@ -9354,7 +9354,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "圆柏 Juniperus chinensis",
+          "text": "叉子圆柏 Juniperus sabina",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -9366,7 +9366,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "圆柏通常为乔木或高大灌木，叶片以鳞形叶为主，刺形叶多见于幼苗或萌生枝。而叉子圆柏多为匍匐或平展的低矮灌木，二型叶片特征更明显。\n*Juniperus chinensis* is usually a tree or tall shrub, predominantly with scale leaves, while needle leaves are mostly seen on seedlings or sprouts. *J. sabina* is mostly a creeping or spreading dwarf shrub with more pronounced dimorphic leaves.",
+          "text": "页面本种：多为匍匐或平展的低矮灌木，刺形叶与鳞形叶常并存；区别于圆柏常呈乔木或高大灌木、成株以鳞形叶为主。\nPage species: usually a creeping or spreading dwarf shrub with both needle and scale leaves; unlike J. chinensis, usually a tree or tall shrub dominated by scale leaves when mature.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -9381,7 +9381,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
+          "label": "圆柏（Juniperus chinensis）相似种对照图"
         },
         {
           "id": "sim-2-title-cvenr",
@@ -9389,7 +9389,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "刺柏 Juniperus squamata",
+          "text": "圆柏 J. chinensis",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -9401,7 +9401,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "刺柏的叶片全部为刺形叶，不具鳞形叶。叉子圆柏则同时具有刺形叶和鳞形叶，且其球果成熟时呈蓝黑色，刺柏的球果多为紫黑色。\n*Juniperus formosana* has entirely needle leaves and no scale leaves. *J. sabina* has both needle and scale leaves, and its mature cones are blue-black, whereas *J. formosana* cones are mostly purplish-black.",
+          "text": "相似种：圆柏通常为乔木或高大灌木，成株以鳞形叶为主，刺形叶多见于幼株或萌生枝；本页叉子圆柏低矮平展，二型叶更常见。\nSimilar species: usually a tree or tall shrub, with scale leaves dominant on mature growth and needle leaves mainly on juvenile shoots; the page species is low and spreading with more evident dimorphic foliage.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -10271,7 +10271,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "枝叶精油含多种有毒萜类，尤其富含 sabinyl acetate 的材料可造成严重刺激和器官损伤；不能把风险简单归因于 sabinene，也不应自行内服。\nIts foliage oil contains a toxic terpene mixture, often rich in sabinyl acetate; toxicity cannot be attributed to sabinene alone, and ingestion is unsafe.",
+          "text": "刺形叶与鳞形叶可在同一株叉子圆柏上出现；不能只凭一种叶型判断，应结合匍匐株形、枝条和成熟球果共同鉴定。\nNeedle and scale leaves may occur on one plant; identification should combine its creeping habit, shoots, and mature cones rather than one leaf type.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -10297,7 +10297,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -10311,7 +10311,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
+          "label": "叉子圆柏（Juniperus sabina）页面本种识别图"
         },
         {
           "id": "sim-1-title-photo",
@@ -10319,7 +10319,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "圆柏 Juniperus chinensis",
+          "text": "叉子圆柏 Juniperus sabina",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -10331,7 +10331,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "圆柏通常为乔木或高大灌木，叶片以鳞形叶为主，刺形叶多见于幼苗或萌生枝。而叉子圆柏多为匍匐或平展的低矮灌木，二型叶片特征更明显。\n*Juniperus chinensis* is usually a tree or tall shrub, predominantly with scale leaves, while needle leaves are mostly seen on seedlings or sprouts. *J. sabina* is mostly a creeping or spreading dwarf shrub with more pronounced dimorphic leaves.",
+          "text": "页面本种：多为匍匐或平展的低矮灌木，刺形叶与鳞形叶常并存；区别于圆柏常呈乔木或高大灌木、成株以鳞形叶为主。\nPage species: usually a creeping or spreading dwarf shrub with both needle and scale leaves; unlike J. chinensis, usually a tree or tall shrub dominated by scale leaves when mature.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -10346,7 +10346,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
+          "label": "圆柏（Juniperus chinensis）相似种对照图"
         },
         {
           "id": "sim-2-title-photo",
@@ -10354,7 +10354,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "刺柏 Juniperus squamata",
+          "text": "圆柏 J. chinensis",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -10366,7 +10366,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "刺柏的叶片全部为刺形叶，不具鳞形叶。叉子圆柏则同时具有刺形叶和鳞形叶，且其球果成熟时呈蓝黑色，刺柏的球果多为紫黑色。\n*Juniperus formosana* has entirely needle leaves and no scale leaves. *J. sabina* has both needle and scale leaves, and its mature cones are blue-black, whereas *J. formosana* cones are mostly purplish-black.",
+          "text": "相似种：圆柏通常为乔木或高大灌木，成株以鳞形叶为主，刺形叶多见于幼株或萌生枝；本页叉子圆柏低矮平展，二型叶更常见。\nSimilar species: usually a tree or tall shrub, with scale leaves dominant on mature growth and needle leaves mainly on juvenile shoots; the page species is low and spreading with more evident dimorphic foliage.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -11235,7 +11235,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "枝叶精油含多种有毒萜类，尤其富含 sabinyl acetate 的材料可造成严重刺激和器官损伤；不能把风险简单归因于 sabinene，也不应自行内服。\nIts foliage oil contains a toxic terpene mixture, often rich in sabinyl acetate; toxicity cannot be attributed to sabinene alone, and ingestion is unsafe.",
+          "text": "刺形叶与鳞形叶可在同一株叉子圆柏上出现；不能只凭一种叶型判断，应结合匍匐株形、枝条和成熟球果共同鉴定。\nNeedle and scale leaves may occur on one plant; identification should combine its creeping habit, shoots, and mature cones rather than one leaf type.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -11261,7 +11261,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -11275,7 +11275,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
+          "label": "叉子圆柏（Juniperus sabina）页面本种识别图"
         },
         {
           "id": "sim-1-title-illus",
@@ -11283,7 +11283,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "圆柏 Juniperus chinensis",
+          "text": "叉子圆柏 Juniperus sabina",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -11295,7 +11295,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "圆柏通常为乔木或高大灌木，叶片以鳞形叶为主，刺形叶多见于幼苗或萌生枝。而叉子圆柏多为匍匐或平展的低矮灌木，二型叶片特征更明显。\n*Juniperus chinensis* is usually a tree or tall shrub, predominantly with scale leaves, while needle leaves are mostly seen on seedlings or sprouts. *J. sabina* is mostly a creeping or spreading dwarf shrub with more pronounced dimorphic leaves.",
+          "text": "页面本种：多为匍匐或平展的低矮灌木，刺形叶与鳞形叶常并存；区别于圆柏常呈乔木或高大灌木、成株以鳞形叶为主。\nPage species: usually a creeping or spreading dwarf shrub with both needle and scale leaves; unlike J. chinensis, usually a tree or tall shrub dominated by scale leaves when mature.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -11310,7 +11310,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "叉子圆柏（Juniperus sabina）相似种对照图"
+          "label": "圆柏（Juniperus chinensis）相似种对照图"
         },
         {
           "id": "sim-2-title-illus",
@@ -11318,7 +11318,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "刺柏 Juniperus squamata",
+          "text": "圆柏 J. chinensis",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -11330,7 +11330,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "刺柏的叶片全部为刺形叶，不具鳞形叶。叉子圆柏则同时具有刺形叶和鳞形叶，且其球果成熟时呈蓝黑色，刺柏的球果多为紫黑色。\n*Juniperus formosana* has entirely needle leaves and no scale leaves. *J. sabina* has both needle and scale leaves, and its mature cones are blue-black, whereas *J. formosana* cones are mostly purplish-black.",
+          "text": "相似种：圆柏通常为乔木或高大灌木，成株以鳞形叶为主，刺形叶多见于幼株或萌生枝；本页叉子圆柏低矮平展，二型叶更常见。\nSimilar species: usually a tree or tall shrub, with scale leaves dominant on mature growth and needle leaves mainly on juvenile shoots; the page species is low and spreading with more evident dimorphic foliage.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -12225,7 +12225,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -12239,7 +12239,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "黄柳（Salix gordejevii）相似种对照图"
+          "label": "黄柳（Salix gordejevii）页面本种识别图"
         },
         {
           "id": "sim-1-title-cf3xm",
@@ -12247,7 +12247,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "小叶柳 Salix microstachya",
+          "text": "黄柳 Salix gordejevii",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -12259,7 +12259,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "小叶柳的叶片通常更小，呈椭圆形或倒卵形，且植株通常更为低矮或匍匐。黄柳的叶片则为线状披针形，且植株多为直立灌木。\n*Salix microstachya* leaves are usually smaller, elliptic or obovate, and the plant is generally lower or creeping. *Salix gordejevii* leaves are linear-lanceolate, and the plant is mostly an erect shrub.",
+          "text": "页面本种：多为直立灌木，叶线状披针形；区别于小叶柳较小的椭圆形或倒卵形叶及低矮、常匍匐的株形。\nPage species: usually an erect shrub with linear-lanceolate leaves; unlike S. microstachya with smaller elliptic or obovate leaves and a lower, often creeping habit.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -12274,7 +12274,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "黄柳（Salix gordejevii）相似种对照图"
+          "label": "小叶柳（Salix microstachya）相似种对照图"
         },
         {
           "id": "sim-2-title-cf3xm",
@@ -12282,7 +12282,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "沙柳 Salix psammophila",
+          "text": "小叶柳 S. microstachya",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -12294,7 +12294,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "沙柳的叶片通常较黄柳宽大，呈披针形或倒披针形，且背面通常无明显的灰白色。沙柳的枝条也常比黄柳粗壮。\n*Salix cheilophila* leaves are usually wider than *S. gordejevii*, being lanceolate or oblanceolate, and typically lack the distinct grayish-white on the back. Its branches are also often thicker.",
+          "text": "相似种：叶片通常较小，呈椭圆形或倒卵形，植株较低矮或匍匐；本页黄柳多直立，叶为线状披针形。\nSimilar species: usually smaller elliptic or obovate leaves and a lower or creeping habit; the page species is generally erect with linear-lanceolate leaves.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -13189,7 +13189,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -13203,7 +13203,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "柠条锦鸡儿（Caragana korshinskii）相似种对照图"
+          "label": "柠条锦鸡儿（Caragana korshinskii）页面本种识别图"
         },
         {
           "id": "sim-1-title-c1cw1",
@@ -13211,7 +13211,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "蒙古锦鸡儿 Caragana microphylla",
+          "text": "柠条锦鸡儿 C. korshinskii",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -13223,7 +13223,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "蒙古锦鸡儿小叶通常较宽，先端常有小尖；柠条锦鸡儿小叶通常较窄，先端钝或微凹。\n*Caragana mongolica* leaflets are usually wider and often have a small mucro at the apex; *C. korshinskii* leaflets are usually narrower with an obtuse or slightly emarginate apex.",
+          "text": "页面本种：小叶通常较窄，先端钝或微凹；区别于蒙古锦鸡儿较宽、先端常具小尖的小叶。\nPage species: usually narrower leaflets with an obtuse or slightly notched apex; unlike C. microphylla with broader leaflets often ending in a small mucro.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -13238,7 +13238,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "柠条锦鸡儿（Caragana korshinskii）相似种对照图"
+          "label": "蒙古锦鸡儿（Caragana microphylla）相似种对照图"
         },
         {
           "id": "sim-2-title-c1cw1",
@@ -13246,7 +13246,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "截叶锦鸡儿 Caragana truncata",
+          "text": "蒙古锦鸡儿 C. microphylla",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -13258,7 +13258,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "截叶锦鸡儿小叶先端截形；柠条锦鸡儿小叶先端钝或微凹。\n*Caragana roborovskyi* leaflets have a truncate apex; *C. korshinskii* leaflets have an obtuse or slightly emarginate apex.",
+          "text": "相似种：蒙古锦鸡儿小叶通常较宽，先端常具小尖；本页柠条锦鸡儿小叶较窄，先端钝或微凹。\nSimilar species: usually broader leaflets, often with a small mucro at the apex; the page species has narrower leaflets with an obtuse or slightly emarginate apex.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -14153,7 +14153,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -14166,8 +14166,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/korshinskii-scientific/similar-microphylla.png",
-          "label": "柠条锦鸡儿（Caragana korshinskii）相似种对照图"
+          "src": "/illustrations/korshinskii-scientific/main-plant.png",
+          "label": "柠条锦鸡儿（Caragana korshinskii）页面本种识别图"
         },
         {
           "id": "sim-1-title-c1cw1-img2copy",
@@ -14175,7 +14175,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "蒙古锦鸡儿 Caragana microphylla",
+          "text": "柠条锦鸡儿 C. korshinskii",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -14187,7 +14187,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "蒙古锦鸡儿小叶通常较宽，先端常有小尖；柠条锦鸡儿小叶通常较窄，先端钝或微凹。\n*Caragana mongolica* leaflets are usually wider and often have a small mucro at the apex; *C. korshinskii* leaflets are usually narrower with an obtuse or slightly emarginate apex.",
+          "text": "页面本种：小叶通常较窄，先端钝或微凹；区别于蒙古锦鸡儿较宽、先端常具小尖的小叶。\nPage species: usually narrower leaflets with an obtuse or slightly notched apex; unlike C. microphylla with broader leaflets often ending in a small mucro.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -14201,8 +14201,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/korshinskii-scientific/similar-truncata.png",
-          "label": "柠条锦鸡儿（Caragana korshinskii）相似种对照图"
+          "src": "/illustrations/korshinskii-scientific/similar-microphylla.png",
+          "label": "蒙古锦鸡儿（Caragana microphylla）相似种对照图"
         },
         {
           "id": "sim-2-title-c1cw1-img2copy",
@@ -14210,7 +14210,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "截叶锦鸡儿 Caragana truncata",
+          "text": "蒙古锦鸡儿 C. microphylla",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -14222,7 +14222,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "截叶锦鸡儿小叶先端截形；柠条锦鸡儿小叶先端钝或微凹。\n*Caragana roborovskyi* leaflets have a truncate apex; *C. korshinskii* leaflets have an obtuse or slightly emarginate apex.",
+          "text": "相似种：蒙古锦鸡儿小叶通常较宽，先端常具小尖；本页柠条锦鸡儿小叶较窄，先端钝或微凹。\nSimilar species: usually broader leaflets, often with a small mucro at the apex; the page species has narrower leaflets with an obtuse or slightly emarginate apex.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -15117,7 +15117,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -15131,7 +15131,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "红砂（Reaumuria soongorica）相似种对照图"
+          "label": "红砂（Reaumuria soongorica）页面本种识别图"
         },
         {
           "id": "sim-1-title-cz2cr",
@@ -15139,7 +15139,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "盐生肉苁蓉 Cistanche salsa",
+          "text": "红砂 Reaumuria soongorica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -15151,7 +15151,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "盐生肉苁蓉是寄生植物，无叶绿素，整体呈黄褐色，而红砂是自养植物，有绿色叶片。\n*Cistanche salsa* is a parasitic plant lacking chlorophyll and is overall yellowish-brown, whereas *Reaumuria soongorica* is an autotrophic plant with green leaves.",
+          "text": "页面本种：自养小灌木，具绿色肉质叶、叶面盐腺和粉色五瓣花；区别于盐生肉苁蓉无叶绿素、黄褐色肉质花序的寄生形态。\nPage species: an autotrophic shrub with green fleshy leaves, leaf salt glands, and five pink petals; unlike the achlorophyllous, yellow-brown parasitic shoots of C. salsa.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -15166,7 +15166,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "红砂（Reaumuria soongorica）相似种对照图"
+          "label": "盐生肉苁蓉（Cistanche salsa）相似种对照图"
         },
         {
           "id": "sim-2-title-cz2cr",
@@ -15174,7 +15174,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "梭梭 Haloxylon ammodendron",
+          "text": "盐生肉苁蓉 Cistanche salsa",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -15186,7 +15186,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "梭梭为无叶植物，枝条绿色，呈节状，花小不明显；红砂有明显的肉质叶片和粉色花朵。\n*Haloxylon ammodendron* is a leafless plant with green, jointed branches and inconspicuous small flowers; *Reaumuria soongorica* has distinct fleshy leaves and pink flowers.",
+          "text": "相似种：盐生肉苁蓉无叶绿素，以吸器寄生，地上部呈黄褐色肉质花序；本页红砂则有绿色肉质叶、盐腺和粉色花。\nSimilar species: an achlorophyllous parasite with a yellow-brown fleshy flowering shoot; the page species has green fleshy leaves, salt glands, and pink flowers.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -16081,7 +16081,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -16094,8 +16094,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/reaumuria-scientific/similar-cistanche-salsa.webp",
-          "label": "红砂（Reaumuria soongorica）相似种对照图"
+          "src": "/illustrations/reaumuria-scientific/main-plant.webp",
+          "label": "红砂（Reaumuria soongorica）页面本种识别图"
         },
         {
           "id": "sim-1-title-cz2cr-img2copy",
@@ -16103,7 +16103,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "盐生肉苁蓉 Cistanche salsa",
+          "text": "红砂 Reaumuria soongorica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -16115,7 +16115,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "盐生肉苁蓉是寄生植物，无叶绿素，整体呈黄褐色，而红砂是自养植物，有绿色叶片。\n*Cistanche salsa* is a parasitic plant lacking chlorophyll and is overall yellowish-brown, whereas *Reaumuria soongorica* is an autotrophic plant with green leaves.",
+          "text": "页面本种：自养小灌木，具绿色肉质叶、叶面盐腺和粉色五瓣花；区别于盐生肉苁蓉无叶绿素、黄褐色肉质花序的寄生形态。\nPage species: an autotrophic shrub with green fleshy leaves, leaf salt glands, and five pink petals; unlike the achlorophyllous, yellow-brown parasitic shoots of C. salsa.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -16129,8 +16129,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/reaumuria-scientific/similar-haloxylon.webp",
-          "label": "红砂（Reaumuria soongorica）相似种对照图"
+          "src": "/illustrations/reaumuria-scientific/similar-cistanche-salsa.webp",
+          "label": "盐生肉苁蓉（Cistanche salsa）相似种对照图"
         },
         {
           "id": "sim-2-title-cz2cr-img2copy",
@@ -16138,7 +16138,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "梭梭 Haloxylon ammodendron",
+          "text": "盐生肉苁蓉 Cistanche salsa",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -16150,7 +16150,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "梭梭为无叶植物，枝条绿色，呈节状，花小不明显；红砂有明显的肉质叶片和粉色花朵。\n*Haloxylon ammodendron* is a leafless plant with green, jointed branches and inconspicuous small flowers; *Reaumuria soongorica* has distinct fleshy leaves and pink flowers.",
+          "text": "相似种：盐生肉苁蓉无叶绿素，以吸器寄生，地上部呈黄褐色肉质花序；本页红砂则有绿色肉质叶、盐腺和粉色花。\nSimilar species: an achlorophyllous parasite with a yellow-brown fleshy flowering shoot; the page species has green fleshy leaves, salt glands, and pink flowers.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -17045,7 +17045,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -17059,7 +17059,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "唐古特白刺（Nitraria tangutorum）相似种对照图"
+          "label": "唐古特白刺（Nitraria tangutorum）页面本种识别图"
         },
         {
           "id": "sim-1-title-c1sa9",
@@ -17067,7 +17067,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "西伯利亚白刺 Nitraria sibirica",
+          "text": "唐古特白刺 N. tangutorum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -17079,7 +17079,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "西伯利亚白刺的果实通常为紫黑色，而唐古特白刺的果实为红色或橙红色。 \n Nitraria sibirica typically has purplish-black fruits, whereas Nitraria tangutorum bears red or orange-red fruits.",
+          "text": "页面本种：成熟果通常红色或橙红色；区别于西伯利亚白刺常见的紫黑色果，但果色只能初筛，仍需结合果核和叶片。\nPage species: mature fruit is usually red to orange-red, unlike the often purplish-black fruit of N. sibirica; colour is only a first clue and must be checked with stone and leaf characters.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -17094,7 +17094,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "唐古特白刺（Nitraria tangutorum）相似种对照图"
+          "label": "西伯利亚白刺（Nitraria sibirica）相似种对照图"
         },
         {
           "id": "sim-2-title-c1sa9",
@@ -17102,7 +17102,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "罗布麻白刺 Nitraria roborowskii",
+          "text": "西伯利亚白刺 N. sibirica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -17114,7 +17114,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "罗布麻白刺的叶片通常较大且呈披针形，而唐古特白刺的叶片较小，多为倒卵形至匙形。 \n Nitraria roborowskii generally has larger, lanceolate leaves, while Nitraria tangutorum has smaller, mostly obovate to spatulate leaves.",
+          "text": "相似种：西伯利亚白刺果实通常紫黑色，本页唐古特白刺多为红色或橙红色；两者形态重叠时应进一步看果核特征。\nSimilar species: fruit is usually purplish-black, whereas the page species is commonly red to orange-red; overlapping plants require fruit-stone characters for confirmation.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -18009,7 +18009,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -18023,7 +18023,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "梭梭（Haloxylon ammodendron）相似种对照图"
+          "label": "梭梭（Haloxylon ammodendron）页面本种识别图"
         },
         {
           "id": "sim-1-title-c57zv",
@@ -18031,7 +18031,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "白梭梭 Haloxylon persicum",
+          "text": "梭梭 Haloxylon ammodendron",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -18043,7 +18043,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "白梭梭通常树形更高大，树皮颜色更浅，枝条更稀疏，果实的翅通常更大更圆。 \n Haloxylon persicum is generally taller with lighter bark, sparser branches, and typically larger, rounder fruit wings.",
+          "text": "页面本种：树皮较深、分枝较密，果翅通常较小；区别于白梭梭较高大的株形、浅色树皮、稀疏枝条和较大圆形果翅。\nPage species: generally darker bark, denser branching, and smaller fruit wings; unlike H. persicum with a taller habit, paler bark, sparser branches, and larger rounder wings.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -18058,7 +18058,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "梭梭（Haloxylon ammodendron）相似种对照图"
+          "label": "白梭梭（Haloxylon persicum）相似种对照图"
         },
         {
           "id": "sim-2-title-c57zv",
@@ -18066,7 +18066,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "红砂 Reaumuria trigyna",
+          "text": "白梭梭 H. persicum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -18078,7 +18078,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "红砂叶片为肉质圆柱形，花较大且呈粉红色，果实为蒴果，与梭梭的鳞片叶和膜质翅果形态差异显著。 \n Reaumuria trigyna has fleshy, cylindrical leaves, larger pink flowers, and capsule fruits, which are significantly different from Haloxylon's scale-like leaves and membranous winged utricles.",
+          "text": "相似种：白梭梭通常树形更高大，树皮更浅、枝条较疏，果翅更大更圆；本页梭梭分枝较密，果翅相对较小。\nSimilar species: usually taller, with paler bark, sparser branches, and larger rounder fruit wings; the page species branches more densely and has relatively smaller wings.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -18973,7 +18973,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -18987,7 +18987,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "沙芥（Pugionium cornutum）相似种对照图"
+          "label": "沙芥（Pugionium cornutum）页面本种识别图"
         },
         {
           "id": "sim-1-title-cp7xi",
@@ -18995,7 +18995,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "长角沙芥 Pugionium dolabratum",
+          "text": "沙芥 Pugionium cornutum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -19007,7 +19007,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "长角沙芥的果实先端通常只有2个长角，形状更像斧头，而沙芥的果实通常有2-4个角状突起，且形状更圆。 · The fruits of Pugionium dolabratum typically have only two long, axe-shaped horns at the apex, whereas Pugionium cornutum usually has 2-4 horn-like appendages and a rounder fruit shape.",
+          "text": "页面本种：成熟果通常具2—4个角状突起，轮廓较圆；区别于长角沙芥常见的2个长角和斧头状果形。\nPage species: mature fruit usually has 2-4 horn-like projections and a rounder outline; unlike P. dolabratum with two long horns and an axe-like fruit.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -19022,7 +19022,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "沙芥（Pugionium cornutum）相似种对照图"
+          "label": "长角沙芥（Pugionium dolabratum）相似种对照图"
         },
         {
           "id": "sim-2-title-cp7xi",
@@ -19030,7 +19030,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "短角沙芥 Pugionium pterocarpum",
+          "text": "长角沙芥 P. dolabratum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -19042,7 +19042,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "短角沙芥的果实边缘具翅状，角状突起不明显或缺失，与沙芥显著的角状果实不同。 · The fruits of Pugionium pterocarpum have winged margins and indistinct or absent horn-like appendages, differing from the prominent horned fruits of Pugionium cornutum.",
+          "text": "相似种：长角沙芥果实先端通常有2个长角，整体近斧头状；本页沙芥多具2—4个角状突起，果形更圆。\nSimilar species: fruit usually has two long apical horns and an axe-like outline; the page species commonly has 2-4 horn-like projections and a rounder fruit.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -19937,7 +19937,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -19951,7 +19951,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "革苞菊（Tugarinovia mongolica）相似种对照图"
+          "label": "革苞菊（Tugarinovia mongolica）页面本种识别图"
         },
         {
           "id": "sim-1-title-cle2s",
@@ -19959,7 +19959,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "沙蒿 Artemisia fruticulosa",
+          "text": "革苞菊 Tugarinovia mongolica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -19971,7 +19971,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "沙蒿叶片多为羽状深裂或全裂，头状花序较小且常集成圆锥花序，总苞片非革质。 · Artemisia fruticulosa has deeply pinnately lobed or dissected leaves, smaller capitula often arranged in panicles, and non-leathery involucral bracts.",
+          "text": "页面本种：叶全缘并密被白绒毛，头状花序单生，具厚革质总苞片和明显黄色舌状花；区别于沙蒿的分裂叶、小型圆锥花序和非革质总苞。\nPage species: entire white-tomentose leaves, solitary capitula, thick leathery involucral bracts, and conspicuous yellow rays; unlike A. fruticulosa with divided leaves, small panicled capitula, and non-leathery bracts.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -19986,7 +19986,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "革苞菊（Tugarinovia mongolica）相似种对照图"
+          "label": "沙蒿（Artemisia fruticulosa）相似种对照图"
         },
         {
           "id": "sim-2-title-cle2s",
@@ -19994,7 +19994,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "鄂尔多斯蒿 Artemisia ordosica",
+          "text": "沙蒿 Artemisia fruticulosa",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -20006,7 +20006,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "鄂尔多斯蒿叶片通常为二回羽状深裂，花序为圆锥状，且无明显的舌状花，总苞片也非革质。 · Artemisia ordosica typically has bipinnately dissected leaves, paniculate inflorescences, lacks prominent ray florets, and its involucral bracts are not leathery.",
+          "text": "相似种：沙蒿叶多羽状深裂，较小的头状花序常组成圆锥花序，总苞片不呈革质；本页革苞菊具全缘绒毛叶、单生头状花序和革质总苞。\nSimilar species: usually deeply divided leaves, smaller capitula in panicles, and non-leathery bracts; the page species has entire tomentose leaves, solitary capitula, and leathery bracts.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -20875,7 +20875,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "无花、无鳞茎特征时，线形叶不足以可靠鉴定蒙古韭；野采还需避开道路、矿区和受污染土壤。\nLinear leaves alone are insufficient for identification without flowers and bulbs; collecting sites must also be free of road, mining and soil contamination.",
+          "text": "无花序和鳞茎特征时，线形叶不足以可靠鉴定蒙古韭；应同时查看叶片是否实心、花被片颜色、花序密度和地下鳞茎。\nLinear leaves alone are insufficient; solid versus hollow leaves, tepal colour, umbel density, and the bulb should be checked together.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -20901,7 +20901,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -20915,7 +20915,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "蒙古韭（Allium mongolicum）相似种对照图"
+          "label": "蒙古韭（Allium mongolicum）页面本种识别图"
         },
         {
           "id": "sim-1-title-ch9iy",
@@ -20923,7 +20923,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "野韭 Allium ramosum",
+          "text": "蒙古韭 Allium mongolicum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -20935,7 +20935,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "野韭的叶片通常为扁平或半圆柱状，但中空，且花序通常较疏散，花被片多为白色。蒙古韭的叶片实心，花序更紧密。\n*Allium ramosum* leaves are usually flat or semi-cylindrical but hollow, with looser inflorescences and mostly white tepals. *Allium mongolicum* leaves are solid, with denser inflorescences.",
+          "text": "页面本种：叶近圆柱形且实心，花序较紧密；区别于野韭扁平或半圆柱形的中空叶、较疏花序和多为白色的花被片。\nPage species: nearly cylindrical solid leaves and a denser umbel; unlike A. ramosum with flat or semicylindrical hollow leaves, a looser umbel, and mostly white tepals.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -20950,7 +20950,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "蒙古韭（Allium mongolicum）相似种对照图"
+          "label": "野韭（Allium ramosum）相似种对照图"
         },
         {
           "id": "sim-2-title-ch9iy",
@@ -20958,7 +20958,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "多根韭 Allium polyrhizum",
+          "text": "野韭 Allium ramosum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -20970,7 +20970,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "多根韭的鳞茎通常较小，且常有多数细长的根状茎，叶片通常更纤细且数量更多。蒙古韭的鳞茎较大，根状茎不明显。\n*Allium polyrhizum* bulbs are usually smaller and often have numerous slender rhizomes, with generally finer and more numerous leaves. *Allium mongolicum* bulbs are larger without obvious rhizomes.",
+          "text": "相似种：野韭叶扁平或半圆柱形而中空，花序较疏，花被片多白色；本页蒙古韭叶实心，花序更紧密。\nSimilar species: flat or semicylindrical hollow leaves, a looser umbel, and mostly white tepals; the page species has solid leaves and a denser umbel.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -21865,7 +21865,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -21879,7 +21879,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "肉苁蓉（Cistanche deserticola）相似种对照图"
+          "label": "肉苁蓉（Cistanche deserticola）页面本种识别图"
         },
         {
           "id": "sim-1-title-ck9ru",
@@ -21887,7 +21887,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "管花肉苁蓉 Cistanche tubulosa",
+          "text": "肉苁蓉 Cistanche deserticola",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -21899,7 +21899,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "管花肉苁蓉主要寄生于柽柳属（Tamarix）植物，花冠裂片较长，花色多为橙黄色至红色，而非肉苁蓉的黄色或淡黄色。 \n Cistanche tubulosa primarily parasitizes Tamarix species, has longer corolla lobes, and its flowers are typically orange-yellow to red, unlike the yellow or pale yellow of Cistanche deserticola.",
+          "text": "页面本种：多寄生于梭梭等寄主，花冠黄色或淡黄色、裂片相对较短；区别于管花肉苁蓉多寄生柽柳、花橙黄至红且裂片更长。\nPage species: commonly parasitic on Haloxylon hosts, with yellow to pale-yellow flowers and relatively shorter corolla lobes; unlike C. tubulosa, usually on Tamarix, with orange-yellow to red flowers and longer lobes.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -21914,7 +21914,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "肉苁蓉（Cistanche deserticola）相似种对照图"
+          "label": "管花肉苁蓉（Cistanche tubulosa）相似种对照图"
         },
         {
           "id": "sim-2-title-ck9ru",
@@ -21922,7 +21922,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "盐生肉苁蓉 Cistanche salsa",
+          "text": "管花肉苁蓉 C. tubulosa",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -21934,7 +21934,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "盐生肉苁蓉通常寄生于藜科（Chenopodiaceae）植物，如盐爪爪（Kalidium foliatum），且其花序通常较短，花冠颜色偏紫或蓝紫色。 \n Cistanche salsa typically parasitizes Chenopodiaceae plants, such as Kalidium foliatum, and its inflorescence is generally shorter with purplish or bluish-purple corollas.",
+          "text": "相似种：管花肉苁蓉多寄生于柽柳属，花冠裂片较长，花色橙黄至红；本页肉苁蓉多与梭梭寄主相连，花黄色或淡黄色。\nSimilar species: mainly parasitic on Tamarix, with longer corolla lobes and orange-yellow to red flowers; the page species is commonly linked to Haloxylon hosts and has yellow to pale-yellow flowers.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -22829,7 +22829,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -22843,7 +22843,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "文冠果（Xanthoceras sorbifolium）相似种对照图"
+          "label": "文冠果（Xanthoceras sorbifolium）页面本种识别图"
         },
         {
           "id": "sim-1-title-cyg0t",
@@ -22851,7 +22851,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "栾树 Koelreuteria paniculata",
+          "text": "文冠果 Xanthoceras sorbifolium",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -22863,7 +22863,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "栾树花为黄色，果实为膨大的膜质蒴果（灯笼状）；文冠果花白色，果实为球形木质蒴果。\n*Koelreuteria paniculata* flowers are yellow, and its fruits are inflated membranous capsules (lantern-like); *Xanthoceras sorbifolium* flowers are white, and its fruits are spherical woody capsules.",
+          "text": "页面本种：花白色，中央常由黄转红，果为球形木质蒴果；区别于栾树的黄色花和膨大灯笼状膜质蒴果。\nPage species: white flowers whose centres often change from yellow to red, and a spherical woody capsule; unlike K. paniculata with yellow flowers and an inflated lantern-like papery capsule.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -22878,7 +22878,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "文冠果（Xanthoceras sorbifolium）相似种对照图"
+          "label": "栾树（Koelreuteria paniculata）相似种对照图"
         },
         {
           "id": "sim-2-title-cyg0t",
@@ -22886,7 +22886,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "臭椿 Ailanthus altissima",
+          "text": "栾树 Koelreuteria paniculata",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -22898,7 +22898,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "臭椿小叶全缘或基部有腺齿，花序大而松散，果实为翅果；文冠果小叶有锯齿，花序较紧凑，果实为蒴果。\n*Ailanthus altissima* leaflets are entire or have glandular teeth at the base, with large, loose inflorescences and samara fruits; *Xanthoceras sorbifolium* leaflets are serrate, with more compact inflorescences and capsule fruits.",
+          "text": "相似种：栾树花黄色，果实为膨大的灯笼状膜质蒴果；本页文冠果花白色，果为球形木质蒴果。\nSimilar species: yellow flowers and an inflated lantern-like papery capsule; the page species has white flowers and a spherical woody capsule.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -23793,7 +23793,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -23807,7 +23807,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "蒙古扁桃（Prunus mongolica）相似种对照图"
+          "label": "蒙古扁桃（Prunus mongolica）页面本种识别图"
         },
         {
           "id": "sim-1-title-c528h",
@@ -23815,7 +23815,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "欧李 Prunus humilis",
+          "text": "蒙古扁桃 Prunus mongolica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -23827,7 +23827,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "欧李的果实无毛或疏生柔毛，成熟时红色，可食；蒙古扁桃果实密被绒毛，通常不作食用。 · Prunus humilis has glabrous or sparsely pubescent red fruits that are edible; Prunus mongolica fruits are densely pubescent and generally not consumed.",
+          "text": "页面本种：叶不裂、花单瓣，果实小而密被绒毛；区别于欧李成熟果红色、无毛或仅疏生柔毛。\nPage species: unlobed leaves, single flowers, and small densely pubescent fruit; unlike P. humilis with red mature fruit that is glabrous or only sparsely hairy.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -23842,7 +23842,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "蒙古扁桃（Prunus mongolica）相似种对照图"
+          "label": "欧李（Prunus humilis）相似种对照图"
         },
         {
           "id": "sim-2-title-c528h",
@@ -23850,7 +23850,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "榆叶梅 Prunus triloba",
+          "text": "欧李 Prunus humilis",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -23862,7 +23862,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "榆叶梅叶片通常3裂，花朵多为重瓣，观赏性强；蒙古扁桃叶片不裂，花朵单瓣，更适应荒漠环境。 · Prunus triloba typically has 3-lobed leaves and often double flowers, valued for ornament; Prunus mongolica has unlobed leaves and single flowers, better adapted to desert environments.",
+          "text": "相似种：欧李成熟果红色，表面无毛或仅疏生柔毛；本页蒙古扁桃果实较小且密被绒毛，枝、叶与果应合看。\nSimilar species: red mature fruit that is glabrous or only sparsely hairy; the page species has smaller, densely pubescent fruit and should be checked with shoot and leaf characters.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -24731,7 +24731,7 @@
           "x": 60,
           "y": 1262,
           "w": 620,
-          "text": "发菜不是维管植物，而是陆生蓝细菌群体。传统搂采会破坏生物土壤结皮并加剧风蚀，中国已禁止采集、收购、加工和销售野生发菜。\nIt is a terrestrial cyanobacterial colony, not a vascular plant; raking damages biological soil crusts, and China prohibits wild collection and trade.",
+          "text": "发菜不是维管植物，而是陆生蓝细菌群体；传统搂采会连同生物土壤结皮一起破坏并加剧风蚀，保护重点是地表结皮及其完整微生境。\nIt is a terrestrial cyanobacterial colony, not a vascular plant; raking damages biological soil crusts and intensifies wind erosion, so protection must focus on the crust and its intact microhabitat.",
           "fontSize": 9,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -24757,7 +24757,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -24771,7 +24771,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "发菜（Nostoc flagelliforme）相似种对照图"
+          "label": "发菜（Nostoc flagelliforme）页面本种识别图"
         },
         {
           "id": "sim-1-title-c3yua",
@@ -24779,7 +24779,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "地木耳 Nostoc commune",
+          "text": "发菜 Nostoc flagelliforme",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -24791,7 +24791,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "地木耳群体通常呈片状或不规则团块状，而非发菜的细长丝状；且地木耳多生长在潮湿的土壤或岩石表面，发菜则偏好干旱环境。\n*Nostoc commune* colonies are usually flake-like or irregular clumps, not the slender filaments of *Nostoc flagelliforme*; and *N. commune* mostly grows on moist soil or rock surfaces, while *N. flagelliforme* prefers arid environments.",
+          "text": "页面本种：群体为细长丝状，陆生于干旱环境；区别于地木耳的片状或不规则团块状群体及较湿润生境。\nPage species: slender filamentous terrestrial colonies in arid habitats; unlike N. commune with sheet-like or irregular clumps on wetter soil or rock surfaces.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -24806,7 +24806,7 @@
           "w": 75,
           "h": 95,
           "src": null,
-          "label": "发菜（Nostoc flagelliforme）相似种对照图"
+          "label": "地木耳（Nostoc commune）相似种对照图"
         },
         {
           "id": "sim-2-title-c3yua",
@@ -24814,7 +24814,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "葛仙米 Nostoc sphaeroides",
+          "text": "地木耳 Nostoc commune",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -24826,7 +24826,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "葛仙米群体呈球形或卵形，通常在淡水环境中生长，与发菜的陆生丝状形态和生境截然不同。\n*Nostoc sphaericum* colonies are spherical or oval and typically grow in freshwater environments, starkly contrasting with the terrestrial filamentous morphology and habitat of *Nostoc flagelliforme*.",
+          "text": "相似种：地木耳群体呈片状或不规则团块，多见于较湿润的土壤或岩面；本页发菜为干旱地表的细长丝状群体。\nSimilar species: sheet-like or irregular colonies, usually on wetter soil or rock surfaces; the page species forms slender filaments on arid ground.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -25721,7 +25721,7 @@
           "x": 60,
           "y": 1430,
           "w": 620,
-          "text": "花瓣、萼片纵肋与花梗姿态  petals, sepal ribs & pedicel posture",
+          "text": "左：页面本种 · 右：相似种  LEFT: PAGE SPECIES · RIGHT: SIMILAR SPECIES",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 600,
@@ -25734,8 +25734,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/nitraria-tangutorum-scientific/similar-sibirica.png",
-          "label": "唐古特白刺（Nitraria tangutorum）相似种对照图"
+          "src": "/illustrations/nitraria-tangutorum-scientific/main-plant.png",
+          "label": "唐古特白刺（Nitraria tangutorum）页面本种识别图"
         },
         {
           "id": "sim-1-title-c1sa9-cni2",
@@ -25743,7 +25743,7 @@
           "x": 145,
           "y": 1472,
           "w": 210,
-          "text": "西伯利亚白刺 Nitraria sibirica",
+          "text": "唐古特白刺 N. tangutorum",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -25755,7 +25755,7 @@
           "x": 145,
           "y": 1515,
           "w": 210,
-          "text": "西伯利亚白刺的果实通常为紫黑色，而唐古特白刺的果实为红色或橙红色。 \n Nitraria sibirica typically has purplish-black fruits, whereas Nitraria tangutorum bears red or orange-red fruits.",
+          "text": "页面本种：成熟果通常红色或橙红色；区别于西伯利亚白刺常见的紫黑色果，但果色只能初筛，仍需结合果核和叶片。\nPage species: mature fruit is usually red to orange-red, unlike the often purplish-black fruit of N. sibirica; colour is only a first clue and must be checked with stone and leaf characters.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,
@@ -25769,8 +25769,8 @@
           "y": 1470,
           "w": 75,
           "h": 95,
-          "src": "/illustrations/nitraria-tangutorum-scientific/similar-roborowskii.png",
-          "label": "唐古特白刺（Nitraria tangutorum）相似种对照图"
+          "src": "/illustrations/nitraria-tangutorum-scientific/similar-sibirica.png",
+          "label": "西伯利亚白刺（Nitraria sibirica）相似种对照图"
         },
         {
           "id": "sim-2-title-c1sa9-cni2",
@@ -25778,7 +25778,7 @@
           "x": 465,
           "y": 1472,
           "w": 210,
-          "text": "罗布麻白刺 Nitraria roborowskii",
+          "text": "西伯利亚白刺 N. sibirica",
           "fontSize": 12,
           "color": "#2a2622",
           "fontWeight": 700,
@@ -25790,7 +25790,7 @@
           "x": 465,
           "y": 1515,
           "w": 210,
-          "text": "罗布麻白刺的叶片通常较大且呈披针形，而唐古特白刺的叶片较小，多为倒卵形至匙形。 \n Nitraria roborowskii generally has larger, lanceolate leaves, while Nitraria tangutorum has smaller, mostly obovate to spatulate leaves.",
+          "text": "相似种：西伯利亚白刺果实通常紫黑色，本页唐古特白刺多为红色或橙红色；两者形态重叠时应进一步看果核特征。\nSimilar species: fruit is usually purplish-black, whereas the page species is commonly red to orange-red; overlapping plants require fruit-stone characters for confirmation.",
           "fontSize": 8,
           "color": "#2a2622",
           "fontWeight": 400,

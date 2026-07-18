@@ -19,28 +19,48 @@ let processed = 0;
 
 for (const posterPage of state.pages) {
   if (checked.has(posterPage.name) || processed >= limit) continue;
-  await page.goto(`${baseUrl}/${encodeURIComponent(posterPage.name)}`, { waitUntil: "networkidle0" });
+  await page.goto(`${baseUrl}/${encodeURIComponent(posterPage.name)}`, {
+    waitUntil: "domcontentloaded",
+  });
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll("div")].some(
+      (el) =>
+        el.style.width === "1240px" &&
+        el.style.height === "1754px" &&
+        el.style.transform.startsWith("scale"),
+    ),
+  );
   await new Promise((resolve) => setTimeout(resolve, 300));
   const measurements = await page.evaluate((blocks) => {
     const scaled = [...document.querySelectorAll("div")].find(
-      (el) => el.style.width === "1240px" && el.style.height === "1754px" && el.style.transform.startsWith("scale"),
+      (el) =>
+        el.style.width === "1240px" &&
+        el.style.height === "1754px" &&
+        el.style.transform.startsWith("scale"),
     );
     if (!scaled) throw new Error("poster canvas not found");
     const scale = Number(scaled.style.transform.match(/scale\(([^)]+)\)/)?.[1] ?? 1);
-    const children = [...scaled.children].slice(0, blocks.length);
-    return children.map((el, index) => {
+    const elementsById = new Map(
+      [...scaled.querySelectorAll(":scope > [data-block-id]")].map((el) => [
+        el.dataset.blockId,
+        el,
+      ]),
+    );
+    return blocks.map((block) => {
+      const el = elementsById.get(block.id);
+      if (!el) throw new Error(`block element not found: ${block.id}`);
       const child = el.firstElementChild;
       const rect = child.getBoundingClientRect();
       const base = scaled.getBoundingClientRect();
       return {
-        id: blocks[index].id,
-        type: blocks[index].type,
+        id: block.id,
+        type: block.type,
         x: (rect.left - base.left) / scale,
         y: (rect.top - base.top) / scale,
         w: rect.width / scale,
         h: rect.height / scale,
-        expectedX: blocks[index].x,
-        expectedY: blocks[index].y,
+        expectedX: block.x,
+        expectedY: block.y,
       };
     });
   }, posterPage.blocks);
@@ -67,6 +87,20 @@ if (checked.size < state.pages.length) {
   process.exit(0);
 }
 const result = state.pages.map((posterPage) => checked.get(posterPage.name));
-await fs.writeFile(process.env.QA_OUTPUT_PATH ?? "layout-audit-2026-07-13.json", `${JSON.stringify(result, null, 2)}\n`);
+await fs.writeFile(
+  process.env.QA_OUTPUT_PATH ?? "layout-audit-2026-07-13.json",
+  `${JSON.stringify(result, null, 2)}\n`,
+);
 const issues = result.flatMap((r) => r.collisions.map((c) => ({ page: r.page, ...c })));
-console.log(JSON.stringify({ pages: result.length, collisions: issues.length, outOfCanvas: result.flatMap((r) => r.outOfCanvas).length, issues }, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      pages: result.length,
+      collisions: issues.length,
+      outOfCanvas: result.flatMap((r) => r.outOfCanvas).length,
+      issues,
+    },
+    null,
+    2,
+  ),
+);
